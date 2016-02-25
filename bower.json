@@ -17,5 +17,8 @@
     "angularjs-slider": "^2.9.0",
     "seiyria-bootstrap-slider": "^6.0.17",
     "angular-rangeslider-directive": "^0.0.2"
+  },
+  "resolutions": {
+    "angular": "~1.4.0"
   }
 }
