@@ -1,10 +1,10 @@
 {
   "name": "angular-seed",
-  "description": "A starter project for AngularJS",
+  "description": "traceMySteps",
   "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
+  "homepage": "https://github.com/PedroF20",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "dependencies": {
     "angular": "~1.4.0",
     "angular-route": "~1.4.0",
