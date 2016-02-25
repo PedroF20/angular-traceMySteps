@@ -1,0 +1,36 @@
+{
+  "name": "angular-rangeslider-directive",
+  "version": "0.0.1",
+  "description": "Range Slider for Angular",
+  "main": "angular-range-slider.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/supertorio/angular-range-slider.git"
+  },
+  "keywords": [
+    "angular",
+    "range",
+    "control",
+    "ui",
+    "slider"
+  ],
+  "author": "Tori Holmes-Kirk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/supertorio/angular-range-slider/issues"
+  },
+  "homepage": "https://github.com/supertorio/angular-range-slider",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-uglify": "^0.7.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-sass": "^0.17.0"
+  }
+}
