@@ -1,3 +1,7 @@
+/********************/
+/* MAIN BODY STYLES */
+/*******************/
+
 #MainBody {
     background: #004756;
     font-size: 16px;
@@ -18,47 +22,58 @@ table {
     border-spacing: 0;
 }
 
-
-    /* Body animation when right panel is opened */
-    body.ps-active {
-      -webkit-transform: translateX(260px);
-      -ms-transform: translateX(260px);
-      transform: translateX(260px);
-    }
-
-    /* Body animation when right panel is opened */
-    body.ps-active-right {
-      -webkit-transform: translateX(-260px);
-      -ms-transform: translateX(-260px);
-      transform: translateX(-260px);
-    }
-
-    /* Panel styles */
-    .panel {
-      position: fixed;
-      top: 0;
-      width: 220px;
-      height: 690px;
-      padding: 20px;
-      background-color: #333;
-      color: #fff;
-      box-shadow: inset 0 0 5px 5px #222;
-    }
-
-    #right-panel {
-      right: 0;
-
-      /* Hide panel on the right of the page. When this panel is opened the
-      class .ps-active-right will be apllied to body, and it's X translation
-      will reveal the panel. */
-      -webkit-transform: translateX(260px);
-      -ms-transform: translateX(260px);
-      transform: translateX(260px);
-    }
+/********END MAIN BODY*******/
 
 
-/* Gridster styles */
-.demo {
+/**********************/
+/* RIGHT PANEL STYLES */
+/**********************/
+/* Body animation when right panel is opened */
+
+body.ps-active {
+  -webkit-transform: translateX(260px);
+  -ms-transform: translateX(260px);
+  transform: translateX(260px);
+}
+
+/* Body animation when right panel is opened */
+body.ps-active-right {
+  -webkit-transform: translateX(-260px);
+  -ms-transform: translateX(-260px);
+  transform: translateX(-260px);
+}
+
+/* Panel styles */
+.panel {
+  position: fixed;
+  top: 0;
+  width: 220px;
+  height: 690px;
+  padding: 20px;
+  background-color: #333;
+  color: #fff;
+  box-shadow: inset 0 0 5px 5px #222;
+}
+
+#right-panel {
+  right: 0;
+
+  /* Hide panel on the right of the page. When this panel is opened the
+  class .ps-active-right will be apllied to body, and it's X translation
+  will reveal the panel. */
+  -webkit-transform: translateX(260px);
+  -ms-transform: translateX(260px);
+  transform: translateX(260px);
+}
+/********END RIGHT PANEL***********/
+
+
+
+/***********************/
+/* OLD GRIDSTER STYLES */
+/***********************/
+
+/*.demo {
     margin: 3em 0;
     padding: 7.5em 0 5.5em;
     background: #004756;
@@ -99,7 +114,7 @@ table {
 
 }*/
 
-.gridster .preview-holder {
+/*.gridster .preview-holder {
     border: none !important;
     border-radius: 0 !important;
     background: red !important;
@@ -133,7 +148,7 @@ li {
 
 .controls {
     margin-bottom: 20px;
-}
+}*/
 
 /*********************/
 /* D3 EXAMPLE STYLES */
@@ -146,3 +161,51 @@ li {
 }
 
 .area1 { fill: #595959; }
+
+/************************/
+/* GRIDSTER TEST STYLES */
+/************************/
+
+/*.controls {
+    margin-bottom: 20px;
+}
+.page-header {
+    margin-top: 20px;
+}
+ul {
+    list-style: none;
+}
+.box {
+    height: 100%;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+*/
+
+.controls {
+    margin-bottom: 20px;
+}
+
+.content {
+    color: white;
+}
+
+ul {
+    list-style: none;
+}
+
+.gridster {
+    border: 1px solid #000;
+    margin: 0 auto;
+    /* opacity: .5; */ 
+    background: #999999;
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+li {
+    height: 100%;
+    border: 1px solid #000;
+    background-color: #61A9CF;
+    cursor: pointer;
+}

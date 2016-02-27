@@ -23,24 +23,47 @@ angular.module('myApp.view1', ['ngRoute'])
 		createGraph("http://localhost:5000/hours", $scope.lowerValue, $scope.upperValue	, "box2");
 	}
 
-	var gridster = $(".gridster > ul").gridster({
-        widget_base_dimensions: ['auto', 140],
-        autogenerate_stylesheet: true,
-        min_cols: 1,
-        max_cols: 6,
-        widget_margins: [5, 5],
-        resize: {
-            enabled: true,
-            stop: function() {
-            	updateAllGraphs();
-            }
-        }
-    }).data('gridster');
-    $('.gridster  ul').css({'width': $(window).width()});
+	// var gridster = $(".gridster > ul").gridster({
+ //        widget_base_dimensions: ['auto', 140],
+ //        autogenerate_stylesheet: true,
+ //        min_cols: 1,
+ //        max_cols: 6,
+ //        widget_margins: [5, 5],
+ //        resize: {
+ //            enabled: true,
+ //            stop: function() {
+ //            	updateAllGraphs();
+ //            }
+ //        }
+ //    }).data('gridster');
+	
+
+	$scope.gridsterOpts = {
+	    columns: 6, // the width of the grid, in columns
+	    margins: [10, 10], // the pixel distance between each widget
+	    swapping: true,
+	    outerMargin: true, // whether margins apply to outer edges of the grid
+	    minColumns: 1, // the minimum columns the grid must have
+	    minRows: 3, // the minimum height of the grid, in rows
+	    maxRows: 10,
+	    maxSizeX: 6,
+	    //maxSizeY: 5,
+	    resizable: {
+	       enabled: true,
+	       stop: function() {updateAllGraphs();} // no need to use gridster events and its scope for resizing (yet)
+	    },
+	    draggable: {
+	       enabled: true, // whether dragging items is supported
+	    }
+	};
+
+    // $('.gridster  ul').css({'width': $(window).width()});
+
 
 	function createGraph(url, day_start, day_end, elementID) {
 
-		$("#" + elementID).html('<div class="handle-resize"></div>');
+		//$("#" + elementID).html('');
+		$("#" + elementID + " > svg").remove();  // Remove the svg of the box element, in order to redraw and append the new svg
 
 	  d3.json(url, function (data) {
 
@@ -109,15 +132,15 @@ angular.module('myApp.view1', ['ngRoute'])
 
 	)};
 
-	$scope.addWidget = function() {
-		console.log("add1");
-//		var gridster = $(".gridster ul").gridster().data('gridster');
-				console.log(gridster);
+// 	$scope.addWidget = function() {
+// 		console.log("add1");
+// //		var gridster = $(".gridster ul").gridster().data('gridster');
+// 				console.log(gridster);
 
-		gridster.add_widget.apply(gridster, ['<li>new</li>', 2, 1]);
-    	console.log("add");
+// 		gridster.add_widget.apply(gridster, ['<li>new</li>', 2, 1]);
+//     	console.log("add");
 
-	}
+// 	}
 
 	var panelslider = null;
 	$(document).ready(function () {

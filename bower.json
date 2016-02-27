@@ -14,9 +14,8 @@
     "bootstrap": "3.2.0",
     "jquery": "2.1.1",
     "d3": "3.4.11",
-    "angularjs-slider": "^2.9.0",
-    "seiyria-bootstrap-slider": "^6.0.17",
-    "angular-rangeslider-directive": "^0.0.2"
+    "angular-rangeslider-directive": "^0.0.2",
+    "angular-gridster": "^0.13.5"
   },
   "resolutions": {
     "angular": "~1.4.0"
