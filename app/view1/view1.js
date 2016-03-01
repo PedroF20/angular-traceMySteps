@@ -57,6 +57,20 @@ angular.module('myApp.view1', ['ngRoute'])
 	    }
 	};
 
+	$scope.addWidget = function() {
+		console.log("add1");
+//		var gridster = $(".gridster ul").gridster().data('gridster');
+
+		$scope.view1.push({
+			sizeX: 1,
+			sizeY: 1
+		});
+
+		// gridster.add_widget.apply(gridster, ['<li>new</li>', 2, 1]);
+  //   	console.log("add");
+
+	}
+
     // $('.gridster  ul').css({'width': $(window).width()});
 
 
@@ -149,14 +163,10 @@ angular.module('myApp.view1', ['ngRoute'])
 		      bodyClass: 'ps-active-right',
 		      clickClose: true,
 		      onOpen: function() {
-		        console.log('right panel open');
+		        //console.log('right panel open');
 		      }
 		    });
 	});
-
-
-	
-
 
 
 }]);
