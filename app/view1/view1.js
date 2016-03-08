@@ -11,11 +11,18 @@ angular.module('myApp.view1', ['ngRoute'])
 
 .controller('View1Ctrl', ['$scope', '$http', function($scope, $http) {
 
+	$scope.extraBoxes = [];
 	$scope.lowerValue = 0;
 	$scope.upperValue = 19;
 	$scope.hours = null; // saves a list of hours from the endpoint response 
 						// -> one of the parameters for the future context?
-
+	function requestHours() {
+		$http.get('http://localhost:5000/hours')
+			 .then(function(response) {
+			 	$scope.hours = response.data;
+ 				updateAllGraphs();
+			 });
+	}
 
 	$scope.gridsterOpts = {
 	    columns: 6, // the width of the grid, in columns
@@ -37,14 +44,15 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 
-	function requestHours() {
-		$http.get('http://localhost:5000/hours')
-			 .then(function(response) {
-			 	$scope.hours = response.data;
- 				updateAllGraphs();
-			 });
+	$scope.addWidget = function() {
+		$scope.extraBoxes.push({sizeX: 1, sizeY: 1});
+		//we can later use the row and column attributes
+    	//to put the new Items where we desire
 	}
 
+	$scope.clear = function() {
+		$scope.extraBoxes = [];
+	};
 
 	$scope.$watch('[lowerValue, upperValue]', function () {
 		if($scope.hours == null) {

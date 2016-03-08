@@ -23,7 +23,8 @@
 
 <div id="right-panel" class="panel">
     <h2 id="panel-title">Visualizations</h2>
-            <a class="btn btn-primary center-block" id="add-item-button" ng-click="addWidget()">Add Item</a>
+            <a class="btn btn-primary" id="add-item-button" ng-click="addWidget()">Add New Item</a>
+            <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Remove New Items</a>
 </div>
 
 <!-- <div class="gridster">
@@ -62,7 +63,13 @@
         <li gridster-item id="box2" row="0" col="3" size-x="3" size-y="2"></li>
 
         <li gridster-item id="box3" row="3" col="0" size-x="6" size-y="1"></li>
+
+        <li ng-repeat="extraBox in extraBoxes" gridster-item size-x="extraBox.sizeX" 
+                size-y="extraBox.sizeY"></li>
     </ul>
 </div>
 
+<!-- row="extraBox.row" col="extraBox.col" we can later use the row and column attributes
+    to put the new Items where we desire -->
+ 
 
