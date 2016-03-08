@@ -9,34 +9,13 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', function($scope) {
+.controller('View1Ctrl', ['$scope', '$http', function($scope, $http) {
 
 	$scope.lowerValue = 0;
 	$scope.upperValue = 19;
+	$scope.hours = null; // saves a list of hours from the endpoint response 
+						// -> one of the parameters for the future context?
 
-	$scope.$watch('[lowerValue, upperValue]', function () {
-		updateAllGraphs();
-	}, true);
-
-	function updateAllGraphs() {
-		createGraph("http://localhost:5000/hours", $scope.lowerValue, $scope.upperValue	, "box1");
-		createGraph("http://localhost:5000/hours", $scope.lowerValue, $scope.upperValue	, "box2");
-	}
-
-	// var gridster = $(".gridster > ul").gridster({
- //        widget_base_dimensions: ['auto', 140],
- //        autogenerate_stylesheet: true,
- //        min_cols: 1,
- //        max_cols: 6,
- //        widget_margins: [5, 5],
- //        resize: {
- //            enabled: true,
- //            stop: function() {
- //            	updateAllGraphs();
- //            }
- //        }
- //    }).data('gridster');
-	
 
 	$scope.gridsterOpts = {
 	    columns: 6, // the width of the grid, in columns
@@ -57,42 +36,49 @@ angular.module('myApp.view1', ['ngRoute'])
 	    }
 	};
 
-	$scope.addWidget = function() {
-		console.log("add1");
-//		var gridster = $(".gridster ul").gridster().data('gridster');
 
-		$scope.view1.push({
-			sizeX: 1,
-			sizeY: 1
-		});
-
-		// gridster.add_widget.apply(gridster, ['<li>new</li>', 2, 1]);
-  //   	console.log("add");
-
+	function requestHours() {
+		$http.get('http://localhost:5000/hours')
+			 .then(function(response) {
+			 	$scope.hours = response.data;
+ 				updateAllGraphs();
+			 });
 	}
 
-    // $('.gridster  ul').css({'width': $(window).width()});
+
+	$scope.$watch('[lowerValue, upperValue]', function () {
+		if($scope.hours == null) {
+			requestHours();
+			//updateAllGraphs();
+		} else {
+			updateAllGraphs();
+		}
+	}, true); // If there was no true flag (false by default), the check would be for "reference" equality, 
+				//which asks if the two objects refer to the same thing, instead of the value itself.
+				//in this case they always refer the same, so we need to check the values.
 
 
-	function createGraph(url, day_start, day_end, elementID) {
+	function updateAllGraphs() {
+		createAreaGraph($scope.hours, $scope.lowerValue, $scope.upperValue, "box1");
+		createAreaGraph($scope.hours, $scope.lowerValue, $scope.upperValue, "box2");
+	}
 
-		//$("#" + elementID).html('');
+
+	function createAreaGraph(list_of_hours, day_start, day_end, elementID) {
+
 		$("#" + elementID + " > svg").remove();  // Remove the svg of the box element, in order to redraw and append the new svg
-
-	  d3.json(url, function (data) {
-
 
 	    var margin = {top: 20, right: 20, bottom: 40, left: 50},
 	        width = $("#" + elementID).width() - margin.left - margin.right,
 	        height = $("#" + elementID).height() - margin.top - margin.bottom,
-	        days = data.initial_hours.length;
+	        days = list_of_hours.initial_hours.length;
 
 	    var x = d3.scale.linear()
 	    .domain([day_start, day_end])
 	    .range([0, width]);
 
 	    var y = d3.scale.linear()
-	    .domain([0, d3.max(data.initial_hours)])
+	    .domain([0, d3.max(list_of_hours.initial_hours)])
 	    .range([height, 0]);
 
 	    var xAxis = d3.svg.axis()
@@ -115,7 +101,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	    var transformation = [];
-	    data.initial_hours.forEach(function(d,i){
+	    list_of_hours.initial_hours.forEach(function(d,i){
 	    	if(i>=day_start && i<=day_end) {
 	        	transformation.push({day: i, hour: d})
 	    	}
@@ -142,19 +128,9 @@ angular.module('myApp.view1', ['ngRoute'])
 	                             gravity: 'w'});
 	    });
 
-	  }
+	};
 
-	)};
-
-// 	$scope.addWidget = function() {
-// 		console.log("add1");
-// //		var gridster = $(".gridster ul").gridster().data('gridster');
-// 				console.log(gridster);
-
-// 		gridster.add_widget.apply(gridster, ['<li>new</li>', 2, 1]);
-//     	console.log("add");
-
-// 	}
+	/////////// RIGHT PANEL /////////////////
 
 	var panelslider = null;
 	$(document).ready(function () {
@@ -167,6 +143,5 @@ angular.module('myApp.view1', ['ngRoute'])
 		      }
 		    });
 	});
-
 
 }]);
