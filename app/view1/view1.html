@@ -4,7 +4,7 @@
 
     <p>
         <a href="#">
-        <span class="glyphicon glyphicon-cog pull-right"></span>
+            <span class="glyphicon glyphicon-cog pull-right"></span>
         </a>
     </p>
 
@@ -13,10 +13,10 @@
    <div>
         <div range-slider
              floor="0"
-             ceiling="19"
+             ceiling="18"
              dragstop="true"
-             ng-model-low="lowerValue"
-             ng-model-high="upperValue"></div>
+             ng-model-low="limits.lowerValue"
+             ng-model-high="limits.upperValue"></div>
     </div>
 
 </div>
@@ -24,52 +24,39 @@
 <div id="right-panel" class="panel">
     <h2 id="panel-title">Visualizations</h2>
             <a class="btn btn-primary" id="add-item-button" ng-click="addWidget()">Add New Item</a>
-            <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Remove New Items</a>
+            <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
 </div>
 
-<!-- <div class="gridster">
-
-<ul>
-            <li data-sizey="3" data-sizex="3" data-col="3" data-row="1">
-                <div class="gridster-box" id="box1">
-                    <div class="handle-resize"></div>
-                </div>
-            </li>
-            <li data-sizey="2" data-sizex="2" data-col="1" data-row="3">
-                <div class="gridster-box" id="box2">
-                    <div class="handle-resize"></div>
-                </div>
-            </li>
-            <li data-sizey="2" data-sizex="2" data-col="1" data-row="3">
-                <div class="gridster-box" id="box3">
-                    <div class="handle-resize"></div>
-                </div>
-            </li>
-            
-            <li data-sizey="1" data-sizex="3" data-col="3" data-row="3">
-                <div class="gridster-box" id="box4">
-                    <div class="handle-resize"></div>
-                </div>
-            </li>
-        </ul>
-
- </div> -->
 
 
 <div gridster="gridsterOpts">
     <ul id="gridster-ul">
-        <li gridster-item id="box1" row="0" col="0" size-x="3" size-y="2"></li>
-
-        <li gridster-item id="box2" row="0" col="3" size-x="3" size-y="2"></li>
-
-        <li gridster-item id="box3" row="3" col="0" size-x="6" size-y="1"></li>
-
-        <li ng-repeat="extraBox in extraBoxes" gridster-item size-x="extraBox.sizeX" 
-                size-y="extraBox.sizeY"></li>
-    </ul>
+        <li ng-repeat="widget in widgets" data-draggable="widget.draggable" gridster-item size-x="widget.sizeX" size-y="widget.sizeY">
+            <div class="box-header">
+               <!--  <h3 class="ng-binding">Discrete Bar Chart Widget</h3> Later add binding between the graph type and the header
+                                                                            to have the correct name in each box -->
+               <h3>Area Chart</h3>
+                <div class="box-header-btns pull-right">
+                    <a title="Pin" ng-click="widget.draggable=true">
+                        <span class="glyphicon glyphicon-pushpin"></span>
+                    </a>
+                    <a title="Remove" ng-click="widgets.splice($index, 1)">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+                </div>
+            </div>
+            <area-graph list_of_hours="{{widget.hours}}" day-start="{{limits.lowerValue}}" day-end="{{limits.upperValue}}" resize="{{limits.resize}}">
+            </area-graph>
+        </li>
+    <ul>
 </div>
 
 <!-- row="extraBox.row" col="extraBox.col" we can later use the row and column attributes
-    to put the new Items where we desire -->
- 
+    to put the new Items where we desire
+
+    we can also add a mechanism to help identify individual boxes -->
+
+<!--     <span ng-click="widgets.splice($index, 1)">Remove</span>
+    <span ng-click="widget.draggable=true">Pin</span> 
+  -->
 

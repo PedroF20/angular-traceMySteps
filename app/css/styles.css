@@ -159,8 +159,44 @@ ul {
 
 .gridster-item {
     height: 100%;
-    border: 1px solid #000;
+    border: 1px solid #ccc;
     background-color: #61A9CF;
     cursor: pointer;
 }
 
+/*******************************/
+/* GRIDSTER BOX HEADER STYLES */
+/******************************/
+
+
+.box-header {
+    background-color: #eee;
+    padding: 0 42px 0 10px;
+    border: 1px solid #ccc;;
+    cursor: move;
+    position: relative;
+    width: 100%;
+    height: 25px;
+    top: 0;
+    left: 0;
+}
+
+.box-header-btns {
+    top: 2px;
+    right: 10px;
+    cursor: pointer;
+    position: absolute;
+}
+
+.box-header-btns a {
+    color: black;
+    text-decoration:none;
+}
+
+.box-header h3 {
+    width: 100%;
+    font-size: 20px;
+    margin: 0px 0px;
+    display: inline-block;
+    color: black;
+}
