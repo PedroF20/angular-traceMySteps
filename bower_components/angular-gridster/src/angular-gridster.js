@@ -1596,8 +1596,10 @@
 						}
 
 						for (var h = 0, hl = $dragHandles.length; h < hl; ++h) {
-							unifiedInputs[h] = new GridsterTouch($dragHandles[h], mouseDown, mouseMove, mouseUp);
-							unifiedInputs[h].enable();
+							if(itemOptions.draggable !== false) { // CUSTOM
+								unifiedInputs[h] = new GridsterTouch($dragHandles[h], mouseDown, mouseMove, mouseUp);
+								unifiedInputs[h].enable();
+							}
 						}
 					});
 				};

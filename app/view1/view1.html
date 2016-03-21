@@ -31,13 +31,13 @@
 
 <div gridster="gridsterOpts">
     <ul id="gridster-ul">
-        <li ng-repeat="widget in widgets" data-draggable="widget.draggable" gridster-item size-x="widget.sizeX" size-y="widget.sizeY">
+        <li ng-repeat="widget in widgets" gridster-item size-x="widget.sizeX" size-y="widget.sizeY">
             <div class="box-header">
                <!--  <h3 class="ng-binding">Discrete Bar Chart Widget</h3> Later add binding between the graph type and the header
                                                                             to have the correct name in each box -->
-               <h3>Area Chart</h3>
+               <h3>Chart</h3>
                 <div class="box-header-btns pull-right">
-                    <a title="Pin" ng-click="widget.draggable=true">
+                    <a title="Pin" ng-click="widget.draggable=false">
                         <span class="glyphicon glyphicon-pushpin"></span>
                     </a>
                     <a title="Remove" ng-click="widgets.splice($index, 1)">
@@ -45,7 +45,8 @@
                     </a>
                 </div>
             </div>
-            <area-graph list_of_hours="{{widget.hours}}" day-start="{{limits.lowerValue}}" day-end="{{limits.upperValue}}" resize="{{limits.resize}}">
+            <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{limits.lowerValue}}" 
+                                                      day-end="{{limits.upperValue}}" resize="{{limits.resize}}">
             </area-graph>
         </li>
     <ul>

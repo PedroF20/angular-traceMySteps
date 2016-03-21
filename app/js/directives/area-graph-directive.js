@@ -46,32 +46,6 @@ angular.module('myApp',['ngRoute',
                 day_end = $scope.$eval($attr.dayEnd);
 
             //createAreaGraph();
-            /*
-            console.log($attr);
-            $scope.$watch($attr.listOfHours, function (newval, oldval) {
-                if(newval === oldval) return;
-                list_of_hours = newval;
-                createAreaGraph();
-            });
-            $scope.$watch($attr.dayStart, function (newval, oldval) {
-            	console.log("day start updated");
-                if(newval === oldval) return;
-                day_start = newval;
-                createAreaGraph();
-            });
-            $scope.$watch('dayStart', function (newval, oldval) {
-            	console.log("day start updated");
-                if(newval === oldval) return;
-                day_start = newval;
-                createAreaGraph();
-            });
-
-            $scope.$watch($attr.dayEnd, function (newval, oldval) {
-                if(newval === oldval) return;
-                day_end = newval;
-                createAreaGraph();
-            });
-			*/
 
 			$attr.$observe('dayStart', function(newVal) {
 				console.log('lowerValue changed to: ' + newVal);
