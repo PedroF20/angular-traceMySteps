@@ -8,7 +8,8 @@ angular.module('myApp', [
   'myApp.version',
   'angularRangeSlider',
   'gridster',
-  'areaGraph'
+  'areaGraph',
+  'chordGraph'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/view1'});

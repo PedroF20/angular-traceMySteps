@@ -119,6 +119,16 @@ body.ps-active-right {
 
 .area1 { fill: #595959; }
 
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+text {
+    font: 10px sans-serif;
+}
+
 /************************/
 /* GRIDSTER TEST STYLES */
 /************************/

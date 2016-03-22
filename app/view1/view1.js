@@ -12,7 +12,7 @@ angular.module('myApp.view1', ['ngRoute'])
 .controller('View1Ctrl', ['$scope', '$http', function($scope, $http) {
 
 	
-	$scope.widgets = [{type: 'area', draggable: true, sizeX: 2, sizeY: 2}];
+	$scope.widgets = [{type: 'chord', draggable: true, sizeX: 2, sizeY: 2}];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -25,7 +25,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 	// MISSING: FILTERS CONTAINED INSIDE EACH GRAPH (ITEM)
 
-	$scope.limits = {
+	$scope.context = {
 		lowerValue : 0,
 		upperValue : 18,
 		resize: 0,
@@ -43,8 +43,8 @@ angular.module('myApp.view1', ['ngRoute'])
 	    //maxSizeY: 5,
 	    resizable: {
 	       enabled: true,
-	       resize: function() {$scope.limits.resize++},
-	       stop: function() {$scope.limits.resize++; console.log('stop');} // no need to use gridster events and its scope for resizing (yet)
+	       resize: function() {$scope.context.resize++},
+	       stop: function() {$scope.context.resize++; console.log('stop');} // no need to use gridster events and its scope for resizing (yet)
 	    },
 	    draggable: {
 	       enabled: true
@@ -53,7 +53,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 
 	$scope.addWidget = function() {
-		$scope.widgets.push({type: 'area', draggable: false, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'area', draggable: true, sizeX: 2, sizeY: 2});
 		//we can later use the row and column attributes
     	//to put the new Items where we desire
     	//we can also add a mechanism to help identify individual boxes

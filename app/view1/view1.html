@@ -45,9 +45,10 @@
                     </a>
                 </div>
             </div>
-            <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{limits.lowerValue}}" 
-                                                      day-end="{{limits.upperValue}}" resize="{{limits.resize}}">
+            <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{context.lowerValue}}" 
+                                                      day-end="{{context.upperValue}}" resize="{{context.resize}}">
             </area-graph>
+            <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
         </li>
     <ul>
 </div>
