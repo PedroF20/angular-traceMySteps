@@ -10,15 +10,13 @@
 
     <h1>TraceMySteps</h1>
 
-   <div>
         <div range-slider
              floor="0"
              ceiling="18"
              dragstop="true"
-             ng-model-low="limits.lowerValue"
-             ng-model-high="limits.upperValue"></div>
-    </div>
-
+             ng-model-low="context.lowerValue"
+             ng-model-high="context.upperValue">
+        </div>
 </div>
 
 <div id="right-panel" class="panel">
@@ -46,8 +44,12 @@
                 </div>
             </div>
             <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{context.lowerValue}}" 
-                                                      day-end="{{context.upperValue}}" resize="{{context.resize}}">
+                                                      day-end="{{context.upperValue}}" resize="{{context.resize}}"
+                                                      hour-start="{{context.hourStart}}" hour-end="{{context.hourEnd}}">
+              <div range-slider id="inner_range_slider" floor="0" ceiling="2400" step= "30" dragstop="true" 
+                          ng-model-low="context.hourStart" ng-model-high="context.hourEnd"></div>
             </area-graph>
+
             <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
         </li>
     <ul>

@@ -26,9 +26,11 @@ angular.module('myApp.view1', ['ngRoute'])
 	// MISSING: FILTERS CONTAINED INSIDE EACH GRAPH (ITEM)
 
 	$scope.context = {
-		lowerValue : 0,
-		upperValue : 18,
-		resize: 0,
+		lowerValue: 0,  //at the moment, the initial day and final day are hardcoded
+		upperValue: 18, //this context has general data that every vis can fetch if they need
+		resize: 0,		//the specific data for each vis is in the directive: "widget.xxxxxx"
+		hourStart: 0,	//the interval of hours here is common sense. they can be hardcoded
+		hourEnd: 2400,
 	}
 
 	$scope.gridsterOpts = {

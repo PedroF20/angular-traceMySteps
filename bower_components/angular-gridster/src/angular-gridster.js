@@ -50,8 +50,17 @@
 		draggable: { // options to pass to draggable handler
 			enabled: true,
 			scrollSensitivity: 20, // Distance in pixels from the edge of the viewport after which the viewport should scroll, relative to pointer
-			scrollSpeed: 15 // Speed at which the window should scroll once the mouse pointer gets within scrollSensitivity distance
+			scrollSpeed: 15, // Speed at which the window should scroll once the mouse pointer gets within scrollSensitivity distance
+			// start: function(event, ui){
+			// 	console.log("startdraggable");
+
+			// 	console.log(event);
+			// 	console.log(ui);
+			// 	if (ui[0].draggable==false){console.log("dfalse");
+			// 		this.enabled=false;} else {this.enabled=true;}
+			// }
 		}
+
 	})
 
 	.controller('GridsterCtrl', ['gridsterConfig', '$timeout',
@@ -1596,6 +1605,9 @@
 						}
 
 						for (var h = 0, hl = $dragHandles.length; h < hl; ++h) {
+														console.log(itemOptions);
+
+							console.log(itemOptions.$$element[0].draggable);
 							if(itemOptions.draggable !== false) { // CUSTOM
 								unifiedInputs[h] = new GridsterTouch($dragHandles[h], mouseDown, mouseMove, mouseUp);
 								unifiedInputs[h].enable();

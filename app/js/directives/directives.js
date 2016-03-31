@@ -1,28 +1,13 @@
-angular.module('myApp',['ngRoute',
-  'myApp.view1',
-  'myApp.view2',
-  'myApp.version',
-  'angularRangeSlider',
-  'gridster'])
-.directive('areaGraph', function ($http) {
+
+app.directive('areaGraph', ['DataManagerService', function (DataManagerService) {
 
 	var delay=350;
 
 	var list_of_hours=null;
 
-	function requestHours() {
-		return $http.get('http://localhost:5000/hours');
-		
-		// $http.get('http://localhost:5000/hours')
-		// 	 .then(function(response) {
-		// 	 	list_of_hours = response.data;
-		// 	 	console.log(list_of_hours);
- 	// 			//createAreaGraph();
-		// 	 });
-		
-		// FICHEIRO A PARTE COM DATA BROKER QUE FICA APENAS RESPONSAVEL PELOS 
-		// PEDIDOS (GET, VERIFICAR SE JA TEM, CACHE, ETC.)
 
+	function sortNumber(a,b) {
+    	return a - b;
 	}
 
 
@@ -31,19 +16,22 @@ angular.module('myApp',['ngRoute',
         scope: true,
         link: function($scope, $elem, $attr) {
             
-            if($scope.list_of_hours == null) {
-            	requestHours().then(function(response) {
-				 	list_of_hours = response.data;
-				 	console.log("get response");
-				 	console.log(list_of_hours);
-	 				createAreaGraph();
-				 });
-            } 
+            
+			DataManagerService.get('/hours', []).then(function(d) {
+				list_of_hours=d;
+				console.log(list_of_hours);
+				createAreaGraph();
+			});
+
 
             list_of_hours = $scope.$eval($attr.listOfHours);
+            
 
             var day_start = $scope.$eval($attr.dayStart),
-                day_end = $scope.$eval($attr.dayEnd);
+                day_end = $scope.$eval($attr.dayEnd),
+                hour_start = $scope.$eval($attr.hourStart),
+            	hour_end = $scope.$eval($attr.hourEnd);
+
 
             //createAreaGraph();
 
@@ -58,6 +46,20 @@ angular.module('myApp',['ngRoute',
 				console.log('upperValue changed to: ' + newVal);
 				if(newVal === day_end) return;
                 day_end = newVal;
+                createAreaGraph();
+			});
+
+			$attr.$observe('hourStart', function(newVal) {
+				console.log('hourStart changed to: ' + newVal);
+				if(newVal === hour_start) return;
+                hour_start = newVal;
+                createAreaGraph();
+			});
+
+			$attr.$observe('hourEnd', function(newVal) {
+				console.log('hourEnd changed to: ' + newVal);
+				if(newVal === hour_end) return;
+                hour_end = newVal;
                 createAreaGraph();
 			});
 
@@ -78,20 +80,21 @@ angular.module('myApp',['ngRoute',
 
 					$elem[0].svg = null;
 
-				    var margin = {top: 20, right: 20, bottom: 50, left: 50},
+
+				    var margin = {top: 20, right: 20, bottom: 80, left: 50},
 				        width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
 				        height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom,
 				        days = list_of_hours.initial_hours.length;
 
-					console.log($elem[0].parentNode.clientWidth);
-					console.log($elem[0].parentNode.clientHeight);
+					// console.log($elem[0].parentNode.clientWidth);
+					// console.log($elem[0].parentNode.clientHeight);
 
 				    var x = d3.scale.linear()
 				    .domain([day_start, day_end])
 				    .range([0, width]);
 
 				    var y = d3.scale.linear()
-				    .domain([0, d3.max(list_of_hours.initial_hours)])
+				    .domain([hour_start, hour_end])
 				    .range([height, 0]);
 
 				    var xAxis = d3.svg.axis()
@@ -113,7 +116,7 @@ angular.module('myApp',['ngRoute',
 				    .attr("width", width + margin.left + margin.right)
 				    .attr("height", height + margin.top + margin.bottom)
 				    .append("g")
-				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
 				  	//svg.selectAll('*').remove();
 
@@ -127,7 +130,10 @@ angular.module('myApp',['ngRoute',
 				    svg.append("path")
 				    .datum(transformation)
 				    .attr("class", "area1")
-				    .attr("d", area1);
+				    .attr("d", area1)
+				    .on("mouseover", function(){
+				    	console.log(d3.mouse(this));
+				    });
 
 				    svg.append("g")
 				    .attr("class", "x axis")
@@ -138,15 +144,16 @@ angular.module('myApp',['ngRoute',
 				    .attr("class", "y axis")
 				    .call(yAxis);
 
+
 				    $elem[0].svg = svg;
 
 			    }, delay);
             }
         }
     };
-})
+}]);
 
-.directive('chordGraph', function ($http) {
+app.directive('chordGraph', function ($http) {
 
 	var delay=350;
 
@@ -263,7 +270,6 @@ angular.module('myApp',['ngRoute',
 				}, delay);
 
         	}
-
 
    		}
 
