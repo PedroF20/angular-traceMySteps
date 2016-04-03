@@ -1605,9 +1605,9 @@
 						}
 
 						for (var h = 0, hl = $dragHandles.length; h < hl; ++h) {
-														console.log(itemOptions);
+														//console.log(itemOptions);
 
-							console.log(itemOptions.$$element[0].draggable);
+							//console.log(itemOptions.$$element[0].draggable);
 							if(itemOptions.draggable !== false) { // CUSTOM
 								unifiedInputs[h] = new GridsterTouch($dragHandles[h], mouseDown, mouseMove, mouseUp);
 								unifiedInputs[h].enable();

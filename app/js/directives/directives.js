@@ -19,7 +19,7 @@ app.directive('areaGraph', ['DataManagerService', function (DataManagerService) 
             
 			DataManagerService.get('/hours', []).then(function(d) {
 				list_of_hours=d;
-				console.log(list_of_hours);
+				//console.log(list_of_hours);
 				createAreaGraph();
 			});
 
@@ -36,41 +36,45 @@ app.directive('areaGraph', ['DataManagerService', function (DataManagerService) 
             //createAreaGraph();
 
 			$attr.$observe('dayStart', function(newVal) {
-				console.log('lowerValue changed to: ' + newVal);
+				//console.log('lowerValue changed to: ' + newVal);
 				if(newVal === day_start) return;
                 day_start = newVal;
                 createAreaGraph();
 			});
 
 			$attr.$observe('dayEnd', function(newVal) {
-				console.log('upperValue changed to: ' + newVal);
+				//console.log('upperValue changed to: ' + newVal);
 				if(newVal === day_end) return;
                 day_end = newVal;
                 createAreaGraph();
 			});
 
+			// ALTHOUGH THIS IS NOT AN "INDIVIDUAL" FILTER (IF WE HAVE MORE THAN ONE COPY OF THE GRAPH
+			//	THE FILTER OF EACH ITEM CHANGES ALL OF THE AREA GRAPHS), THE USER WILL NEVER HAVE MORE
+			//	THAN ONE COPY OF EACH GRAPH IN THE DASHBOARD, MAKING IT AN IRRELEVANT BUG
+
 			$attr.$observe('hourStart', function(newVal) {
-				console.log('hourStart changed to: ' + newVal);
+				//console.log('hourStart changed to: ' + newVal);
 				if(newVal === hour_start) return;
                 hour_start = newVal;
                 createAreaGraph();
 			});
 
 			$attr.$observe('hourEnd', function(newVal) {
-				console.log('hourEnd changed to: ' + newVal);
+				//console.log('hourEnd changed to: ' + newVal);
 				if(newVal === hour_end) return;
                 hour_end = newVal;
                 createAreaGraph();
 			});
 
 			$attr.$observe('resize', function(newVal) {
-				console.log('resize');
+				//console.log('resize');
                 createAreaGraph();
 			});
 
             function createAreaGraph () {
             	
-            	console.log($elem);
+            	//console.log($elem);
                 //d3.selectAll($elem.toArray());
 
 				//$("#" + elementID + " > svg").remove();  // Remove the svg of the box element, in order to redraw and append the new svg
