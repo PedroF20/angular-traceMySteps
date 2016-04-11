@@ -1,6 +1,19 @@
 <div class="content">
 
-    <button type="button" class="btn btn-primary" id="right-panel-link" href="#right-panel">Visualizations Panel</button>
+<!--     <button type="button" class="btn btn-primary" id="right-panel-link" href="#right-panel">Visualizations Panel</button>
+ -->
+<!--  <button type="button" class="btn btn-primary" id="right-panel-link" href="" ng-click="toggle()">Visualizations Panel</button>
+ -->
+
+  <a class="btn btn-primary" id="right-panel-link" ng-click="toggle()">Visualizations Panel</a>
+      <div pageslide ps-open="checked" ps-push="true" ps-speed="0.25"> <!-- ps-key-listener="true" -->
+          <div style="padding:20px">
+              <h2 id="panel-title">Visualizations</h2>
+              <a ng-click="toggle()" class="glyphicon glyphicon-remove-circle" ></a>
+              <a class="btn btn-primary" id="add-item-button" ng-click="addWidget()">Add New Item</a>
+              <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
+          </div>
+      </div>
 
     <p>
         <a href="#">
@@ -19,13 +32,12 @@
         </div>
 </div>
 
-<div id="right-panel" class="panel">
+<!-- <div id="right-panel" class="panel">
     <h2 id="panel-title">Visualizations</h2>
             <a class="btn btn-primary" id="add-item-button" ng-click="addWidget()">Add New Item</a>
             <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
 </div>
-
-
+ -->
 
 <div gridster="gridsterOpts">
     <ul id="gridster-ul">
@@ -60,8 +72,4 @@
     to put the new Items where we desire
 
     we can also add a mechanism to help identify individual boxes -->
-
-<!--     <span ng-click="widgets.splice($index, 1)">Remove</span>
-    <span ng-click="widget.draggable=true">Pin</span> 
-  -->
 

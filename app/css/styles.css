@@ -9,7 +9,13 @@
     -webkit-font-smoothing: antialiased;
     color: #ffffff;
     margin: 0;
-    transition: transform .2s;
+    /*position: absolute;
+
+    de-comment to push page 
+
+    */
+    /*transition: all 0.1s ease;*/
+    /*transition: transform .2s;*/
     -webkit-transition: -webkit-transform .2s;
 }
 
@@ -43,62 +49,52 @@ table {
 /**********************/
 /* RIGHT PANEL STYLES */
 /**********************/
-/* Body animation when right panel is opened */
-
-body.ps-active {
-  -webkit-transform: translateX(260px);
-  -ms-transform: translateX(260px);
-  transform: translateX(260px);
-}
-
-/* Body animation when right panel is opened */
-body.ps-active-right {
-  -webkit-transform: translateX(-260px);
-  -ms-transform: translateX(-260px);
-  transform: translateX(-260px);
-}
-
-/* Panel styles */
-.panel {
-  position: fixed;
-  top: 0;
-  width: 220px;
-  height: 890px;
-  background-color: #333;
-  color: #fff;
-  box-shadow: inset 0 0 5px 5px #222;
-}
-
-#right-panel {
-  right: 0;
-
-  /* Hide panel on the right of the page. When this panel is opened the
-  class .ps-active-right will be apllied to body, and it's X translation
-  will reveal the panel. */
-  -webkit-transform: translateX(260px);
-  -ms-transform: translateX(260px);
-  transform: translateX(260px);
-}
 
 #right-panel-link {
 
   position: absolute;
   top: 4px;
   right: 100px;
-
 }
 
 #panel-title {
 
-   color: white;
-   text-align: center;
-
+  position: relative;
+  color: white;
+  text-align: center;
+  top: 15px;
 }
 
+html {
+  overflow-x: hidden;
+}
+
+.ng-pageslide {
+  background: black;
+  background-color:rgba(0,0,0,1);
+}
+
+.glyphicon.glyphicon-remove-circle {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 30px;
+}
 
 #add-item-button {
-
+    position: absolute;
+    top: 200px;
+    right: 90px;
 }
+
+#clear-items-button {
+    position: absolute;
+    top: 250px;
+    left: 73px;
+}
+
+/*.buttonHolder1{ text-align: center; }
+.buttonHolder2{ text-align: center; }*/
 
 /********END RIGHT PANEL***********/
 
@@ -115,6 +111,10 @@ body.ps-active-right {
 }
 
 .area1 { fill: #595959; }
+
+.selectedArea {
+  fill: #595959 !important;
+}
 
 .chord path {
   fill-opacity: .67;

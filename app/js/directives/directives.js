@@ -1,5 +1,5 @@
 
-app.directive('areaGraph', ['DataManagerService', function (DataManagerService) {
+app.directive('areaGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var delay=350;
 
@@ -72,6 +72,18 @@ app.directive('areaGraph', ['DataManagerService', function (DataManagerService) 
                 createAreaGraph();
 			});
 
+
+			$rootScope.$on('rootScope:broadcast', function (event, data) {
+			 		console.log("Area broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+			 		createHighlightAreaGraph(data.start,data.end);
+			});
+
+			$rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+			 		console.log("Area broadcast leave: " + data); // 'Broadcast!'
+			 		createAreaGraph();
+			});
+
+
             function createAreaGraph () {
             	
             	//console.log($elem);
@@ -135,9 +147,10 @@ app.directive('areaGraph', ['DataManagerService', function (DataManagerService) 
 				    .datum(transformation)
 				    .attr("class", "area1")
 				    .attr("d", area1)
-				    .on("mouseover", function(){
-				    	console.log(d3.mouse(this));
-				    });
+				    // .on("mouseover", function(){
+				    // 	//console.log(d3.mouse(this));
+				    // 	console.log($rootScope.selectedItem);
+				    // });
 
 				    svg.append("g")
 				    .attr("class", "x axis")
@@ -148,16 +161,104 @@ app.directive('areaGraph', ['DataManagerService', function (DataManagerService) 
 				    .attr("class", "y axis")
 				    .call(yAxis);
 
-
 				    $elem[0].svg = svg;
 
 			    }, delay);
+            }
+
+
+            function createHighlightAreaGraph (min, max) {
+            	
+            	//console.log($elem);
+                //d3.selectAll($elem.toArray());
+
+				//$("#" + elementID + " > svg").remove();  // Remove the svg of the box element, in order to redraw and append the new svg
+				//d3.select("svg").remove();
+
+
+					$elem[0].svg = null;
+
+
+				    var margin = {top: 20, right: 20, bottom: 80, left: 50},
+				        width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+				        height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom,
+				        days = list_of_hours.initial_hours.length;
+
+					// console.log($elem[0].parentNode.clientWidth);
+					// console.log($elem[0].parentNode.clientHeight);
+
+				    var x = d3.scale.linear()
+				    .domain([day_start, day_end])
+				    .range([0, width]);
+
+				    var y = d3.scale.linear()
+				    .domain([hour_start, hour_end])
+				    .range([height, 0]);
+
+				    var xAxis = d3.svg.axis()
+				    .scale(x)
+				    .orient("bottom");
+
+				    var yAxis = d3.svg.axis()
+				    .scale(y)
+				    .orient("left");
+
+				    var area1 = d3.svg.area()
+				    .x(function(d) { return x(d.day); })
+				
+				    .y0(height)
+				    .y1(function(d) { return y(d.hour); });
+
+					d3.select($elem[0]).selectAll("svg").remove()
+				    var svg = d3.select($elem[0]).append("svg")
+				    .attr("width", width + margin.left + margin.right)
+				    .attr("height", height + margin.top + margin.bottom)
+				    .append("g")
+				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+				  	//svg.selectAll('*').remove();
+
+				    var transformation = [];
+				    var selectedTransformation = [];
+				    list_of_hours.initial_hours.forEach(function(d,i){
+				    	if(i>=day_start && i<=day_end) {
+				    		if(i<min || i > max) {
+					        	transformation.push({day: i, hour: d});
+					        } else {
+					        	transformation.push({day: i, hour: 0});
+					        	selectedTransformation.push({day: i, hour: d});
+					        }
+				    	}
+				    });
+
+				    svg.append("path")
+				    .datum(transformation)
+				    .attr("class", "area1")
+				    .attr("d", area1)
+				    // .on("mouseover", function(){
+				    // 	//console.log(d3.mouse(this));
+				    // 	//console.log($rootScope.selectedItem);
+				    // })
+				    .datum(selectedTransformation)
+				    .attr("d", area1)
+				    .classed("selectedArea", true);
+
+				    svg.append("g")
+				    .attr("class", "x axis")
+				    .attr("transform", "translate(0," + height + ")") 
+				    .call(xAxis);
+
+				    svg.append("g")
+				    .attr("class", "y axis")
+				    .call(yAxis);
+
+				    $elem[0].svg = svg;
             }
         }
     };
 }]);
 
-app.directive('chordGraph', function ($http) {
+app.directive('chordGraph', function ($http, $rootScope) {
 
 	var delay=350;
 
@@ -213,7 +314,7 @@ app.directive('chordGraph', function ($http) {
 					    .style("stroke", function(d) { return fill(d.index); })
 					    .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
 					    .on("mouseover", fade(.1))
-					    .on("mouseout", fade(1));
+					    .on("mouseout", fade1(1));
 
 					var ticks = svg.append("g").selectAll("g")
 					    .data(chord.groups)
@@ -250,6 +351,7 @@ app.directive('chordGraph', function ($http) {
 
 					$elem[0].svg = svg;
 
+
 					// Returns an array of tick angles and labels, given a group.
 					function groupTicks(d) {
 					  var k = (d.endAngle - d.startAngle) / d.value;
@@ -268,6 +370,21 @@ app.directive('chordGraph', function ($http) {
 					        .filter(function(d) { return d.source.index != i && d.target.index != i; })
 					      .transition()
 					        .style("opacity", opacity);
+					        $rootScope.selectedItem=true;
+
+					        $rootScope.$broadcast('rootScope:broadcast', { start : 4, end : 8});
+
+					  };
+					}
+
+					function fade1(opacity) {
+					  return function(g, i) {
+					    svg.selectAll(".chord path")
+					        .filter(function(d) { return d.source.index != i && d.target.index != i; })
+					      .transition()
+					        .style("opacity", opacity);
+					        $rootScope.selectedItem=false;
+					        $rootScope.$broadcast('rootScope:broadcast-leave', 'json vazio');
 					  };
 					}
 

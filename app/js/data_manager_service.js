@@ -6,7 +6,6 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
 
     var cached_data=null;
 
-    
     // function memorySizeOf(obj) {
     // var bytes = 0;
 
@@ -46,7 +45,6 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
     // //return formatByteSize(sizeOf(obj));
 
     // return sizeOf(obj); // returns size of object in bytes, instead of converting to bigger units
-    
     // };
 
     this.get = function(endpoint, params) {
@@ -71,6 +69,22 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
                 });
                 
                 return request.then(function(response) {
+
+
+            //         var size = JSON.stringify(cached_data).length*2;
+            //         if (size > 2500000) { 
+
+            //             cached_data=null;
+            //             cached_data=response.data;
+
+            //         } else {
+
+            //              cached_data=response.data;
+            //             }
+
+            //         return cached_data;
+            //     });
+
                     cached_data=response.data;
                     return cached_data;
                 });
@@ -89,8 +103,6 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
                     
                     return request.then(function(response) {
                         cached_data=response.data;
-                                console.log(memorySizeOf(JSON.stringify(cached_data)));
-
                         return cached_data;
                     });
                 }

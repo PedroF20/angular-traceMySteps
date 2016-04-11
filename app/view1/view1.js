@@ -9,7 +9,13 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http', function($scope, $http) {
+.controller('View1Ctrl', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http) {
+
+	$scope.checked = false; // This will be binded using the ps-open attribute
+
+    $scope.toggle = function(){
+        $scope.checked = !$scope.checked;
+    }
 
 	
 	$scope.widgets = [{type: 'chord', draggable: true, sizeX: 2, sizeY: 2}];
@@ -32,6 +38,8 @@ angular.module('myApp.view1', ['ngRoute'])
 		hourStart: 0,	//the interval of hours here is common sense. they can be hardcoded
 		hourEnd: 2400,
 	}
+
+	$rootScope.selectedItem = false;
 
 	$scope.gridsterOpts = {
 	    columns: 6, // the width of the grid, in columns
@@ -83,16 +91,16 @@ angular.module('myApp.view1', ['ngRoute'])
 
 	/////////// RIGHT PANEL /////////////////
 
-	var panelslider = null;
-	$(document).ready(function () {
+	// var panelslider = null;
+	// $(document).ready(function () {
 
-		$('#right-panel-link').panelslider({
-		      bodyClass: 'ps-active-right',
-		      clickClose: true,
-		      onOpen: function() {
-		        //console.log('right panel open');
-		      }
-		    });
-	});
+	// 	$('#right-panel-link').panelslider({
+	// 	      bodyClass: 'ps-active-right',
+	// 	      clickClose: true,
+	// 	      onOpen: function() {
+	// 	        //console.log('right panel open');
+	// 	      }
+	// 	    });
+	// });
 
 }]);
