@@ -1,16 +1,13 @@
 <div class="content">
 
-<!--     <button type="button" class="btn btn-primary" id="right-panel-link" href="#right-panel">Visualizations Panel</button>
- -->
-<!--  <button type="button" class="btn btn-primary" id="right-panel-link" href="" ng-click="toggle()">Visualizations Panel</button>
- -->
-
   <a class="btn btn-primary" id="right-panel-link" ng-click="toggle()">Visualizations Panel</a>
       <div pageslide ps-open="checked" ps-push="true" ps-speed="0.25"> <!-- ps-key-listener="true" -->
           <div style="padding:20px">
               <h2 id="panel-title">Visualizations</h2>
               <a ng-click="toggle()" class="glyphicon glyphicon-remove-circle" ></a>
-              <a class="btn btn-primary" id="add-item-button" ng-click="addWidget()">Add New Item</a>
+              <a class="btn btn-primary" id="add-area-button" ng-click="addAreaWidget()">Add Area Graph</a>
+              <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Hexbin Graph</a>
+              <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
           </div>
       </div>
@@ -32,12 +29,6 @@
         </div>
 </div>
 
-<!-- <div id="right-panel" class="panel">
-    <h2 id="panel-title">Visualizations</h2>
-            <a class="btn btn-primary" id="add-item-button" ng-click="addWidget()">Add New Item</a>
-            <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
-</div>
- -->
 
 <div gridster="gridsterOpts">
     <ul id="gridster-ul">
@@ -56,6 +47,7 @@
                     </a>
                 </div>
             </div>
+            
             <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{context.lowerValue}}" 
                                                       day-end="{{context.upperValue}}" resize="{{context.resize}}"
                                                       hour-start="{{context.hourStart}}" hour-end="{{context.hourEnd}}">
@@ -64,6 +56,12 @@
             </area-graph>
 
             <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
+
+            <hexbin-graph class="hexbin-graph" ng-if="widget.type == 'hexbin'" resize="{{context.resize}}">
+              <!-- <button onclick="generateData()">Generate Data</button> -->
+            </hexbin-graph>
+
+            <area-gradient ng-if="widget.type == 'area-g'" resize="{{context.resize}}"></area-gradient>
         </li>
     <ul>
 </div>

@@ -18,7 +18,7 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
 	
-	$scope.widgets = [{type: 'chord', draggable: true, sizeX: 2, sizeY: 2}];
+	$scope.widgets = [{type: 'area-g', draggable: true, sizeX: 3, sizeY: 3}];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -62,7 +62,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 
-	$scope.addWidget = function() {
+	$scope.addAreaWidget = function() {
 		$scope.widgets.push({type: 'area', draggable: true, sizeX: 2, sizeY: 2});
 		//we can later use the row and column attributes
     	//to put the new Items where we desire
@@ -75,32 +75,26 @@ angular.module('myApp.view1', ['ngRoute'])
     	// ex: funcao para adicionar grafico de arcos, etc.
 	}
 
+	$scope.addHexbinWidget = function() {
+		$scope.widgets.push({type: 'hexbin', draggable: true, sizeX: 2, sizeY: 2});
+	};
+
+	$scope.addGradientWidget = function() {
+		$scope.widgets.push({type: 'area-g', draggable: true, sizeX: 3, sizeY: 3});
+	};
+
+
+
 	$scope.clear = function() {
 		$scope.widgets = [];
 	};
 
 
 	// $scope.$watch('[limits]', function () {
-	// 	//console.log("lower: " + $scope.limits.lowerValue);
-	// 	//console.log("upper: " + $scope.limits.upperValue);
+
 	// }, true); // If there was no true flag (false by default), the check would be for "reference" equality, 
 	// 			//which asks if the two objects refer to the same thing, instead of the value itself.
 	// 			//in this case they always refer the same, so we need to check the values.
 
-
-
-	/////////// RIGHT PANEL /////////////////
-
-	// var panelslider = null;
-	// $(document).ready(function () {
-
-	// 	$('#right-panel-link').panelslider({
-	// 	      bodyClass: 'ps-active-right',
-	// 	      clickClose: true,
-	// 	      onOpen: function() {
-	// 	        //console.log('right panel open');
-	// 	      }
-	// 	    });
-	// });
 
 }]);

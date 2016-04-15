@@ -9,6 +9,7 @@
     -webkit-font-smoothing: antialiased;
     color: #ffffff;
     margin: 0;
+    height: 100%;
     /*position: absolute;
 
     de-comment to push page 
@@ -67,6 +68,7 @@ table {
 
 html {
   overflow-x: hidden;
+  height: 100%;
 }
 
 .ng-pageslide {
@@ -81,9 +83,21 @@ html {
     font-size: 30px;
 }
 
-#add-item-button {
+#add-area-button {
     position: absolute;
     top: 200px;
+    right: 90px;
+}
+
+#add-hex-button {
+    position: absolute;
+    top: 150px;
+    right: 90px;
+}
+
+#add-gradient-button {
+    position: absolute;
+    top: 100px;
     right: 90px;
 }
 
@@ -116,15 +130,27 @@ html {
   fill: #595959 !important;
 }
 
+.area {
+  fill: #404040;
+  clip-path: url(#clip);
+}
+
 .chord path {
   fill-opacity: .67;
   stroke: #000;
   stroke-width: .5px;
 }
 
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
 text {
     font: 10px sans-serif;
 }
+
 
 /********END D3 EXAMPLE STYLES***********/
 
@@ -250,4 +276,25 @@ text {
     margin: 0px 0px;
     display: inline-block;
     color: black;
+}
+
+
+/* HexBin */
+.leaflet-container {
+  display: block;
+  position: initial !important;
+}
+
+.leaflet-container, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-layer, .leaflet-tile-container, .leaflet-tile {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.leaflet-tile {
+  left: 0 !important;
+  top: 0 !important;
+}
+
+div.leaflet-bottom.leaflet-right {
+  display: none;
 }
