@@ -101,6 +101,12 @@ html {
     right: 90px;
 }
 
+#add-chord-button {
+    position: absolute;
+    top: 300px;
+    right: 90px;
+}
+
 #clear-items-button {
     position: absolute;
     top: 250px;
@@ -115,7 +121,7 @@ html {
 
 
 /*********************/
-/* D3 EXAMPLE STYLES */
+/*    D3 STYLES      */
 /*********************/
 
 .axis path, .axis line {

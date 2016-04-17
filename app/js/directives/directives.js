@@ -192,31 +192,31 @@ app.directive('areaGradient', ['DataManagerService', function (DataManagerServic
 					      .attr("class", "area")
 					      .attr("d", area);
 
-					  focus.append("g")
-					      .attr("class", "x axis")
-					      .attr("transform", "translate(0," + height + ")")
-					      .call(xAxis);
+						  focus.append("g")
+						      .attr("class", "x axis")
+						      .attr("transform", "translate(0," + height + ")")
+						      .call(xAxis);
 
-					  focus.append("g")
-					      .attr("class", "y axis")
-					      .call(yAxis);
+						  focus.append("g")
+						      .attr("class", "y axis")
+						      .call(yAxis);
 
-					  context.append("path")
-					      .datum(transformation)
-					      .attr("class", "area")
-					      .attr("d", area2);
+						  context.append("path")
+						      .datum(transformation)
+						      .attr("class", "area")
+						      .attr("d", area2);
 
-					  context.append("g")
-					      .attr("class", "x axis")
-					      .attr("transform", "translate(0," + height2 + ")")
-					      .call(xAxis2);
+						  context.append("g")
+						      .attr("class", "x axis")
+						      .attr("transform", "translate(0," + height2 + ")")
+						      .call(xAxis2);
 
-					  context.append("g")
-					      .attr("class", "x brush")
-					      .call(brush)
-					    .selectAll("rect")
-					      .attr("y", -6)
-					      .attr("height", height2 + 7);
+						  context.append("g")
+						      .attr("class", "x brush")
+						      .call(brush)
+						    .selectAll("rect")
+						      .attr("y", -6)
+						      .attr("height", height2 + 7);
 
 					$elem[0].svg = svg;
 

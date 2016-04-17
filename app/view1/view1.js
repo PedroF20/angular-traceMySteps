@@ -18,7 +18,7 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
 	
-	$scope.widgets = [{type: 'area-g', draggable: true, sizeX: 3, sizeY: 3}];
+	$scope.widgets = [{type: 'area-g', name: "Area Gradient Chart", draggable: true, sizeX: 3, sizeY: 3}];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -63,7 +63,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 
 	$scope.addAreaWidget = function() {
-		$scope.widgets.push({type: 'area', draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'area', name: "Area Chart", draggable: true, sizeX: 2, sizeY: 2});
 		//we can later use the row and column attributes
     	//to put the new Items where we desire
     	//we can also add a mechanism to help identify individual boxes
@@ -73,17 +73,22 @@ angular.module('myApp.view1', ['ngRoute'])
     	// adicionar funcoes para adicionar diferentes tipos de graficos,
     	// associados as thumbnails da barra lateral
     	// ex: funcao para adicionar grafico de arcos, etc.
+
+    	// name is used to bind the type of graph to the box header
+    	// to display the different graph names on the box
 	}
 
 	$scope.addHexbinWidget = function() {
-		$scope.widgets.push({type: 'hexbin', draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'hexbin', name: "Hexbin Chart", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'area-g', draggable: true, sizeX: 3, sizeY: 3});
+		$scope.widgets.push({type: 'area-g', name: "Area Gradient Chart", draggable: true, sizeX: 3, sizeY: 3});
 	};
 
-
+	$scope.addChordWidget = function() {
+		$scope.widgets.push({type: 'chord', name: "Chord Chart", draggable: true, sizeX: 2, sizeY: 2});
+	};
 
 	$scope.clear = function() {
 		$scope.widgets = [];

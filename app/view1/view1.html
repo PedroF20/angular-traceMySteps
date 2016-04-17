@@ -8,6 +8,7 @@
               <a class="btn btn-primary" id="add-area-button" ng-click="addAreaWidget()">Add Area Graph</a>
               <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Hexbin Graph</a>
               <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
+              <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
           </div>
       </div>
@@ -34,9 +35,7 @@
     <ul id="gridster-ul">
         <li ng-repeat="widget in widgets" gridster-item size-x="widget.sizeX" size-y="widget.sizeY">
             <div class="box-header">
-               <!--  <h3 class="ng-binding">Discrete Bar Chart Widget</h3> Later add binding between the graph type and the header
-                                                                            to have the correct name in each box -->
-               <h3>Chart</h3>
+                <h3>{{widget.name}}</h3> 
                 <div class="box-header-btns pull-right">
                     <a title="Pin" ng-click="widget.draggable=false">
                       <!-- PIN BUG!!!!!!! -->
