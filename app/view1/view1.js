@@ -18,7 +18,7 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
 	
-	$scope.widgets = [{type: 'area-g', name: "Area Gradient Chart", draggable: true, sizeX: 3, sizeY: 3}];
+	$scope.widgets = [{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3}];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -49,15 +49,16 @@ angular.module('myApp.view1', ['ngRoute'])
 	    minColumns: 1, // the minimum columns the grid must have
 	    minRows: 3, // the minimum height of the grid, in rows
 	    maxRows: 10,
-	    maxSizeX: 6,
-	    //maxSizeY: 5,
+	    maxSizeX: 5,
+	    maxSizeY: 3,
 	    resizable: {
 	       enabled: true,
 	       resize: function() {$scope.context.resize++},
 	       stop: function() {$scope.context.resize++; console.log('stop');} // no need to use gridster events and its scope for resizing (yet)
 	    },
 	    draggable: {
-	       enabled: true
+	       enabled: true,
+	       handle: '.box-header',  // means the boxes can only be dragged when clicking the box header
 	    }
 	};
 
@@ -83,7 +84,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'area-g', name: "Area Gradient Chart", draggable: true, sizeX: 3, sizeY: 3});
+		$scope.widgets.push({type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3});
 	};
 
 	$scope.addChordWidget = function() {
