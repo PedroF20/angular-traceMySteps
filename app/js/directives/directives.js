@@ -10,8 +10,9 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
         link: function($scope, $elem, $attr) {
 
 	        	
-
-				if (map != undefined) { map.remove(); }
+				if (map != undefined) { 
+					map.remove();
+				}
 
 				var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -25,24 +26,12 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 					console.log('resize hexbin');
 	                createHexbinGraph();
 	                map.invalidateSize();
-	                console.log($elem[0].parentNode.offsetHeight);
+	                //console.log($elem[0].parentNode.offsetHeight);
 				});
 
 	        	function createHexbinGraph () {
 
-	        		// $elem[0] = null;
-	        		//var map = undefined;
-
-	    //     		if (map != undefined) { map.remove(); }
-
-	    //     		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-				 //    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-				 //    osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
-
-					// map = new L.Map($elem[0], {layers: [osm], center: new L.LatLng(center[0], center[1]), zoom: 7});
-
 					var options = {
-						attributionControl: false,
 					    radius : 12,
 					    opacity: 0.5,
 					    duration: 500,
@@ -73,10 +62,6 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 					    hexLayer.data(data);
 					};
 					map.invalidateSize();
-					// $elem[0] = map;
-					//map.remove();
-
-					//if (map != undefined) { map.remove(); }
 	        	}
     		}
     	}
