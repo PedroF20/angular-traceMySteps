@@ -219,7 +219,7 @@ text {
 /********END SLIDER STYLES***********/
 
 /************************/
-/* GRIDSTER STYLES */
+/*    GRIDSTER STYLES   */
 /************************/
 
 #gridster-ul {
@@ -284,8 +284,15 @@ text {
     color: black;
 }
 
+/********END GRIDSTER STYLES***********/
 
-/* HexBin */
+
+
+/*******************************/
+/*      Hexbin / Leaflet      */
+/******************************/
+
+/*
 .leaflet-container {
   display: block;
   position: initial !important;
@@ -302,5 +309,9 @@ text {
 }
 
 div.leaflet-bottom.leaflet-right {
+  display: none;
+}
+*/
+.leaflet-control-attribution {
   display: none;
 }

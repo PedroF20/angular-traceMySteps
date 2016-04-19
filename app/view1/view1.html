@@ -56,7 +56,7 @@
 
             <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
 
-            <hexbin-graph class="hexbin-graph" ng-if="widget.type == 'hexbin'" resize="{{context.resize}}">
+            <hexbin-graph ng-if="widget.type == 'hexbin'" resize="{{context.resize}}">
               <!-- <button onclick="generateData()">Generate Data</button> -->
             </hexbin-graph>
 

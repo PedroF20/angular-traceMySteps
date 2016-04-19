@@ -6,6 +6,9 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
 
     var cached_data=null;
 
+    var cache_content=[];  // acts as an identifier/key for each type of data. this way we can get from the cache
+                           // the specific data we want, simply by reading the key attached to the data
+
     // function memorySizeOf(obj) {
     // var bytes = 0;
 
@@ -49,15 +52,17 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
 
     this.get = function(endpoint, params) {
 
-        if(cached_data==null) {
+        if(cached_data==null || cache_content.indexOf(endpoint + JSON.stringify(params)) == -1) {
 
             var size = JSON.stringify(cached_data).length*2;
 
             if (size > 2500000) {  // 2,5 million bytes = max size of 2,5MB
 
                 cached_data=null;
+                cache_content = [];
 
                 console.log("cleaned cache request");
+
                 var request = $http({
                     url: urlBase + endpoint,
                     params: params,
@@ -70,22 +75,8 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
                 
                 return request.then(function(response) {
 
-
-            //         var size = JSON.stringify(cached_data).length*2;
-            //         if (size > 2500000) { 
-
-            //             cached_data=null;
-            //             cached_data=response.data;
-
-            //         } else {
-
-            //              cached_data=response.data;
-            //             }
-
-            //         return cached_data;
-            //     });
-
                     cached_data=response.data;
+                    cache_content.push(endpoint + JSON.stringify(params));
                     return cached_data;
                 });
 
@@ -103,6 +94,7 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
                     
                     return request.then(function(response) {
                         cached_data=response.data;
+                        cache_content.push(endpoint + JSON.stringify(params));
                         return cached_data;
                     });
                 }

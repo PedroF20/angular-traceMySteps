@@ -21,6 +21,7 @@ app.directive('areaGraph', ['DataManagerService', '$rootScope', function (DataMa
 				list_of_hours=d;
 				//console.log(list_of_hours);
 				createAreaGraph();
+				console.log(list_of_hours);
 			});
 
 

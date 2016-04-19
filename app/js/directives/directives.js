@@ -9,19 +9,24 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
         scope: true,
         link: function($scope, $elem, $attr) {
 
-	        	$attr.$observe('resize', function(newVal) {
-					console.log('resize');
-	                createHexbinGraph();
-				});
+	        	
 
 				if (map != undefined) { map.remove(); }
 
 				var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-			    osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
+			    osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
 
-				map = new L.Map($elem[0], {layers: [osm], center: new L.LatLng(center[0], center[1]), zoom: 10});
+				angular.element($elem[0]).append(angular.element('<div id="map" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+				map = new L.Map('map', {layers: [osm], center: new L.LatLng(center[0], center[1]), zoom: 10});
 
+
+				$attr.$observe('resize', function(newVal) {
+					console.log('resize hexbin');
+	                createHexbinGraph();
+	                map.invalidateSize();
+	                console.log($elem[0].parentNode.offsetHeight);
+				});
 
 	        	function createHexbinGraph () {
 
@@ -37,6 +42,7 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 					// map = new L.Map($elem[0], {layers: [osm], center: new L.LatLng(center[0], center[1]), zoom: 7});
 
 					var options = {
+						attributionControl: false,
 					    radius : 12,
 					    opacity: 0.5,
 					    duration: 500,
@@ -66,7 +72,7 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 					    }
 					    hexLayer.data(data);
 					};
-
+					map.invalidateSize();
 					// $elem[0] = map;
 					//map.remove();
 
