@@ -33,7 +33,7 @@
 
 <div gridster="gridsterOpts">
     <ul id="gridster-ul">
-        <li ng-repeat="widget in widgets" gridster-item size-x="widget.sizeX" size-y="widget.sizeY">
+        <li ng-repeat="widget in widgets" gridster-item size-x="widget.sizeX" size-y="widget.sizeY" minSizeX="widget.minSizeX" minSizeY="widget.minSizeY">
             <div class="box-header">
                 <h3>{{widget.name}}</h3> 
                 <div class="box-header-btns pull-right">

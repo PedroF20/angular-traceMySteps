@@ -18,7 +18,7 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
 	
-	$scope.widgets = [{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3}];
+	$scope.widgets = [{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 3}];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -28,8 +28,6 @@ angular.module('myApp.view1', ['ngRoute'])
 	// MAYBE ADOPT A TYPED-PROGRAMMING APPROACH (EASIEST), WITH ONE DIRECTIVE PER GRAPH, AND THEN IN THE VIEW
 	// LET THE TYPE ATTRIBUTE DECIDE WHICH GRAPH IS GOING TO BE DRAWN. THEN EACH GRAPH ONLY CONTROLS
 	// ITS CONTEXT (AND THUS LESS VARIABLES, BECAUSE THEY ONLY OBSERVE WHAT IS IMPORTANT TO THEM)
-
-	// MISSING: FILTERS CONTAINED INSIDE EACH GRAPH (ITEM)
 
 	$scope.context = {
 		lowerValue: 0,  //at the moment, the initial day and final day are hardcoded
@@ -84,7 +82,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3});
+		$scope.widgets.push({type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 3});
 	};
 
 	$scope.addChordWidget = function() {
@@ -97,7 +95,6 @@ angular.module('myApp.view1', ['ngRoute'])
 
 
 	// $scope.$watch('[limits]', function () {
-
 	// }, true); // If there was no true flag (false by default), the check would be for "reference" equality, 
 	// 			//which asks if the two objects refer to the same thing, instead of the value itself.
 	// 			//in this case they always refer the same, so we need to check the values.
