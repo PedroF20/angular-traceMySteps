@@ -4,6 +4,7 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 	var center = [38.7, -9.1];
 
 
+
 	return {
         restrict: 'E',
         scope: true,
@@ -51,16 +52,17 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 					var hexLayer = L.hexbinLayer(options).addTo(map)
 					hexLayer.colorScale().range(['white', 'blue']);
 
-					var latFn = d3.random.normal(center[0], 1);
-					var longFn = d3.random.normal(center[1], 1);
+					var latFn = d3.random.normal(center[0], 0.5);
+					var longFn = d3.random.normal(center[1], 0.5);
 
-					var generateData = function(){
+					function generateData(){
 					    var data = [];
 					    for(i=0; i<1000; i++){
 					        data.push([longFn(),  latFn()]);
 					    }
 					    hexLayer.data(data);
 					};
+					generateData();
 					map.invalidateSize();
 	        	}
     		}
