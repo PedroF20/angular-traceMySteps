@@ -18,7 +18,7 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
 	
-	$scope.widgets = [{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 3}];
+	$scope.widgets = [{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2}];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -43,12 +43,13 @@ angular.module('myApp.view1', ['ngRoute'])
 	    columns: 6, // the width of the grid, in columns
 	    margins: [10, 10], // the pixel distance between each widget
 	    swapping: true,
+	    rowHeight: 'match', // 180 if we want to adjust to the window
 	    outerMargin: true, // whether margins apply to outer edges of the grid
 	    minColumns: 1, // the minimum columns the grid must have
 	    minRows: 3, // the minimum height of the grid, in rows
 	    maxRows: 10,
 	    maxSizeX: 5,
-	    maxSizeY: 3,
+	    maxSizeY: 5,
 	    resizable: {
 	       enabled: true,
 	       resize: function() {$scope.context.resize++},
@@ -67,14 +68,6 @@ angular.module('myApp.view1', ['ngRoute'])
     	//to put the new Items where we desire
     	//we can also add a mechanism to help identify individual boxes
     	//in order for them to be easily accessible
-
-    	// de momento apenas adiciona gráfico de area, mais tarde
-    	// adicionar funcoes para adicionar diferentes tipos de graficos,
-    	// associados as thumbnails da barra lateral
-    	// ex: funcao para adicionar grafico de arcos, etc.
-
-    	// name is used to bind the type of graph to the box header
-    	// to display the different graph names on the box
 	}
 
 	$scope.addHexbinWidget = function() {
@@ -82,11 +75,15 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 3});
+		$scope.widgets.push({type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
 	};
 
 	$scope.addChordWidget = function() {
 		$scope.widgets.push({type: 'chord', name: "Chord Chart", draggable: true, sizeX: 2, sizeY: 2});
+	};
+
+	$scope.addCalendarWidget = function() {
+		$scope.widgets.push({type: 'calendar', name: "Calendar View: places bla bla", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.clear = function() {

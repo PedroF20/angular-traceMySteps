@@ -1,23 +1,26 @@
 {
-  "name": "traceMySteps",
-  "description": "traceMySteps",
-  "version": "0.0.0",
-  "homepage": "https://github.com/PedroF20",
+  "name": "angular-tracemysteps",
+  "description": "tracemysteps",
+  "main": "n",
+  "authors": [
+    "github.com/PedroF20"
+  ],
   "license": "MIT",
+  "homepage": "https://github.com/PedroF20/angular-tracemysteps",
   "private": false,
   "dependencies": {
-    "angular": "~1.4.0",
-    "angular-route": "~1.4.0",
+    "angular-gridster": "^0.13.5",
     "angular-loader": "~1.4.0",
     "angular-mocks": "~1.4.0",
-    "html5-boilerplate": "~5.2.0",
-    "bootstrap": "3.2.0",
-    "jquery": "2.1.1",
-    "d3": "3.4.11",
+    "angular-pageslide-directive": "ng-pageslide#^1.1.1",
     "angular-rangeslider-directive": "^0.0.2",
-    "angular-gridster": "^0.13.5"
-  },
-  "resolutions": {
-    "angular": "~1.4.0"
+    "angular-route": "~1.4.0",
+    "bootstrap": "3.2.0",
+    "d3-plugins": "*",
+    "html5-boilerplate": "~5.2.0",
+    "leaflet-d3": "^0.3.8",
+    "leaflet": "^0.7.7",
+    "mapbox-js": "mapbox.js#^2.4.0",
+    "simple-statistics": "^1.0.1"
   }
 }

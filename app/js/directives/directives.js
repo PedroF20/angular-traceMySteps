@@ -1,33 +1,45 @@
-app.directive('hexbinGraph', function ($http, $rootScope) {
+app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+	var maps = [];
 
 	var map = undefined;
 	var center = [38.7, -9.1];
+	var latFn = d3.random.normal(center[0], 0.5);
+	var longFn = d3.random.normal(center[1], 0.5);
+	var data = [];
+	var mapCount=0;
 
+	function generateData(){
+	    for(i=0; i<1000; i++){
+	        data.push([longFn(),  latFn()]);
+	    }
+	};
 
+	generateData();
 
 	return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
 
-	        	
-				if (map != undefined) { 
-					map.remove();
-				}
 
 				var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 			    osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
 
-				angular.element($elem[0]).append(angular.element('<div id="map" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
-				map = new L.Map('map', {layers: [osm], center: new L.LatLng(center[0], center[1]), zoom: 10});
+				angular.element($elem[0]).append(angular.element('<div id="map'+ mapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+				console.log('map'+ mapCount +'');
+				maps[mapCount] = new L.Map('map'+ mapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
+				var layer1 = osm.addTo(maps[mapCount]);
+				
 
 
 				$attr.$observe('resize', function(newVal) {
-					console.log('resize hexbin');
-	                createHexbinGraph();
-	                map.invalidateSize();
-	                //console.log($elem[0].parentNode.offsetHeight);
+	                //createHexbinGraph();
+	                for(var i = 0; i < mapCount; i++) {
+	                	maps[i].invalidateSize();
+	                }
+	                
 				});
 
 	        	function createHexbinGraph () {
@@ -49,28 +61,23 @@ app.directive('hexbinGraph', function ($http, $rootScope) {
 					    valueCeil: undefined
 					};
 
-					var hexLayer = L.hexbinLayer(options).addTo(map)
+					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
 					hexLayer.colorScale().range(['white', 'blue']);
 
-					var latFn = d3.random.normal(center[0], 0.5);
-					var longFn = d3.random.normal(center[1], 0.5);
-
-					function generateData(){
-					    var data = [];
-					    for(i=0; i<1000; i++){
-					        data.push([longFn(),  latFn()]);
-					    }
-					    hexLayer.data(data);
-					};
-					generateData();
-					map.invalidateSize();
+					hexLayer.data(data);
+					
+					maps[mapCount].invalidateSize();
 	        	}
+	        	
+	        	//generateData();
+	        	createHexbinGraph();
+	        	mapCount++;
     		}
     	}
-});
+}]);
 
 
-app.directive('areaGradient', ['DataManagerService', function (DataManagerService, $rootScope) {
+app.directive('areaGradient', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var delay=350;
 
@@ -99,26 +106,21 @@ app.directive('areaGradient', ['DataManagerService', function (DataManagerServic
 				setTimeout(function() {
 
 					$elem[0].svg = null;
-
-
+					
+					var parentHeigtht = angular.element($elem[0])[0].parentNode.clientHeight;
+					
 				    var margin = {top: 20, right: 10, bottom: 220, left: 40},
-	    				margin2 = {top: 500, right: 10, bottom: 60, left: 40},
+	    				margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
 				        width = ($elem[0].parentNode.clientWidth) - margin.left - margin.right,
 				        height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
 				        height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
 
-				    // var margin = {top: 10, right: 10, bottom: 100, left: 40},
-					   //  margin2 = {top: 430, right: 10, bottom: 20, left: 40},
-					   //  width = 960 - margin.left - margin.right,
-					   //  height = 500 - margin.top - margin.bottom,
-					   //  height2 = 500 - margin2.top - margin2.bottom;
-
 				    var parseDate = d3.time.format("%b %Y").parse;
 
 				    var x = d3.time.scale().range([0, width]),
-					    x2 = d3.time.scale().range([0, width]),
+					    x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
 					    y = d3.scale.linear().range([height, 0]),
-					    y2 = d3.scale.linear().range([height2, 0]);
+					    y2 = d3.scale.linear().range([height2, 0]); 
 
 					var xAxis = d3.svg.axis().scale(x).orient("bottom"),
 					    xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
@@ -144,7 +146,7 @@ app.directive('areaGradient', ['DataManagerService', function (DataManagerServic
 
 					var svg = d3.select($elem[0]).append("svg")
 					    .attr("width", width + margin.left + margin.right)
-					    .attr("height", height + margin.top + margin.bottom);
+					    .attr("height", height + margin.top + margin.bottom)
 
 						svg.append("defs").append("clipPath")
 						    .attr("id", "clip")
@@ -175,41 +177,43 @@ app.directive('areaGradient', ['DataManagerService', function (DataManagerServic
 					});
 
 				
-						  x.domain(d3.extent(transformation.map(function(d) { return d.date; })));
-						  y.domain([0, d3.max(transformation.map(function(d) { return d.price; }))]);
-						  x2.domain(x.domain());
-						  y2.domain(y.domain());
+					  x.domain(d3.extent(transformation.map(function(d) { return d.date; })));
+					  y.domain([0, d3.max(transformation.map(function(d) { return d.price; }))]);
+					  x2.domain(x.domain());
+					  y2.domain(y.domain());
 
-						focus.append("path")
-					      .datum(transformation)
-					      .attr("class", "area")
-					      .attr("d", area);
+					focus.append("path")
+				      .datum(transformation)
+				      .attr("class", "area")
+				      .attr("d", area);
 
-						  focus.append("g")
-						      .attr("class", "x axis")
-						      .attr("transform", "translate(0," + height + ")")
-						      .call(xAxis);
+					focus.append("g")
+				      .attr("class", "x axis")
+				      .attr("transform", "translate(0," + height + ")")
+				      .call(xAxis);
 
-						  focus.append("g")
-						      .attr("class", "y axis")
-						      .call(yAxis);
+					focus.append("g")
+				      .attr("class", "y axis")
+				      .call(yAxis);
 
-						  context.append("path")
-						      .datum(transformation)
-						      .attr("class", "area")
-						      .attr("d", area2);
+					context.append("path")
+				      .datum(transformation)
+				      .attr("class", "area")
+				      .attr("d", area2);
 
-						  context.append("g")
-						      .attr("class", "x axis")
-						      .attr("transform", "translate(0," + height2 + ")")
-						      .call(xAxis2);
+					context.append("g")
+				      .attr("class", "x axis")
+				      .attr("transform", "translate(0," + height2 + ")")
+				      .call(xAxis2);
 
-						  context.append("g")
-						      .attr("class", "x brush")
-						      .call(brush)
-						    .selectAll("rect")
-						      .attr("y", -6)
-						      .attr("height", height2 + 7);
+					context.append("g")
+				 	  .attr("class", "x brush")
+				      .call(brush)
+				      .selectAll("rect")
+				      .attr("y", -6)
+				      .attr("height", height2 + 7);
+
+				    // create brush to also zoom in with + detail on the main graph
 
 					$elem[0].svg = svg;
 
@@ -227,5 +231,39 @@ app.directive('areaGradient', ['DataManagerService', function (DataManagerServic
 		}
 		
 	};
+
+}]);
+
+
+app.directive('calendarView', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+	var delay = 350;
+
+	var jsonRes = null;
+
+	var calendar = null;
+
+	return {
+        restrict: 'E',
+        scope: true,
+        link: function($scope, $elem, $attr) {
+
+
+			$attr.$observe('resize', function(newVal) {
+		            
+		            calendarInit();
+			});
+
+			function calendarInit () {
+
+				calendar = new CalHeatMap();
+
+			}
+
+
+
+		}
+
+    };
 
 }]);

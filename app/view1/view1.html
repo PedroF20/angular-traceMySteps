@@ -9,6 +9,7 @@
               <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Hexbin Graph</a>
               <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
+              <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
           </div>
       </div>
@@ -53,14 +54,10 @@
               <div range-slider id="inner_range_slider" floor="0" ceiling="2400" step= "30" dragstop="true" 
                           ng-model-low="context.hourStart" ng-model-high="context.hourEnd"></div>
             </area-graph>
-
             <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
-
-            <hexbin-graph ng-if="widget.type == 'hexbin'" resize="{{context.resize}}">
-              <!-- <button onclick="generateData()">Generate Data</button> -->
-            </hexbin-graph>
-
+            <hexbin-graph ng-if="widget.type == 'hexbin'" resize="{{context.resize}}"></hexbin-graph>
             <area-gradient ng-if="widget.type == 'area-g'" resize="{{context.resize}}"></area-gradient>
+            <calendar-view ng-if="widget.type == 'calendar'" resize="{{context.resize}}"></calendar-view>
         </li>
     <ul>
 </div>
