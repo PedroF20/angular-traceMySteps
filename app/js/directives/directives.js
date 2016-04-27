@@ -235,35 +235,46 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 }]);
 
 
-app.directive('calendarView', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+// app.directive('calendarView', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-	var delay = 350;
+// 	var delay = 350;
 
-	var jsonRes = null;
+// 	var jsonRes = null;
 
-	var calendar = null;
+// 	var calendar = null;
 
-	return {
-        restrict: 'E',
-        scope: true,
-        link: function($scope, $elem, $attr) {
+// 	return {
+//         restrict: 'E',
+//         scope: true,
+//         link: function($scope, $elem, $attr) {
 
 
-			$attr.$observe('resize', function(newVal) {
+// 			$attr.$observe('resize', function(newVal) {
 		            
-		            calendarInit();
-			});
+// 		            calendarInit();
+// 			});
 
-			function calendarInit () {
+// 			function calendarInit () {
 
-				calendar = new CalHeatMap();
+// 				calendar = new CalHeatMap();
 
-			}
+// 				calendar.init({
+// 			        data: "datas-hours-calendar.json",
+// 			        start: new Date(2000, 0, 15),
+// 			        range: 15, // Number of days to display
+// 			        domain: "day", // Display days
+// 			        subDomain: "hour", // Split each day by hours
+// 			        browsing: true, // Enable browsing
+// 			        afterLoadNextDomain: function (start, end) {
+// 			            alert("You just loaded a new domain starting on " + start + " and ending on " + end);
+// 			        }
+//     			});
+
+// 			}
 
 
+// 		}
 
-		}
+//     };
 
-    };
-
-}]);
+// }]);

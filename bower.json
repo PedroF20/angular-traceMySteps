@@ -21,6 +21,7 @@
     "leaflet-d3": "^0.3.8",
     "leaflet": "^0.7.7",
     "mapbox-js": "mapbox.js#^2.4.0",
-    "simple-statistics": "^1.0.1"
+    "simple-statistics": "^1.0.1",
+    "angular-calendar-heatmap": "^0.0.7"
   }
 }

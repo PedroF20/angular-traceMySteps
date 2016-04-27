@@ -18,7 +18,7 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
 	
-	$scope.widgets = [{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2}];
+	$scope.widgets = [/*{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2}*/];
 	// $scope.widgets = [ {type: 'area', ...}, {type: 'area', ...}, {type: 'arc', ...} ];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
@@ -48,7 +48,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	    minColumns: 1, // the minimum columns the grid must have
 	    minRows: 3, // the minimum height of the grid, in rows
 	    maxRows: 10,
-	    maxSizeX: 5,
+	    maxSizeX: 6,
 	    maxSizeY: 5,
 	    resizable: {
 	       enabled: true,
@@ -83,13 +83,36 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addCalendarWidget = function() {
-		$scope.widgets.push({type: 'calendar', name: "Calendar View: places bla bla", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'calendar', name: "Calendar: Frequency of places visited", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
+	 	maxSizeY:1, maxSizeX:6});
 	};
 
 	$scope.clear = function() {
 		$scope.widgets = [];
 	};
 
+	 var now = moment().endOf('day').toDate();
+        var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
+        $scope.exampleData = d3.time.days(yearAgo, now).map(function (dateElement) {
+          return {
+            date: dateElement,
+            details: Array.apply(null, new Array(Math.floor(Math.random() * 10))).map(function(e, i, arr) {
+              return {
+                'name': 'Project ' + (i+1),
+                'value': 3600 * (arr.length - i-1) + Math.floor(Math.random() * 3600)
+              }
+            }),
+            init: function () {
+              this.total = this.details.reduce(function (prev, e) {
+                return e.value + prev;
+              }, 0);
+              return this;
+            }
+          }.init();
+        });
+        $scope.print = function (val) {
+          console.log(val);
+        };
 
 	// $scope.$watch('[limits]', function () {
 	// }, true); // If there was no true flag (false by default), the check would be for "reference" equality, 

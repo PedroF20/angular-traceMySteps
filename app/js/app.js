@@ -8,7 +8,8 @@ var app = angular.module('myApp', [
   'myApp.version',
   'angularRangeSlider',
   'gridster',
-  'pageslide-directive'
+  'pageslide-directive',
+  'g1b.calendar-heatmap'
 ]);
 
 app.config(['$routeProvider', function($routeProvider) {

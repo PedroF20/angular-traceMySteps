@@ -10,7 +10,7 @@
               <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
               <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
-              <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All New Items</a>
+              <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All Items</a>
           </div>
       </div>
 
@@ -34,7 +34,7 @@
 
 <div gridster="gridsterOpts">
     <ul id="gridster-ul">
-        <li ng-repeat="widget in widgets" gridster-item size-x="widget.sizeX" size-y="widget.sizeY" minSizeX="widget.minSizeX" minSizeY="widget.minSizeY">
+        <li ng-repeat="widget in widgets" gridster-item size-x="widget.sizeX" size-y="widget.sizeY" minSizeX="widget.minSizeX" minSizeY="widget.minSizeY"  maxSizeY="widget.maxSizeY" maxSizeX="widget.maxSizeX">
             <div class="box-header">
                 <h3>{{widget.name}}</h3> 
                 <div class="box-header-btns pull-right">
@@ -57,7 +57,7 @@
             <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
             <hexbin-graph ng-if="widget.type == 'hexbin'" resize="{{context.resize}}"></hexbin-graph>
             <area-gradient ng-if="widget.type == 'area-g'" resize="{{context.resize}}"></area-gradient>
-            <calendar-view ng-if="widget.type == 'calendar'" resize="{{context.resize}}"></calendar-view>
+            <calendar-heatmap data="exampleData" color="'#3b6427'" handler="print"></calendar-heatmap>
         </li>
     <ul>
 </div>
