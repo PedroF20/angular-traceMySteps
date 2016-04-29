@@ -9,7 +9,9 @@ Current state:
 Minor bugs: 
 
 - Python backend sometimes crashes.
+- Calendar resize bug
 
-Next steps:
+Steps to run:
 
-- Continue to add functionality.
+Download this folder and the backend folder, run npm start on angular command window and python app.py on backend window. 
+(To be pretty written)
