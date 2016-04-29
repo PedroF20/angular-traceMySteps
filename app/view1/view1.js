@@ -91,29 +91,6 @@ angular.module('myApp.view1', ['ngRoute'])
 		$scope.widgets = [];
 	};
 
-	 var now = moment().endOf('day').toDate();
-        var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
-        $scope.exampleData = d3.time.days(yearAgo, now).map(function (dateElement) {
-          return {
-            date: dateElement,
-            details: Array.apply(null, new Array(Math.floor(Math.random() * 10))).map(function(e, i, arr) {
-              return {
-                'name': 'Project ' + (i+1),
-                'value': 3600 * (arr.length - i-1) + Math.floor(Math.random() * 3600)
-              }
-            }),
-            init: function () {
-              this.total = this.details.reduce(function (prev, e) {
-                return e.value + prev;
-              }, 0);
-              return this;
-            }
-          }.init();
-        });
-        $scope.print = function (val) {
-          console.log(val);
-        };
-
 	// $scope.$watch('[limits]', function () {
 	// }, true); // If there was no true flag (false by default), the check would be for "reference" equality, 
 	// 			//which asks if the two objects refer to the same thing, instead of the value itself.

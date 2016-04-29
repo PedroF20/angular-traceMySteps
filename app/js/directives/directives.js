@@ -235,46 +235,289 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 }]);
 
 
-// app.directive('calendarView', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-// 	var delay = 350;
+	var delay=350;
 
-// 	var jsonRes = null;
+     var now = moment().endOf('day').toDate();
+     console.log("error");
+      var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
+      var data = d3.time.days(yearAgo, now).map(function (dateElement) {
+        return {
+          date: dateElement,
+          details: Array.apply(null, new Array(Math.floor(Math.random() * 10))).map(function(e, i, arr) {
+            return {
+              'name': 'Place ' + (i+1),
+              'value': 3600 * (arr.length - i-1) + Math.floor(Math.random() * 3600)
+            }
+          }),
+          init: function () {
+            this.total = this.details.reduce(function (prev, e) {
+              return e.value + prev;
+            }, 0);
+            return this;
+          }
+        }.init();
+      });
 
-// 	var calendar = null;
-
-// 	return {
-//         restrict: 'E',
-//         scope: true,
-//         link: function($scope, $elem, $attr) {
-
-
-// 			$attr.$observe('resize', function(newVal) {
-		            
-// 		            calendarInit();
-// 			});
-
-// 			function calendarInit () {
-
-// 				calendar = new CalHeatMap();
-
-// 				calendar.init({
-// 			        data: "datas-hours-calendar.json",
-// 			        start: new Date(2000, 0, 15),
-// 			        range: 15, // Number of days to display
-// 			        domain: "day", // Display days
-// 			        subDomain: "hour", // Split each day by hours
-// 			        browsing: true, // Enable browsing
-// 			        afterLoadNextDomain: function (start, end) {
-// 			            alert("You just loaded a new domain starting on " + start + " and ending on " + end);
-// 			        }
-//     			});
-
-// 			}
+    return {
+      restrict: 'E',
+      scope: true,
+      replace: true,
+      template: '<div class="calendar-heatmap"></div>',
+      link: function ($scope, $elem, $attr) {
 
 
-// 		}
+        $attr.$observe('resize', function(newVal) {
+            console.log("resize cal");
+            drawChart();
+        });
 
-//     };
 
-// }]);
+        function drawChart() {
+
+          setTimeout(function() {
+
+            $elem[0].svg = null;
+
+            //Defaults
+            var gutter = 5;
+            var initalWidth = ($elem[0].parentNode.clientWidth);
+            var initialHeight = ($elem[0].parentNode.clientHeight);
+            var circle_radius = 10;
+            var label_padding = 40;
+            var delay=350;
+
+            // Tooltip defaults
+            var tooltip_width = 250;
+            var tooltip_padding = 15;
+            var tooltip_line_height = 15;
+
+            if ( !initalWidth ) { return; }
+
+            var width = initalWidth < 1000 ? 1000 : initalWidth;
+            var circle_radius = (((width - gutter) / (moment().weeksInYear() + 2)) - gutter) / 2;
+            var label_padding = circle_radius * 4;
+            var height = label_padding + 7 * (circle_radius * 3 + gutter);
+
+            d3.select($elem[0]).selectAll("svg").remove()
+
+            var svg = d3.select($elem[0]).append('svg')
+              .attr('class', 'svg')
+              .attr("width", width)
+              .attr("height", height);
+
+            var labels = svg.append('g');
+            var circles = svg.append('g');
+
+            var tooltip = svg.append('g')
+              .attr('opacity', 0)
+              .attr('class', 'heatmap-tooltip');
+
+
+            if ( !data ) { return; }
+
+            var firstDate = moment(data[0].date);
+            var max = d3.max(data, function (d) {
+              return d.total;
+            });
+
+            var color = d3.scale.linear()
+              .range(['#ffffff', '#3b6427' || '#ff4500'])
+              .domain([0, max]);
+
+            circles.selectAll('circle').remove();
+            circles.selectAll('circle')
+              .data(data)
+              .enter()
+              .append('circle')
+              .attr('class', 'circle')
+              .attr('opacity', 0)
+              .attr('r', function (d) {
+                if ( max <= 0 ) { return circle_radius; }
+                return circle_radius * 0.75 + (circle_radius * d.total / max) * 0.25;
+              })
+              .attr('fill', function (d) {
+                return color(d.total);
+              })
+              .attr('cx', function (d) {
+                var cellDate = moment(d.date);
+                var week_num = cellDate.week() - firstDate.week() + (firstDate.weeksInYear() * (cellDate.weekYear() - firstDate.weekYear()));
+                return week_num * (circle_radius * 2 + gutter) + label_padding;
+              })
+              .attr('cy', function (d) {
+                return moment(d.date).weekday() * (circle_radius * 2 + gutter) + label_padding;
+              })
+              .on('click', function (d) {
+                console.log(d);
+              })
+              .on('mouseover', function (d) {
+                // Pulsating animation
+                var circle = d3.select(this);
+                (function repeat() {
+                  circle = circle.transition()
+                    .duration(500)
+                    .ease('ease-in')
+                    .attr('r', circle_radius+1)
+                    .transition()
+                    .duration(500)
+                    .ease('ease-in')
+                    .attr('r', circle_radius)
+                    .each('end', repeat);
+                })();
+
+                // Construct tooltip
+                var tooltip_height = 60 + tooltip_line_height * d.details.length;
+                tooltip.selectAll('text').remove();
+                tooltip.selectAll('rect').remove();
+                tooltip.insert('rect')
+                  .attr('class', 'heatmap-tooltip-background')
+                  .attr('width', tooltip_width)
+                  .attr('height', tooltip_height);
+                tooltip.append('text')
+                  .attr('font-weight', 900)
+                  .attr('x', tooltip_padding)
+                  .attr('y', tooltip_padding)
+                  .text((d.total ? formatTime(d.total) : 'No time') + ' tracked');
+                tooltip.append('text')
+                  .attr('x', tooltip_padding)
+                  .attr('y', tooltip_padding * 1.8)
+                  .text('on ' + moment(d.date).format('dddd, MMM Do YYYY'));
+
+                // Add details to the tooltip
+                angular.forEach(d.details, function (d, i) {
+                  tooltip.append('text')
+                    .attr('font-weight', 900)
+                    .attr('x', tooltip_padding)
+                    .attr('y', tooltip_line_height * 3 + i * tooltip_line_height)
+                    .text(d.name)
+                    .each(function () {
+                      var obj = d3.select(this),
+                        textLength = obj.node().getComputedTextLength(),
+                        text = obj.text();
+                      while (textLength > (tooltip_width / 2 - tooltip_padding) && text.length > 0) {
+                        text = text.slice(0, -1);
+                        obj.text(text + '...');
+                        textLength = obj.node().getComputedTextLength();
+                      }
+                    });
+                  tooltip.append('text')
+                    .attr('x', tooltip_width / 2 + tooltip_padding / 2)
+                    .attr('y', tooltip_line_height * 3 + i * tooltip_line_height)
+                    .text(formatTime(d.value));
+                });
+
+                var cellDate = moment(d.date);
+                var week_num = cellDate.week() - firstDate.week() + (firstDate.weeksInYear() * (cellDate.weekYear() - firstDate.weekYear()));
+                var x = week_num * (circle_radius * 2 + gutter) + label_padding + circle_radius;
+                while ( width - x < (tooltip_width + tooltip_padding * 3) ) {
+                  x -= 10;
+                }
+                var y = cellDate.weekday() * (circle_radius * 2 + gutter) + label_padding + circle_radius;
+                while ( height - y < tooltip_height && y > label_padding/2 ) {
+                  y -= 10;
+                }
+                tooltip.attr('transform', 'translate(' + x + ',' + y + ')');
+                tooltip.transition()
+                  .duration(250)
+                  .ease('ease-in')
+                  .attr('opacity', 1);
+              })
+              .on('mouseout', function () {
+                // Set circle radius back to what it's supposed to be
+                d3.select(this).transition()
+                  .duration(250)
+                  .ease('ease-in')
+                  .attr('r', circle_radius);
+
+                // Hide tooltip
+                tooltip.transition()
+                  .duration(250)
+                  .ease('ease-in')
+                  .attr('opacity', 0);
+              })
+              .transition()
+                .delay( function () {
+                  return Math.cos( Math.PI * Math.random() ) * 1000;
+                })
+                .duration(500)
+                .ease('ease-in')
+                .attr('opacity', 1);
+
+            // Add month labels
+            var now = moment().endOf('day').toDate();
+            var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
+            labels.selectAll('.label-month').remove();
+            labels.selectAll('.label-month')
+              .data(d3.time.months(moment(yearAgo).startOf('month').toDate(), now))
+              .enter()
+              .append('text')
+              .attr('class', 'label label-month')
+              .attr('font-size', function () {
+                return Math.floor(label_padding / 3) + 'px';
+              })
+              .text(function (d) {
+                return d.toLocaleDateString('en-us', {month: 'short'});
+              })
+              .attr('x', function (d, i) {
+                return i * ((circle_radius * 2 + gutter) * 30 / 7) + label_padding / 3;
+              })
+              .attr('y', label_padding / 2);
+
+            // Add day labels
+            var days = [];
+            for (var i = 0; i < 7; i++ ) {
+              days.push(moment().startOf('week').add(i, 'days').format('dddd')[0]); //isoweek to start week on monday
+            }
+            labels.selectAll('.label-day').remove();
+            labels.selectAll('.label-day')
+              .data(days)
+              .enter()
+              .append('text')
+              .attr('class', 'label label-day')
+              .attr('x', label_padding / 3)
+              .attr('y', function (d, i) {
+                return i * (circle_radius * 2 + gutter) + label_padding;
+              })
+              .style('text-anchor', 'middle')
+              .attr('font-size', function () {
+                return Math.floor(label_padding / 3) + 'px';
+              })
+              .attr('dy', function () {
+                return Math.floor(width / 100) / 3;
+              })
+              .text(function (d) {
+                return d;
+              });
+
+              $elem[0].svg = svg;
+
+            }, delay);
+          };
+
+          /**
+           * Helper function to convert seconds to a human readable format
+           * @param seconds Integer
+           */
+          function formatTime(seconds) {
+            var sec_num = parseInt(seconds, 10);
+            var hours = Math.floor(sec_num / 3600);
+            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+            var time = '';
+            if ( hours > 0 ) {
+              time += hours === 1 ? '1 hour ' : hours + ' hours ';
+            }
+            if ( minutes > 0 ) {
+              time += minutes === 1 ? '1 minute' : minutes + ' minutes';
+            }
+            if ( hours === 0 && minutes === 0 ) {
+              time = seconds + ' seconds';
+            }
+            return time;
+        };
+      }
+    };
+
+
+
+}]);
