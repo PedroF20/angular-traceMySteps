@@ -32,9 +32,8 @@ angular.module('myApp.view1', ['ngRoute'])
 	$scope.context = {
 		lowerValue: 0,  //at the moment, the initial day and final day are hardcoded
 		upperValue: 18, //this context has general data that every vis can fetch if they need
-		resize: 0,		//the specific data for each vis is in the directive: "widget.xxxxxx"
-		hourStart: 0,	//the interval of hours here is common sense. they can be hardcoded
-		hourEnd: 2400,
+		hourStart: 0,	//the specific data for each vis is in the directive: "widget.xxxxxx"
+		hourEnd: 2400,	//the interval of hours here is common sense. they can be hardcoded
 	}
 
 	$rootScope.selectedItem = false;
@@ -43,17 +42,17 @@ angular.module('myApp.view1', ['ngRoute'])
 	    columns: 6, // the width of the grid, in columns
 	    margins: [10, 10], // the pixel distance between each widget
 	    swapping: true,
-	    rowHeight: 'match', // 180 if we want to adjust to the window
+	    rowHeight: 'match', // 120 if we want to adjust to the window
 	    outerMargin: true, // whether margins apply to outer edges of the grid
 	    minColumns: 1, // the minimum columns the grid must have
 	    minRows: 3, // the minimum height of the grid, in rows
-	    maxRows: 10,
+	    maxRows: 100,
 	    maxSizeX: 6,
 	    maxSizeY: 5,
 	    resizable: {
 	       enabled: true,
-	       resize: function() {$scope.context.resize++},
-	       stop: function() {$scope.context.resize++; console.log('stop');} // no need to use gridster events and its scope for resizing (yet)
+	       resize: function() {},
+	       stop: function() {console.log('stop');} // no need to use gridster events and its scope for resizing (yet)
 	    },
 	    draggable: {
 	       enabled: true,
@@ -75,7 +74,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
+		$scope.widgets.push({type: 'areagradient', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
 	};
 
 	$scope.addChordWidget = function() {
@@ -84,7 +83,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 	$scope.addCalendarWidget = function() {
 		$scope.widgets.push({type: 'calendar', name: "Calendar: Frequency of places visited", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
-	 	maxSizeY:1, maxSizeX:6});
+	 	maxSizeY:1, maxSizeX:5});
 	};
 
 	$scope.clear = function() {

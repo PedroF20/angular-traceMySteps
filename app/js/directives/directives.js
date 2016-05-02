@@ -33,43 +33,51 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 				var layer1 = osm.addTo(maps[mapCount]);
 				
 
+        $scope.$watch(function () {
+          return $elem[0].parentNode.clientWidth;
+        }, function ( w ) {
+          if ( !w ) { return; }
+          for(var i = 0; i < mapCount; i++) {
+            maps[i].invalidateSize();
+          }
+        });
 
-				$attr.$observe('resize', function(newVal) {
-	                //createHexbinGraph();
-	                for(var i = 0; i < mapCount; i++) {
-	                	maps[i].invalidateSize();
-	                }
-	                
-				});
-
-	        	function createHexbinGraph () {
-
-					var options = {
-					    radius : 12,
-					    opacity: 0.5,
-					    duration: 500,
-					    lng: function(d){
-					        return d[0];
-					    },
-					    lat: function(d){
-					        return d[1];
-					    },
-					    value: function(d){
-					        return d.length;
-					    },
-					    valueFloor: 0,
-					    valueCeil: undefined
-					};
-
-					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
-					hexLayer.colorScale().range(['white', 'blue']);
-
-					hexLayer.data(data);
-					
-					maps[mapCount].invalidateSize();
-	        	}
+        $scope.$watch(function () {
+          return $elem[0].parentNode.clientHeight;
+        }, function ( h ) {
+          if ( !h ) { return; }
+          for(var i = 0; i < mapCount; i++) {
+            maps[i].invalidateSize();
+          }
+        });
 	        	
-	        	//generateData();
+        function createHexbinGraph () {
+
+  					var options = {
+  					    radius : 12,
+  					    opacity: 0.5,
+  					    duration: 500,
+  					    lng: function(d){
+  					        return d[0];
+  					    },
+  					    lat: function(d){
+  					        return d[1];
+  					    },
+  					    value: function(d){
+  					        return d.length;
+  					    },
+  					    valueFloor: 0,
+  					    valueCeil: undefined
+  					};
+
+  					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
+  					hexLayer.colorScale().range(['white', 'blue']);
+
+  					hexLayer.data(data);
+  					
+  					maps[mapCount].invalidateSize();
+	       }
+	        	
 	        	createHexbinGraph();
 	        	mapCount++;
     		}
@@ -91,15 +99,22 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
         	DataManagerService.get('/areagradient', []).then(function(d) {
 				jsonRes=d;
-				//console.log(list_of_hours);
 				createAreaGradientGraph();
 			});
 
+      $scope.$watch(function () {
+          return $elem[0].parentNode.clientWidth;
+        }, function ( w ) {
+          if ( !w ) { return; }
+          createAreaGradientGraph();
+        });
 
-			$attr.$observe('resize', function(newVal) {
-						//console.log('resize');
-		                createAreaGradientGraph();
-			});
+      $scope.$watch(function () {
+          return $elem[0].parentNode.clientHeight;
+        }, function ( h ) {
+          if ( !h ) { return; }
+          createAreaGradientGraph();
+        });
 
 			function createAreaGradientGraph () {
 
@@ -110,7 +125,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 					var parentHeigtht = angular.element($elem[0])[0].parentNode.clientHeight;
 					
 				    var margin = {top: 20, right: 10, bottom: 220, left: 40},
-	    				margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
+	    				  margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
 				        width = ($elem[0].parentNode.clientWidth) - margin.left - margin.right,
 				        height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
 				        height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
@@ -240,7 +255,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 	var delay=350;
 
      var now = moment().endOf('day').toDate();
-     console.log("error");
       var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
       var data = d3.time.days(yearAgo, now).map(function (dateElement) {
         return {
@@ -267,53 +281,49 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       template: '<div class="calendar-heatmap"></div>',
       link: function ($scope, $elem, $attr) {
 
+        var margin = {top: 20, right: 10, bottom: 20, left: 10};
+        var gutter = 5;
+        var initalWidth = 1000;
+        var initialHeight = ($elem[0].parentNode.clientHeight);
+        var circle_radius = 10;
+        var label_padding = 40;
+        var delay=350;
 
-        $attr.$observe('resize', function(newVal) {
-            console.log("resize cal");
-            drawChart();
+        // Tooltip defaults
+        var tooltip_width = 250;
+        var tooltip_padding = 15;
+        var tooltip_line_height = 15;
+
+
+        d3.select($elem[0]).selectAll("svg").remove()
+
+        var svg = d3.select($elem[0]).append('svg')
+          .attr('class', 'svg')
+
+        var labels = svg.append('g').attr("transform", "translate(" + 0 + "," + 0 + ")");
+        var circles = svg.append('g').attr("transform", "translate(" + 0 + "," + 0 + ")");
+
+        var tooltip = svg.append('g')
+          .attr('opacity', 0)
+          .attr('class', 'heatmap-tooltip');
+
+        $scope.$watch(function () {
+          return $elem[0].parentNode.clientWidth;
+        }, function ( w ) {
+          if ( !w ) { return; }
+          width = w < 1000 ? 1000 : w;
+          circle_radius = (((width - gutter) / (moment().weeksInYear() + 2)) - gutter) / 2;
+          label_padding = circle_radius * 4;
+          height = label_padding + 7 * (circle_radius * 2 + gutter);
+          svg.attr({'width': width, 'height': height});
+          drawChart();
         });
-
 
         function drawChart() {
 
           setTimeout(function() {
 
             $elem[0].svg = null;
-
-            //Defaults
-            var gutter = 5;
-            var initalWidth = ($elem[0].parentNode.clientWidth);
-            var initialHeight = ($elem[0].parentNode.clientHeight);
-            var circle_radius = 10;
-            var label_padding = 40;
-            var delay=350;
-
-            // Tooltip defaults
-            var tooltip_width = 250;
-            var tooltip_padding = 15;
-            var tooltip_line_height = 15;
-
-            if ( !initalWidth ) { return; }
-
-            var width = initalWidth < 1000 ? 1000 : initalWidth;
-            var circle_radius = (((width - gutter) / (moment().weeksInYear() + 2)) - gutter) / 2;
-            var label_padding = circle_radius * 4;
-            var height = label_padding + 7 * (circle_radius * 3 + gutter);
-
-            d3.select($elem[0]).selectAll("svg").remove()
-
-            var svg = d3.select($elem[0]).append('svg')
-              .attr('class', 'svg')
-              .attr("width", width)
-              .attr("height", height);
-
-            var labels = svg.append('g');
-            var circles = svg.append('g');
-
-            var tooltip = svg.append('g')
-              .attr('opacity', 0)
-              .attr('class', 'heatmap-tooltip');
-
 
             if ( !data ) { return; }
 
@@ -377,11 +387,11 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 tooltip.append('text')
                   .attr('font-weight', 900)
                   .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding)
+                  .attr('y', tooltip_padding * 1.5)
                   .text((d.total ? formatTime(d.total) : 'No time') + ' tracked');
                 tooltip.append('text')
                   .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding * 1.8)
+                  .attr('y', tooltip_padding * 2.5)
                   .text('on ' + moment(d.date).format('dddd, MMM Do YYYY'));
 
                 // Add details to the tooltip
@@ -389,7 +399,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   tooltip.append('text')
                     .attr('font-weight', 900)
                     .attr('x', tooltip_padding)
-                    .attr('y', tooltip_line_height * 3 + i * tooltip_line_height)
+                    .attr('y', tooltip_line_height * 4 + i * tooltip_line_height)
                     .text(d.name)
                     .each(function () {
                       var obj = d3.select(this),
@@ -403,7 +413,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                     });
                   tooltip.append('text')
                     .attr('x', tooltip_width / 2 + tooltip_padding / 2)
-                    .attr('y', tooltip_line_height * 3 + i * tooltip_line_height)
+                    .attr('y', tooltip_line_height * 4 + i * tooltip_line_height)
                     .text(formatTime(d.value));
                 });
 
@@ -415,9 +425,9 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 }
                 var y = cellDate.weekday() * (circle_radius * 2 + gutter) + label_padding + circle_radius;
                 while ( height - y < tooltip_height && y > label_padding/2 ) {
-                  y -= 10;
+                  y -= 100;
                 }
-                tooltip.attr('transform', 'translate(' + x + ',' + y + ')');
+                tooltip.attr('transform', 'translate(' + x + ',' + (y)+ ')');
                 tooltip.transition()
                   .duration(250)
                   .ease('ease-in')
@@ -517,7 +527,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         };
       }
     };
-
 
 
 }]);

@@ -68,11 +68,19 @@ app.directive('areaGraph', ['DataManagerService', '$rootScope', function (DataMa
                 createAreaGraph();
 			});
 
-			$attr.$observe('resize', function(newVal) {
-				//console.log('resize');
-                createAreaGraph();
-			});
+		      $scope.$watch(function () {
+		          return $elem[0].parentNode.clientWidth;
+		        }, function ( w ) {
+		          if ( !w ) { return; }
+		          createAreaGraph();
+		        });
 
+		      $scope.$watch(function () {
+		          return $elem[0].parentNode.clientHeight;
+		        }, function ( h ) {
+		        if ( !h ) { return; }
+		        createAreaGraph();
+		       });
 
 			$rootScope.$on('rootScope:broadcast', function (event, data) {
 			 		console.log("Area broadcast: " + JSON.stringify(data)); // 'Broadcast!'
@@ -275,10 +283,19 @@ app.directive('chordGraph', function ($http, $rootScope) {
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        	$attr.$observe('resize', function(newVal) {
-				console.log('resize');
-                createChordGraph();
-			});
+		      $scope.$watch(function () {
+		          return $elem[0].parentNode.clientWidth;
+		        }, function ( w ) {
+		          if ( !w ) { return; }
+		          createChordGraph();
+		        });
+
+		      $scope.$watch(function () {
+		          return $elem[0].parentNode.clientHeight;
+		        }, function ( h ) {
+		        if ( !h ) { return; }
+		        createChordGraph();
+		       });
 
         	function createChordGraph () {
 

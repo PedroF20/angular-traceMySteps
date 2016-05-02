@@ -303,31 +303,16 @@ text {
     stroke-width: 1px;
 }
 
-/*
-.leaflet-container {
-  display: block;
-  position: initial !important;
-}
-
-.leaflet-container, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-layer, .leaflet-tile-container, .leaflet-tile {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.leaflet-tile {
-  left: 0 !important;
-  top: 0 !important;
-}
-
-div.leaflet-bottom.leaflet-right {
-  display: none;
-}
-*/
 .leaflet-control-attribution {
   display: none;
 }
 
-/* CALENDAR */
+/********END LEAFLET STYLES************/
+
+
+/*******************************/
+/*          CALENDAR          */
+/******************************/
 
 .calendar-heatmap {
   user-select: none;
@@ -344,7 +329,7 @@ div.leaflet-bottom.leaflet-right {
 }
 .calendar-heatmap .heatmap-tooltip {
   pointer-events: none;
-  position: absolute;
+  z-index: 100;
 }
 .calendar-heatmap .heatmap-tooltip .heatmap-tooltip-background {
   fill: rgba(255, 255, 255, 0.75);

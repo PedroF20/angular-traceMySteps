@@ -49,15 +49,15 @@
             </div>
             
             <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{context.lowerValue}}" 
-                                                      day-end="{{context.upperValue}}" resize="{{context.resize}}"
-                                                      hour-start="{{context.hourStart}}" hour-end="{{context.hourEnd}}">
+                                                      day-end="{{context.upperValue}}" hour-start="{{context.hourStart}}" 
+                                                      hour-end="{{context.hourEnd}}">
               <div range-slider id="inner_range_slider" floor="0" ceiling="2400" step= "30" dragstop="true" 
                           ng-model-low="context.hourStart" ng-model-high="context.hourEnd"></div>
             </area-graph>
-            <chord-graph ng-if="widget.type == 'chord'" resize="{{context.resize}}"></chord-graph>
-            <hexbin-graph ng-if="widget.type == 'hexbin'" resize="{{context.resize}}"></hexbin-graph>
-            <area-gradient ng-if="widget.type == 'area-g'" resize="{{context.resize}}"></area-gradient>
-            <calendar-heatmap ng-if="widget.type == 'calendar'" resize="{{context.resize}}"></calendar-heatmap>
+            <chord-graph ng-if="widget.type == 'chord'"></chord-graph>
+            <hexbin-graph ng-if="widget.type == 'hexbin'"></hexbin-graph>
+            <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>
+            <calendar-heatmap ng-if="widget.type == 'calendar'"></calendar-heatmap>
         </li>
     <ul>
 </div>
