@@ -10,6 +10,7 @@
               <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
               <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
+              <a class="btn btn-primary" id="add-tracks-button" ng-click="addTracksWidget()">Add Tracks</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All Items</a>
           </div>
       </div>
@@ -58,6 +59,7 @@
             <hexbin-graph ng-if="widget.type == 'hexbin'"></hexbin-graph>
             <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>
             <calendar-heatmap ng-if="widget.type == 'calendar'"></calendar-heatmap>
+            <gps-tracks ng-if="widget.type == 'tracks'"></gps-tracks>
         </li>
     <ul>
 </div>

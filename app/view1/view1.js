@@ -86,6 +86,10 @@ angular.module('myApp.view1', ['ngRoute'])
 	 	maxSizeY:1, maxSizeX:5});
 	};
 
+	$scope.addTracksWidget = function() {
+		$scope.widgets.push({type: 'tracks', name: "My Tracks", draggable: true, sizeX: 2, sizeY: 2});
+	};
+
 	$scope.clear = function() {
 		$scope.widgets = [];
 	};
@@ -94,6 +98,5 @@ angular.module('myApp.view1', ['ngRoute'])
 	// }, true); // If there was no true flag (false by default), the check would be for "reference" equality, 
 	// 			//which asks if the two objects refer to the same thing, instead of the value itself.
 	// 			//in this case they always refer the same, so we need to check the values.
-
 
 }]);

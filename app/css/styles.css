@@ -111,6 +111,12 @@ html {
     right: 90px;
 }
 
+#add-tracks-button {
+    position: absolute;
+    top: 400px;
+    right: 90px;
+}
+
 #clear-items-button {
     position: absolute;
     top: 250px;

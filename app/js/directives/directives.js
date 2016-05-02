@@ -527,6 +527,57 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         };
       }
     };
+}]);
 
+
+app.directive('gpsTracks', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+  var trackmaps = [];
+
+  var trackmap = undefined;
+  var center = [38.7, -9.1];
+  var latFn = d3.random.normal(center[0], 0.5);
+  var longFn = d3.random.normal(center[1], 0.5);
+  var trackmapCount=0;
+
+  return {
+
+        restrict: 'E',
+        scope: true,
+        link: function($scope, $elem, $attr) {
+
+
+        var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
+
+        angular.element($elem[0]).append(angular.element('<div id="trackmap'+ trackmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+        console.log('trackmap'+ trackmapCount +'');
+        trackmaps[trackmapCount] = new L.Map('trackmap'+ trackmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
+        var layer1 = osm.addTo(trackmaps[trackmapCount]);
+        
+
+        $scope.$watch(function () {
+          return $elem[0].parentNode.clientWidth;
+        }, function ( w ) {
+          if ( !w ) { return; }
+          for(var i = 0; i < trackmapCount; i++) {
+            trackmaps[i].invalidateSize();
+          }
+        });
+
+        $scope.$watch(function () {
+          return $elem[0].parentNode.clientHeight;
+        }, function ( h ) {
+          if ( !h ) { return; }
+          for(var i = 0; i < trackmapCount; i++) {
+            trackmaps[i].invalidateSize();
+          }
+        });
+
+        trackmaps[trackmapCount].invalidateSize();
+        trackmapCount++;
+      }
+    }
 
 }]);
