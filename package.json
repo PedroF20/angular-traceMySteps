@@ -34,7 +34,8 @@
   },
   "main": "n",
   "dependencies": {
-    "cal-heatmap": "^3.5.4"
+    "leaflet-plugins": "^1.6.0",
+    "togeojson": "^0.13.0"
   },
   "repository": {
     "type": "git",

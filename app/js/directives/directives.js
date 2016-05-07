@@ -97,7 +97,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        	DataManagerService.get('/areagradient', []).then(function(d) {
+      DataManagerService.get('/areagradient', []).then(function(d) {
 				jsonRes=d;
 				createAreaGradientGraph();
 			});
@@ -530,32 +530,31 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 }]);
 
 
-app.directive('gpsTracks', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  function (DataManagerService, $rootScope, $http) {
+
+  // temporarily we will use gpx tracks as means to get the points in geojson to draw the tracks.
+  // in the future, using the real backend and database, we will collect the parsed points/geojson?
+  // from the backend and draw them. the gpx tracks will be already dealt with in the backend
+
+  // function clear_geolayer() {
+  //   map.removeLayer(geolayer);
+  //   can addLayer() too
+  // }
 
   var trackmaps = [];
-
-  var trackmap = undefined;
+  var trackmapCount=0;
+  var geo = [];
+  var geolayer = null;
   var center = [38.7, -9.1];
   var latFn = d3.random.normal(center[0], 0.5);
   var longFn = d3.random.normal(center[1], 0.5);
-  var trackmapCount=0;
 
   return {
 
         restrict: 'E',
         scope: true,
-        link: function($scope, $elem, $attr) {
+        link: function($scope, $elem, $attr, $http) {
 
-
-        var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
-
-        angular.element($elem[0]).append(angular.element('<div id="trackmap'+ trackmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
-        console.log('trackmap'+ trackmapCount +'');
-        trackmaps[trackmapCount] = new L.Map('trackmap'+ trackmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-        var layer1 = osm.addTo(trackmaps[trackmapCount]);
-        
 
         $scope.$watch(function () {
           return $elem[0].parentNode.clientWidth;
@@ -575,8 +574,45 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', function (DataMa
           }
         });
 
-        trackmaps[trackmapCount].invalidateSize();
-        trackmapCount++;
+        $.ajax('2016-05-04 13-13-36.gpx').done(function(response) {
+            
+            geo[0] = toGeoJSON.gpx(response);
+
+            var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+              osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
+            var ggl = new L.Google();
+
+            angular.element($elem[0]).append(angular.element('<div id="trackmap'+ trackmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+            trackmaps[trackmapCount] = new L.Map('trackmap'+ trackmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
+            trackmaps[trackmapCount].addControl(new L.Control.Layers( {'Google':ggl,'OSM':osm}, {}));
+            
+            //trackmaps[trackmapCount].addLayer(ggl);
+            // if both were active, the two layers would be active with one layed over the other,
+            // depending on the order of call. this way the map initializes on the layer1 (leaflet)
+            // layer, and then we can choose to change to the google layer
+            var layer1 = osm.addTo(trackmaps[trackmapCount]);
+
+            var myStyle = {
+                "color": "red",
+                "weight": 5,
+                "opacity": 0.65,
+                "clickable": true
+            };
+
+            for (var i = 0; i < geo.length; i++) {
+                geolayer = L.geoJson(geo[i], {
+                    style: myStyle,
+                })
+                .on('click', function(e) {
+                    console.log(e.latlng);
+                });
+                geolayer.addTo(trackmaps[trackmapCount]);
+                trackmaps[trackmapCount].invalidateSize();
+                trackmapCount++;
+
+            };
+        });
       }
     }
 

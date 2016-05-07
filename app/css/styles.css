@@ -300,9 +300,9 @@ text {
 
 
 
-/*******************************/
-/*      Hexbin / Leaflet      */
-/******************************/
+/***************************************/
+/*      Hexbin / Leaflet / Google     */
+/**************************************/
 
 .hexbin-hexagon {
     stroke: #000;
@@ -313,7 +313,20 @@ text {
   display: none;
 }
 
-/********END LEAFLET STYLES************/
+
+.gm-style-cc {
+  display: none;
+}
+
+.gmnoprint gm-style-cc {
+  display: none;
+}
+
+.gmnoprint {
+  display: none;
+}
+
+/********END MAP STYLES************/
 
 
 /*******************************/
