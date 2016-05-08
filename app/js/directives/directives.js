@@ -377,7 +377,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 })();
 
                 // Construct tooltip
-                var tooltip_height = 60 + tooltip_line_height * d.details.length;
+                var tooltip_height = tooltip_padding * 4 + tooltip_line_height * d.details.length;
                 tooltip.selectAll('text').remove();
                 tooltip.selectAll('rect').remove();
                 tooltip.insert('rect')
@@ -455,11 +455,16 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 .attr('opacity', 1);
 
             // Add month labels
-            var now = moment().endOf('day').toDate();
-            var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
+            var today = moment().endOf('day');
+            var todayYearAgo = moment().startOf('day').subtract(1, 'year');
+            var monthLabels = d3.time.months(todayYearAgo.startOf('month'), today);
+            var monthLabelOffset = (width - label_padding * 2) / 12 / 2;
+            var monthAxis = d3.scale.linear()
+              .range([label_padding, width])
+              .domain([0, monthLabels.length]);
             labels.selectAll('.label-month').remove();
             labels.selectAll('.label-month')
-              .data(d3.time.months(moment(yearAgo).startOf('month').toDate(), now))
+              .data(monthLabels)
               .enter()
               .append('text')
               .attr('class', 'label label-month')
@@ -470,24 +475,41 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return d.toLocaleDateString('en-us', {month: 'short'});
               })
               .attr('x', function (d, i) {
-                return i * ((circle_radius * 2 + gutter) * 30 / 7) + label_padding / 3;
+                return monthLabelOffset + monthAxis(i);
               })
-              .attr('y', label_padding / 2);
+              .attr('y', label_padding / 2)
+              .on('mouseenter', function (d) {
+                var selectedMonth = moment(d);
+                circles.selectAll('circle')
+                  .transition()
+                  .duration(500)
+                  .ease('ease-in')
+                  .attr('opacity', function (d) {
+                    return moment(d.date).isSame(selectedMonth, 'month') ? 1 : 0.1;
+                  });
+              })
+              .on('mouseout', function () {
+                circles.selectAll('circle')
+                  .transition()
+                  .duration(500)
+                  .ease('ease-in')
+                  .attr('opacity', 1);
+              });
 
             // Add day labels
-            var days = [];
-            for (var i = 0; i < 7; i++ ) {
-              days.push(moment().startOf('week').add(i, 'days').format('dddd')[0]); //isoweek to start week on monday
-            }
+            var dayLabels = d3.time.days(moment().startOf('week'), moment().endOf('week'));
+            var dayAxis = d3.scale.linear()
+              .range([label_padding, height])
+              .domain([0, dayLabels.length]);
             labels.selectAll('.label-day').remove();
             labels.selectAll('.label-day')
-              .data(days)
+              .data(dayLabels)
               .enter()
               .append('text')
               .attr('class', 'label label-day')
               .attr('x', label_padding / 3)
               .attr('y', function (d, i) {
-                return i * (circle_radius * 2 + gutter) + label_padding;
+                return dayAxis(i);
               })
               .style('text-anchor', 'middle')
               .attr('font-size', function () {
@@ -497,7 +519,24 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return Math.floor(width / 100) / 3;
               })
               .text(function (d) {
-                return d;
+                return moment(d).format('dddd')[0];
+              })
+              .on('mouseenter', function (d) {
+                var selectedDay = moment(d);
+                circles.selectAll('circle')
+                  .transition()
+                  .duration(500)
+                  .ease('ease-in')
+                  .attr('opacity', function (d) {
+                    return (moment(d.date).day() === selectedDay.day()) ? 1 : 0.1;
+                  });
+              })
+              .on('mouseout', function () {
+                circles.selectAll('circle')
+                  .transition()
+                  .duration(500)
+                  .ease('ease-in')
+                  .attr('opacity', 1);
               });
 
               $elem[0].svg = svg;

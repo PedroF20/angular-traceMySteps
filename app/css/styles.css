@@ -313,7 +313,6 @@ text {
   display: none;
 }
 
-
 .gm-style-cc {
   display: none;
 }
@@ -343,6 +342,7 @@ text {
   cursor: pointer;
 }
 .calendar-heatmap .label {
+  cursor: pointer;
   fill: rgb(0, 0, 0);
   font-family: Helvetica, arial, 'Open Sans', sans-serif;
 }
