@@ -89,7 +89,7 @@ var PolylineExtremities = {
             return this;
         }
 
-        var svg = this._map._renderer._container;
+        var svg = this._map._pathRoot;
 
         // Check if the defs node is already created
         var defsNode;
@@ -98,7 +98,7 @@ var PolylineExtremities = {
 
         } else{
             L.DomUtil.addClass(svg, 'defs');
-            defsNode = L.SVG.create('defs');
+            defsNode = L.Path.prototype._createElement('defs');
             defsNode.setAttribute('id', 'defs');
             svg.appendChild(defsNode);
         }
@@ -110,8 +110,8 @@ var PolylineExtremities = {
         this._path.setAttribute('marker-start', 'url(#' + id + ')');
         this._path.setAttribute('marker-end', 'url(#' + id + ')');
 
-        var markersNode = L.SVG.create('marker'),
-            markerPath = L.SVG.create('path'),
+        var markersNode = L.Path.prototype._createElement('marker'),
+            markerPath = L.Path.prototype._createElement('path'),
             symbol = PolylineExtremities.SYMBOLS[pattern];
 
         // Create the markers definition

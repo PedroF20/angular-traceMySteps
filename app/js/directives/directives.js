@@ -278,7 +278,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       restrict: 'E',
       scope: true,
       replace: true,
-      template: '<div class="calendar-heatmap"></div>',
       link: function ($scope, $elem, $attr) {
 
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
@@ -385,7 +384,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   .attr('width', tooltip_width)
                   .attr('height', tooltip_height);
                 tooltip.append('text')
-                  .attr('font-weight', 900)
+                  .style('font-weight', 900)
                   .attr('x', tooltip_padding)
                   .attr('y', tooltip_padding * 1.5)
                   .text((d.total ? formatTime(d.total) : 'No time') + ' tracked');
@@ -397,7 +396,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 // Add details to the tooltip
                 angular.forEach(d.details, function (d, i) {
                   tooltip.append('text')
-                    .attr('font-weight', 900)
+                    .style('font-weight', 900)
                     .attr('x', tooltip_padding)
                     .attr('y', tooltip_line_height * 4 + i * tooltip_line_height)
                     .text(d.name)
@@ -468,8 +467,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .enter()
               .append('text')
               .attr('class', 'label label-month')
-              .attr('font-size', function () {
-                return Math.floor(label_padding / 3) + 'px';
+              .style('font-size', function () {
+                return Math.floor(label_padding / 2.5) + 'px';
               })
               .text(function (d) {
                 return d.toLocaleDateString('en-us', {month: 'short'});
@@ -512,8 +511,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return dayAxis(i);
               })
               .style('text-anchor', 'middle')
-              .attr('font-size', function () {
-                return Math.floor(label_padding / 3) + 'px';
+              .style('font-size', function () {
+                return Math.floor(label_padding / 2.5) + 'px';
               })
               .attr('dy', function () {
                 return Math.floor(width / 100) / 3;
@@ -647,6 +646,7 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
                     console.log(e.latlng);
                 });
                 geolayer.addTo(trackmaps[trackmapCount]);
+                geolayer.showExtremities('dotM');
                 trackmaps[trackmapCount].invalidateSize();
                 trackmapCount++;
 
