@@ -82,15 +82,20 @@ app.directive('areaGraph', ['DataManagerService', '$rootScope', function (DataMa
 		        createAreaGraph();
 		       });
 
-			$rootScope.$on('rootScope:broadcast', function (event, data) {
+			var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
 			 		console.log("Area broadcast: " + JSON.stringify(data)); // 'Broadcast!'
 			 		createHighlightAreaGraph(data.start,data.end);
 			});
 
-			$rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+			var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
 			 		console.log("Area broadcast leave: " + data); // 'Broadcast!'
 			 		createAreaGraph();
 			});
+
+			$scope.$on('$destroy', function() {
+    			rootScopeBroadcast();
+    			rootScopeBroadcastLeave();
+			})
 
 
             function createAreaGraph () {
