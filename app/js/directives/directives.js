@@ -50,6 +50,18 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
             maps[i].invalidateSize();
           }
         });
+
+        var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+              console.log("Tracks broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+              var zoom = 15;
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].setView([38.73659, -9.14090], zoom);
+              }
+        });
+
+        $scope.$on('$destroy', function() {
+            rootScopeBroadcast();
+        })
 	        	
         function createHexbinGraph () {
 
@@ -80,9 +92,10 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
   					maps[mapCount].invalidateSize();
 
 	       }
-	        	
 	        	createHexbinGraph();
 	        	mapCount++;
+
+
     		}
     	}
 }]);
@@ -307,8 +320,8 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
             geo[0] = toGeoJSON.gpx(response);
 
             var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-              osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
+                osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
             var ggl = new L.Google();
 
             angular.element($elem[0]).append(angular.element('<div id="trackmap'+ trackmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
@@ -333,7 +346,12 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
                     style: myStyle,
                 })
                 .on('click', function(e) {
-                    console.log(e.latlng);
+                    console.log(e);
+                    /* EXEMPLO PARA QUARTA: AO CLICAR AQUI NA TRACK, FAZER BROADCAST PARA O CALENDARIO DESENHAR
+                    A SUPOSTA DAY VIEW ASSOCIADA AO SUPOSTO DIA DESTA TRACK. FAZER BROADCAST TB PARA O AREA GRADIENT
+                    PARA REDESENHAR PARA QUALQUER ZOOM TEMPORAL. EM RELACAO AO HEXBIN MANDAR O BROADCAST PARA ESTE
+                    FAZER ZOOM PARA A ZONA DO MAPA CORRESPONDENTE A TRACK */
+                    $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin'});
                 });
                 geolayer.addTo(trackmaps[trackmapCount]);
                 geolayer.showExtremities('arrowM');
@@ -348,71 +366,71 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 }]);
 
 
-app.directive('multiLine', ['DataManagerService', '$rootScope', '$http',  function (DataManagerService, $rootScope, $http) {
+// app.directive('multiLine', ['DataManagerService', '$rootScope', '$http',  function (DataManagerService, $rootScope, $http) {
 
-  var delay=350;
+//   var delay=350;
 
-  var jsonRes=null;
-
-
-  return {
-        restrict: 'E',
-        scope: true,
-        link: function($scope, $elem, $attr) {
-
-      // DataManagerService.get('/multiline', []).then(function(d) {
-      //   jsonRes=d;
-      //   createAreaGradientGraph();
-      // });
-
-      $scope.$watch(function () {
-          return $elem[0].parentNode.clientWidth;
-        }, function ( w ) {
-          if ( !w ) { return; }
-          createMultiLineGraph();
-      });
-
-      $scope.$watch(function () {
-          return $elem[0].parentNode.clientHeight;
-        }, function ( h ) {
-          if ( !h ) { return; }
-          createMultiLineGraph();
-      });
-
-      function createMultiLineGraph () {
-
-        setTimeout(function() {
-
-          $elem[0].svg = null;
-
-          var margin = {top: 20, right: 80, bottom: 30, left: 50},
-              width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
-              height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
-
-          var parseDate = d3.time.format("%Y%m%d").parse;
-
-          var x = d3.time.scale()
-            .range([0, width]);
-
-          var y = d3.time.scale()
-            .range([height, 0]);
-
-          var color = d3.scale.category10();
-
-          var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
-
-          var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
+//   var jsonRes=null;
 
 
+//   return {
+//         restrict: 'E',
+//         scope: true,
+//         link: function($scope, $elem, $attr) {
 
-        }, delay);
+//       // DataManagerService.get('/multiline', []).then(function(d) {
+//       //   jsonRes=d;
+//       //   createAreaGradientGraph();
+//       // });
 
-      }
-    }
-  };
+//       $scope.$watch(function () {
+//           return $elem[0].parentNode.clientWidth;
+//         }, function ( w ) {
+//           if ( !w ) { return; }
+//           createMultiLineGraph();
+//       });
 
-}]);
+//       $scope.$watch(function () {
+//           return $elem[0].parentNode.clientHeight;
+//         }, function ( h ) {
+//           if ( !h ) { return; }
+//           createMultiLineGraph();
+//       });
+
+//       function createMultiLineGraph () {
+
+//         setTimeout(function() {
+
+//           $elem[0].svg = null;
+
+//           var margin = {top: 20, right: 80, bottom: 30, left: 50},
+//               width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+//               height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+
+//           var parseDate = d3.time.format("%Y%m%d").parse;
+
+//           var x = d3.time.scale()
+//             .range([0, width]);
+
+//           var y = d3.time.scale()
+//             .range([height, 0]);
+
+//           var color = d3.scale.category10();
+
+//           var xAxis = d3.svg.axis()
+//             .scale(x)
+//             .orient("bottom");
+
+//           var yAxis = d3.svg.axis()
+//             .scale(y)
+//             .orient("left");
+
+
+
+//         }, delay);
+
+//       }
+//     }
+//   };
+
+// }]);

@@ -34,7 +34,7 @@ angular.module('myApp.view1', ['ngRoute'])
 		hourEnd: 2400,	//the interval of hours here is common sense. they can be hardcoded
 	}
 
-	$rootScope.selectedItem = false;
+	//$rootScope.selectedItem = false;
 
 	$scope.gridsterOpts = {
 	    columns: 6, // the width of the grid, in columns

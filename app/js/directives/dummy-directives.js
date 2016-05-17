@@ -97,6 +97,10 @@ app.directive('areaGraph', ['DataManagerService', '$rootScope', function (DataMa
     			rootScopeBroadcastLeave();
 			})
 
+			//Angular will broadcast a $destroy event just before tearing down a scope and removing the scope from its parent.
+			//Listening for this event is crucial for cleaning up tasks and resources
+			//This is needed since $rootScope is never destroyed during the lifetime of the application.
+
 
             function createAreaGraph () {
             	
@@ -393,7 +397,7 @@ app.directive('chordGraph', function ($http, $rootScope) {
 					        .filter(function(d) { return d.source.index != i && d.target.index != i; })
 					      .transition()
 					        .style("opacity", opacity);
-					        $rootScope.selectedItem=true;
+					        //$rootScope.selectedItem=true;
 
 					        $rootScope.$broadcast('rootScope:broadcast', { start : 4, end : 8});
 
@@ -406,7 +410,7 @@ app.directive('chordGraph', function ($http, $rootScope) {
 					        .filter(function(d) { return d.source.index != i && d.target.index != i; })
 					      .transition()
 					        .style("opacity", opacity);
-					        $rootScope.selectedItem=false;
+					        //$rootScope.selectedItem=false;
 					        $rootScope.$broadcast('rootScope:broadcast-leave', 'json vazio');
 					  };
 					}

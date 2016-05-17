@@ -108,6 +108,11 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
           drawChart();
         });
 
+        $scope.$on('$destroy', function() {
+          // rootScopeBroadcast();
+          // rootScopeBroadcastLeave();
+        })
+
         /**
          * Draw the chart based on the current overview type
          */
