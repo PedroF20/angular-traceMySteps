@@ -4,7 +4,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
   // **************************** EXAMPLE DATA ***********************
 
-     var now = moment().endOf('day').toDate();
+      var now = moment().endOf('day').toDate();
       var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
       var data = d3.time.days(yearAgo, now).map(function (dateElement) {
         return {
@@ -108,9 +108,22 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
           drawChart();
         });
 
+        var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, response) {
+            console.log("Calendar broadcast: " + JSON.stringify(response.calendar)); // 'Broadcast!'
+            removeYearOverview();
+            selected_date=data[0]; //hardcoded to show the first day of the data array in the day overview (proof-of-concept)
+            drawDayOverview();
+        });
+
+        var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+          console.log("Calendar broadcast leave"); // 'Broadcast!'
+          removeDayOverview();
+          drawYearOverview();
+        });
+
         $scope.$on('$destroy', function() {
-          // rootScopeBroadcast();
-          // rootScopeBroadcastLeave();
+            rootScopeBroadcast();
+            rootScopeBroadcastLeave();
         })
 
         /**
@@ -171,7 +184,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
                 // Set selected date to the one clicked on
                 selected_date = d;
-  
+                console.log(d);
                 // Remove all year overview related items and labels
                 removeYearOverview();
   

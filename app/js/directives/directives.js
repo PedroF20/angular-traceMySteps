@@ -52,15 +52,24 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
         });
 
         var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
-              console.log("Tracks broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+              console.log("Hexbin broadcast: " + JSON.stringify(data.hexbin_info)); // 'Broadcast!'
               var zoom = 15;
               for(var i = 0; i < mapCount; i++) {
                 maps[i].setView([38.73659, -9.14090], zoom);
               }
         });
 
+        var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+          console.log("Hexbin broadcast leave"); // 'Broadcast!'
+          var zoom = 10;
+          for(var i = 0; i < mapCount; i++) {
+            maps[i].setView([center[0], center[1]], zoom);
+          }
+        });
+
         $scope.$on('$destroy', function() {
             rootScopeBroadcast();
+            rootScopeBroadcastLeave();
         })
 	        	
         function createHexbinGraph () {
@@ -132,9 +141,20 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
           createAreaGradientGraph();
         });
 
-$scope.$on('$destroy', function() {
-    cleanup();
-})
+      var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+        console.log("Area gradient broadcast: " + JSON.stringify(data.area_gradient)); // 'Broadcast!'
+        createAreaGradientHighlightGraph();
+      });
+
+      var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+        console.log("Area gradient broadcast leave"); // 'Broadcast!'
+        createAreaGradientGraph();
+      });
+
+      $scope.$on('$destroy', function() {
+          rootScopeBroadcast();
+          rootScopeBroadcastLeave();
+      })
 
 			function createAreaGradientGraph () {
 
@@ -259,8 +279,129 @@ $scope.$on('$destroy', function() {
 					}
 
 			    }, delay);
-
 			}
+
+
+      function createAreaGradientHighlightGraph () {
+
+          $elem[0].svg = null;
+          
+          var parentHeigtht = angular.element($elem[0])[0].parentNode.clientHeight;
+          
+            var margin = {top: 20, right: 10, bottom: 220, left: 40},
+                margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
+                width = ($elem[0].parentNode.clientWidth) - margin.left - margin.right,
+                height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
+                height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
+
+            var parseDate = d3.time.format("%b %Y").parse;
+
+            var x = d3.time.scale().range([0, width]),
+              x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
+              y = d3.scale.linear().range([height, 0]),
+              y2 = d3.scale.linear().range([height2, 0]); 
+
+          var xAxis = d3.svg.axis().scale(x).orient("bottom"),
+              xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
+              yAxis = d3.svg.axis().scale(y).orient("left");
+
+          var brush = d3.svg.brush()
+              .x(x2)
+              .on("brush", brushed);
+
+          var area = d3.svg.area()
+              .interpolate("monotone")
+              .x(function(d) { return x(d.date); })
+              .y0(height)
+              .y1(function(d) { return y(d.price); });
+
+          var area2 = d3.svg.area()
+              .interpolate("monotone")
+              .x(function(d) { return x2(d.date); })
+              .y0(height2)
+              .y1(function(d) { return y2(d.price); });
+
+          d3.select($elem[0]).selectAll("svg").remove()
+
+          var svg = d3.select($elem[0]).append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+
+            svg.append("defs").append("clipPath")
+                .attr("id", "clip")
+                .append("rect")
+                .attr("width", width)
+                .attr("height", height);
+
+          var focus = svg.append("g")
+              .attr("class", "focus")
+              .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
+
+          var context = svg.append("g")
+              .attr("class", "context")
+              .attr("transform", "translate(" + margin2.left + "," + (margin2.top) + ")");
+
+          var selectedTransformation = [];
+
+          var selectedTransformation = jsonRes.date_price.map(el => (
+            { date: el.date, price: el.price }
+          ));
+
+          selectedTransformation = selectedTransformation.slice(120,122); /* hardcoded to slice the data 
+          and focus to a certain day supposedly associated with the track selected */
+          
+          selectedTransformation.forEach(function(d) {
+            d.date = parseDate(d.date);
+            d.price = +d.price;
+            return d;
+          });
+
+            x.domain(d3.extent(selectedTransformation.map(function(d) { return d.date; })));
+            y.domain([0, d3.max(selectedTransformation.map(function(d) { return d.price; }))]);
+            x2.domain(x.domain());
+            y2.domain(y.domain());
+
+          focus.append("path")
+              .datum(selectedTransformation)
+              .attr("class", "area")
+              .attr("d", area);
+
+          focus.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+
+          focus.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
+
+          context.append("path")
+              .datum(selectedTransformation)
+              .attr("class", "area")
+              .attr("d", area2);
+
+          context.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height2 + ")")
+              .call(xAxis2);
+
+          context.append("g")
+            .attr("class", "x brush")
+              .call(brush)
+              .selectAll("rect")
+              .attr("y", -6)
+              .attr("height", height2 + 7);
+
+            // create brush to also zoom in with + detail on the main graph
+
+          $elem[0].svg = svg;
+
+          function brushed() {
+            x.domain(brush.empty() ? x2.domain() : brush.extent());
+            focus.select(".area").attr("d", area);
+            focus.select(".x.axis").call(xAxis);
+          }
+      }
 
 		}
 		
@@ -281,6 +422,10 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
   //   map.removeLayer(geolayer);
   //   can addLayer() too
   // }
+
+  function isOdd(num) { 
+    return (num % 2) == 1;
+  }
 
   var trackmaps = [];
   var trackmapCount=0;
@@ -317,6 +462,8 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
         $.ajax('2016-05-04 13-13-36.gpx').done(function(response) {
             
+            var counter = 0;
+
             geo[0] = toGeoJSON.gpx(response);
 
             var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -346,12 +493,18 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
                     style: myStyle,
                 })
                 .on('click', function(e) {
-                    console.log(e);
+                    //console.log(e);
                     /* EXEMPLO PARA QUARTA: AO CLICAR AQUI NA TRACK, FAZER BROADCAST PARA O CALENDARIO DESENHAR
                     A SUPOSTA DAY VIEW ASSOCIADA AO SUPOSTO DIA DESTA TRACK. FAZER BROADCAST TB PARA O AREA GRADIENT
                     PARA REDESENHAR PARA QUALQUER ZOOM TEMPORAL. EM RELACAO AO HEXBIN MANDAR O BROADCAST PARA ESTE
                     FAZER ZOOM PARA A ZONA DO MAPA CORRESPONDENTE A TRACK */
-                    $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin'});
+                    if (!isOdd(counter)) {
+                      $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin', calendar: 'draw track day', area_gradient: 'draw that day'});
+                      counter++;
+                    } else {
+                      $rootScope.$broadcast('rootScope:broadcast-leave');
+                      counter++;
+                    }
                 });
                 geolayer.addTo(trackmaps[trackmapCount]);
                 geolayer.showExtremities('arrowM');
@@ -360,8 +513,15 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
             };
         });
+    
+          for(var i = 0; i < trackmapCount; i++) {
+            trackmaps[i].fireEvent('click', function(e) {
+              alert("out of tracks");          
+            });
+          }
+          
       }
-    }
+    };
 
 }]);
 
