@@ -4,7 +4,7 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 ### TODO List: 
 
---1) Bind first four visualizations as proof-of-concept.--
+<s>1) Bind first four visualizations as proof-of-concept.</s>
 
 2) Change from a faux database/backend to the real deal.
 
