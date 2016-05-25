@@ -11,7 +11,6 @@
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
               <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
               <a class="btn btn-primary" id="add-tracks-button" ng-click="addTracksWidget()">Add Tracks</a>
-              <a class="btn btn-primary" id="add-multiline-button" ng-click="addMultilineWidget()">Add Line Chart</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All Items</a>
           </div>
       </div>
@@ -64,7 +63,6 @@
             <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>
             <calendar-heatmap class="calendar-heatmap" ng-if="widget.type == 'calendar'"></calendar-heatmap>
             <gps-tracks ng-if="widget.type == 'tracks'"></gps-tracks>
-            <multi-line ng-if="widget.type == 'line'"></gps-tracks>
         </li>
     <ul>
 </div>

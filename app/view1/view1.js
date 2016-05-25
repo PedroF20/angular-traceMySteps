@@ -88,10 +88,6 @@ angular.module('myApp.view1', ['ngRoute'])
 		$scope.widgets.push({type: 'tracks', name: "My Tracks", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
-	$scope.addMultilineWidget = function() {
-		$scope.widgets.push({type: 'line', name: "qwertyqwerty", draggable: true, sizeX: 2, sizeY: 2});
-	};
-
 	$scope.clear = function() {
 		$scope.widgets = [];
 	};
