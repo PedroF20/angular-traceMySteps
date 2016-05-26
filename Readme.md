@@ -46,6 +46,6 @@ python app.py
 
 ## Dependencies
 
-For the time being and for development purposes, the dependency files (bower.json and package.json) are not updated. Use the repository provived dependency folders and follow the steps to run.
+For the time being and for development purposes, the dependency files (bower.json and package.json) are not updated. Use the repository-provived dependency folders and follow the steps to run.
 
 When the project is completed the dependency files will be updated.
