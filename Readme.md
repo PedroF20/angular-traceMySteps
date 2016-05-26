@@ -38,7 +38,7 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 npm start
 ```
 
-4) On the backend folder:
+4) On the mock backend folder (will update when changed to the actual backend):
 ```
 python app.py
 ```
