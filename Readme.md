@@ -1,5 +1,7 @@
 # traceMySteps - front-end
 
+A visualization that allows users to understand and analyze their spatio-temporal information, with focus on personal semantics.
+
 AngularJS development of the front-end for traceMySteps. Works with the back-end in python also provided in another repository.
 
 ### TODO List: 
@@ -31,7 +33,7 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 ### Steps to run:
 
 1) Download this folder and the backend repository (on my profile).
-2) Open two terminal windows (one for each repository).
+2) Open two shell windows (one for each repository).
 
 3) On the Angular project folder:
 ```
