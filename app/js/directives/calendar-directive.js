@@ -80,8 +80,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         // Tooltip defaults
         var tooltip_width = 250;
         var tooltip_padding = 15;
-        var tooltip_line_height = 15;
-
 
         d3.select($elem[0]).selectAll("svg").remove()
         // Initialize svg element
@@ -92,9 +90,11 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         var items = svg.append('g').attr("transform", "translate(" + 0 + "," + 0 + ")");
         var labels = svg.append('g').attr("transform", "translate(" + 0 + "," + 0 + ")");
         var buttons = svg.append('g');
-        var tooltip = svg.append('g')
-          .style('opacity', 0)
-          .attr('class', 'heatmap-tooltip');
+       
+        // Add tooltip to the same element as main svg
+        var tooltip = d3.select($elem[0]).append('div')
+          .attr('class', 'heatmap-tooltip')
+          .style('opacity', 0);
 
         $scope.$watch(function () {
           return $elem[0].parentNode.clientWidth;
@@ -180,11 +180,20 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return moment(d.date).weekday() * (circle_radius * 2 + gutter) + label_padding;
               })
               .on('click', function (d) {
+                if ( in_transition ) { return; }
+  
+                // Don't transition if there is no data to show
+                if ( d.total === 0 ) { return; }
+  
                 in_transition = true;
 
                 // Set selected date to the one clicked on
                 selected_date = d;
                 console.log(d);
+
+                // Hide tooltip
+                hideTooltip();
+
                 // Remove all year overview related items and labels
                 removeYearOverview();
   
@@ -192,7 +201,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 drawChart();
               })
               .on('mouseover', function (d) {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
+
                 // Pulsating animation
                 var circle = d3.select(this);
                 (function repeat() {
@@ -208,64 +218,35 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 })();
   
                 // Construct tooltip
-                var tooltip_height = tooltip_padding * 4 + tooltip_line_height * d.summary.length;
-                tooltip.selectAll('text').remove();
-                tooltip.selectAll('rect').remove();
-                tooltip.insert('rect')
-                  .attr('class', 'heatmap-tooltip-background')
-                  .attr('width', tooltip_width)
-                  .attr('height', tooltip_height);
-                tooltip.append('text')
-                  .attr('font-weight', 900)
-                  .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding * 1.5)
-                  .text((d.total ? formatTime(d.total) : 'No time') + ' tracked');
-                tooltip.append('text')
-                  .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding * 2.5)
-                  .text('on ' + moment(d.date).format('dddd, MMM Do YYYY'));
+                var tooltip_html = '';
+                tooltip_html += '<div class="header"><strong>' + (d.total ? formatTime(d.total) : 'No time') + ' tracked</strong></div>';
+                tooltip_html += '<div>on ' + moment(d.date).format('dddd, MMM Do YYYY') + '</div><br>';
   
                 // Add summary to the tooltip
-                angular.forEach(d.summary, function (d, i) {
-                  tooltip.append('text')
-                    .style('font-weight', 900)
-                    .attr('x', tooltip_padding)
-                    .attr('y', tooltip_line_height * 4 + i * tooltip_line_height)
-                    .text(d.name)
-                    .each(function () {
-                      var obj = d3.select(this),
-                        textLength = obj.node().getComputedTextLength(),
-                        text = obj.text();
-                      while (textLength > (tooltip_width / 2 - tooltip_padding) && text.length > 0) {
-                        text = text.slice(0, -1);
-                        obj.text(text + '...');
-                        textLength = obj.node().getComputedTextLength();
-                      }
-                    });
-                  tooltip.append('text')
-                    .attr('x', tooltip_width / 2 + tooltip_padding / 2)
-                    .attr('y', tooltip_line_height * 4 + i * tooltip_line_height)
-                    .text(formatTime(d.value));
+                angular.forEach(d.summary, function (d) {
+                  tooltip_html += '<div><span><strong>' + d.name + '</strong></span>';
+                  tooltip_html += '<span>' + formatTime(d.value) + '</span></div>';
                 });
 
+                // Calculate tooltip position
                 var cellDate = moment(d.date);
                 var week_num = cellDate.week() - firstDate.week() + (firstDate.weeksInYear() * (cellDate.weekYear() - firstDate.weekYear()));
                 var x = week_num * (circle_radius * 2 + gutter) + label_padding + circle_radius;
-                while ( width - x < (tooltip_width + tooltip_padding * 3) ) {
-                  x -= 10;
+                if ( width - x < (tooltip_width + tooltip_padding * 3) ) {
+                  x -= tooltip_width + tooltip_padding * 3;
                 }
                 var y = cellDate.weekday() * (circle_radius * 2 + gutter) + label_padding + circle_radius;
-                while ( height - y < tooltip_height && y > label_padding/2 ) {
-                  y -= 10;
-                }
-                tooltip.attr('transform', 'translate(' + x + ',' + y + ')');
-                tooltip.transition()
-                  .duration(transition_duration / 2)
-                  .ease('ease-in')
-                  .style('opacity', 1);
+                // Show tooltip
+                tooltip.html(tooltip_html)
+                  .style('left', x + 'px')
+                  .style('top', y + 'px')
+                  .transition()
+                    .duration(transition_duration / 2)
+                    .ease('ease-in')
+                    .style('opacity', 1);
               })
               .on('mouseout', function () {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
   
                 // Set circle radius back to what it's supposed to be
                 d3.select(this).transition()
@@ -274,10 +255,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   .attr('r', circle_radius);
 
                 // Hide tooltip
-                tooltip.transition()
-                  .duration(transition_duration / 2)
-                  .ease('ease-in')
-                  .style('opacity', 0);
+                hideTooltip();
               })
               .transition()
                 .delay(function () {
@@ -308,7 +286,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             var today = moment().endOf('day');
             var todayYearAgo = moment().startOf('day').subtract(1, 'year');
             var monthLabels = d3.time.months(todayYearAgo.startOf('month'), today);
-            var monthLabelOffset = (width - label_padding * 2) / 12 / 2;
             var monthAxis = d3.scale.linear()
               .range([label_padding, width])
               .domain([0, monthLabels.length]);
@@ -325,11 +302,11 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return d.toLocaleDateString('en-us', {month: 'short'});
               })
               .attr('x', function (d, i) {
-                return monthLabelOffset + monthAxis(i);
+                return monthAxis(i);
               })
               .attr('y', label_padding / 2)
               .on('mouseenter', function (d) {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 var selectedMonth = moment(d);
                 items.selectAll('.item-circle')
                   .transition()
@@ -340,7 +317,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   });
               })
               .on('mouseout', function () {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 items.selectAll('.item-circle')
                   .transition()
                   .duration(transition_duration)
@@ -374,7 +351,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return moment(d).format('dddd')[0];
               })
               .on('mouseenter', function (d) {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 var selectedDay = moment(d);
                 items.selectAll('.item-circle')
                   .transition()
@@ -385,7 +362,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   });
               })
               .on('mouseout', function () {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 items.selectAll('.item-circle')
                   .transition()
                   .duration(transition_duration)
@@ -439,62 +416,33 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .style('opacity', 0)
               .on('mouseover', function(d) {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
   
                 // Construct tooltip
-                var tooltip_height = tooltip_padding * 4 + tooltip_line_height;
-                tooltip.selectAll('text').remove();
-                tooltip.selectAll('rect').remove();
-                tooltip.insert('rect')
-                  .attr('class', 'heatmap-tooltip-background')
-                  .attr('width', tooltip_width)
-                  .attr('height', tooltip_height);
-                tooltip.append('text')
-                  .attr('font-weight', 900)
-                  .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding * 1.5)
-                  .text(d.name)
-                  .each(function () {
-                    var obj = d3.select(this),
-                      textLength = obj.node().getComputedTextLength(),
-                      text = obj.text();
-                    while (textLength > (tooltip_width - tooltip_padding * 2) && text.length > 0) {
-                      text = text.slice(0, -1);
-                      obj.text(text + '...');
-                      textLength = obj.node().getComputedTextLength();
-                    }
-                  });
-                tooltip.append('text')
-                  .attr('font-weight', 900)
-                  .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding * 3)
-                  .text((d.value ? formatTime(d.value) : 'No time') + ' tracked');
-                tooltip.append('text')
-                  .attr('x', tooltip_padding)
-                  .attr('y', tooltip_padding * 4)
-                  .text('on ' + moment(d.date).format('dddd, MMM Do YYYY HH:mm'));
+                var tooltip_html = '';
+                tooltip_html += '<div class="header"><strong>' + d.name + '</strong><div><br>';
+                tooltip_html += '<div><strong>' + (d.value ? formatTime(d.value) : 'No time') + ' tracked</strong></div>';
+                tooltip_html += '<div>on ' + moment(d.date).format('dddd, MMM Do YYYY HH:mm') + '</div>';
   
+                // Calculate tooltip position
                 var x = d.value * 100 / (60 * 60 * 24) + itemScale(moment(d.date));
                 while ( width - x < (tooltip_width + tooltip_padding * 3) ) {
                   x -= 10;
                 }
                 var y = projectScale(d.name) - 10 + projectScale.rangeBand();
-                while ( height - y < tooltip_height && y > label_padding/2 ) {
-                  y -= 10;
-                }
-                tooltip.attr('transform', 'translate(' + x + ',' + y + ')');
-                tooltip.transition()
-                  .duration(transition_duration / 2)
-                  .ease('ease-in')
-                  .style('opacity', 1);
+                // Show tooltip
+                tooltip.html(tooltip_html)
+                  .style('left', x + 'px')
+                  .style('top', y + 'px')
+                  .transition()
+                    .duration(transition_duration / 2)
+                    .ease('ease-in')
+                    .style('opacity', 1);
               })
               .on('mouseout', function () {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 // Hide tooltip
-                tooltip.transition()
-                  .duration(transition_duration / 2)
-                  .ease('ease-in')
-                  .style('opacity', 0);
+                hideTooltip();
               })
               .on('click', function (d) {
                 console.log(d);
@@ -547,7 +495,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .attr('y', label_padding / 2)
               .on('mouseenter', function (d) {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 var selected = itemScale(moment(d));
                 items.selectAll('.item-block')
                   .transition()
@@ -559,8 +507,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                     return ( selected >= start && selected <= end ) ? 1 : 0.1;
                   });
               })
-              .on('mouseout', function (time) {
-                if ( in_transition ) { return; };
+              .on('mouseout', function () {
+                if ( in_transition ) { return; }
                 items.selectAll('.item-block')
                   .transition()
                   .duration(transition_duration)
@@ -603,7 +551,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 }
               })
               .on('mouseenter', function (project) {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 items.selectAll('.item-block')
                   .transition()
                   .duration(transition_duration)
@@ -613,7 +561,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   });
               })
               .on('mouseout', function () {
-                if ( in_transition ) { return; };
+                if ( in_transition ) { return; }
                 items.selectAll('.item-block')
                   .transition()
                   .duration(transition_duration)
@@ -685,12 +633,10 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .ease('ease')
               .style('opacity', 0)
               .remove();
-            tooltip.selectAll('rect').remove();
             labels.selectAll('.label-day').remove();
             labels.selectAll('.label-month').remove();
 
             $elem[0].svg = svg;
-
           };
  
   
@@ -722,6 +668,19 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             $elem[0].svg = svg;
 
           };
+
+
+          /**
+           * Helper function to hide the tooltip
+           */
+          function hideTooltip() {
+            tooltip.transition()
+              .duration(transition_duration / 2)
+              .ease('ease-in')
+              .style('opacity', 0);
+          };
+
+
           /**
            * Helper function to convert seconds to a human readable format
            * @param seconds Integer
