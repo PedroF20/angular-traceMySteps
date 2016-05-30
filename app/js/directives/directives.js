@@ -521,6 +521,29 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
 app.directive('barChart', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
+
+/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+          FrequencyData = [
+              {label:"Rialva", value:22},
+              {label:"INESC", value:33},
+              {label:"IST", value:4},
+              {label:"Casa", value:15},
+              {label:"Atrium Saldanha", value:36},
+              {label:"Estádio da Luz", value:0}
+          ];
+
+          TimeSpentData = [
+              {label:"Rialva", value:10},
+              {label:"INESC", value:20},
+              {label:"IST", value:30},
+              {label:"Casa", value:5},
+              {label:"Atrium Saldanha", value:12},
+              {label:"Estádio da Luz", value:23}
+          ];
+
+/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
   return {
 
       restrict: 'E',
@@ -540,42 +563,21 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
-              createBarChart();
+              //selectDataset(); to be used when corrected the button thing
+              createBarChart(FrequencyData);
             });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
               if ( !h ) { return; }
-              createBarChart();
+              //selectDataset(); to be used when corrected the button thing
             });
 
           // $scope.$on('$destroy', function() {
           //   rootScopeBroadcast();
           //   rootScopeBroadcastLeave();
           // })
-        
-          /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-          FrequencyData = [
-              {label:"Category 1", value:22},
-              {label:"Category 2", value:33},
-              {label:"Category 3", value:4},
-              {label:"Category 4", value:15},
-              {label:"Category 5", value:36},
-              {label:"Category 6", value:0}
-          ];
-
-          TimeSpentData = [
-              {label:"Category 1", value:10},
-              {label:"Category 2", value:20},
-              {label:"Category 3", value:30},
-              {label:"Category 4", value:5},
-              {label:"Category 5", value:12},
-              {label:"Category 6", value:23}
-          ];
-
-          /******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
           d3.selectAll("input").on("change", selectDataset);
 
@@ -592,14 +594,48 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               }
           }
 
-          var margin = {top: 20, right: 10, bottom: 20, left: 10},
-              width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
-              height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
-
-
+          
           function createBarChart(dataset) {
 
             $elem[0].svg = null;
+
+            var margin = {top: 20, right: 10, bottom: 120, left: 10},
+                width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+                height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+
+            var div = d3.select("body").append("div").attr("class", "toolTip");
+            var formatPercent = d3.format("");
+
+            var y = d3.scale.ordinal()
+              .rangeRoundBands([height, 0], .2, 0.5);
+
+            var x = d3.scale.linear()
+                    .range([0, width]);
+
+            var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .tickSize(-height)
+                    .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient("left");
+
+            d3.select($elem[0]).selectAll("svg").remove()
+
+            var svg = d3.select($elem[0]).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+
+            d3.select("input[value=\"total\"]").property("checked", true);
+
 
             y.domain(dataset.map(function(d) { return d.label; }));
             x.domain([0, d3.max(dataset, function(d) { return d.value; })]);
@@ -617,11 +653,11 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                     .call(yAxis)
                     .append("text")
                     .attr("transform", "rotate(0)")
-                    .attr("x", 50)
+                    .attr("x", 170)
                     .attr("dx", ".1em")
                     .style("text-anchor", "end")
-                    .text("Option %");
-
+                    .text("Frequency of Visit/Time Spent (mins)");
+                    console.log(dataset);
 
             var bar = svg.selectAll(".bar")
                       .data(dataset, function(d) { return d.label; });
@@ -631,7 +667,8 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                     .attr("x", function(d) { return x(d.value); })
                     .attr("y", function(d) { return y(d.label); })
                     .attr("width", function(d) { return width-x(d.value); })
-                    .attr("height", y.rangeBand());
+                    .attr("height", y.rangeBand())
+                    .text(function(d) { return d.label; })
 
             bar.on("mousemove", function(d){
                     div.style("left", d3.event.pageX+10+"px");
