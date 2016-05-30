@@ -24,7 +24,7 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 ### Minor bugs: 
 
-1) Calendar tooltip bug (Gets cropped when shown outside of svg).
+<s>1) Calendar tooltip bug (Gets cropped when shown outside of svg).</s>
 
 2) Calendar resize bug (Not urgent, calendar is supposed to be of fixed position).
 
