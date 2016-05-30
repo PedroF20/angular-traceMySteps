@@ -5,7 +5,7 @@
 #MainBody {
     background: #004756;
     font-size: 16px;
-    font-family: 'Helvetica', Arial, 'Open Sans', sans-serif;
+    font-family: 'Helvetica Neue', Arial, 'Open Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     color: #ffffff;
     /*position: absolute;
@@ -117,6 +117,12 @@ html {
     right: 90px;
 }
 
+#add-barchart-button {
+    position: absolute;
+    top: 450px;
+    right: 90px;
+}
+
 #clear-items-button {
     position: absolute;
     top: 250px;
@@ -127,48 +133,6 @@ html {
 .buttonHolder2{ text-align: center; }*/
 
 /********END RIGHT PANEL***********/
-
-
-
-/*********************/
-/*    D3 STYLES      */
-/*********************/
-
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.area1 { fill: #595959; }
-
-.selectedArea {
-  fill: #595959 !important;
-}
-
-.area {
-  fill: #404040;
-  clip-path: url(#clip);
-}
-
-.chord path {
-  fill-opacity: .67;
-  stroke: #000;
-  stroke-width: .5px;
-}
-
-.brush .extent {
-  stroke: #fff;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
-}
-
-text {
-    font: 10px sans-serif;
-}
-
-
-/********END D3 EXAMPLE STYLES***********/
 
 
 /******************/
@@ -223,10 +187,8 @@ text {
         color: #777; }
 
 
-
-
-
 /********END SLIDER STYLES***********/
+
 
 /************************/
 /*    GRIDSTER STYLES   */
@@ -259,10 +221,12 @@ text {
     cursor: pointer;
 }
 
+/********END GRIDSTER STYLES***********/
+
+
 /*******************************/
 /* GRIDSTER BOX HEADER STYLES */
 /******************************/
-
 
 .box-header {
     background-color: #eee;
@@ -298,6 +262,157 @@ text {
 
 /********END GRIDSTER STYLES***********/
 
+
+/*********************/
+/*    D3 STYLES      */
+/*********************/
+
+/* AREA EXAMPLE */
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.area1 { fill: #595959; }
+
+/*.selectedArea {
+  fill: #000000 !important;
+}*/
+/* AREA EXAMPLE END */
+
+
+/* AREA GRADIENT GRAPH */
+
+.area {
+  fill: #404040;
+  clip-path: url(#clip);
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+/* AREA GRADIENT GRAPH END */
+
+
+/* HORIZONTAL BAR CHART */
+
+polyline{
+    opacity: .3;
+    stroke: black;
+    stroke-width: 2px;
+    fill: none;
+}
+
+.labelValue
+{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 60%;
+    opacity: .5;
+
+}
+
+label {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: normal;
+}
+
+.toolTip {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: absolute;
+    display: none;
+    width: auto;
+    height: auto;
+    background: none repeat scroll 0 0 white;
+    border: 0 none;
+    border-radius: 8px 8px 8px 8px;
+    box-shadow: -3px 3px 15px #888888;
+    color: black;
+    font: 12px sans-serif;
+    padding: 5px;
+    text-align: center;
+}
+
+.legend {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 60%;
+}
+rect {
+    stroke-width: 2;
+}
+
+text {
+    font: 10px sans-serif;
+}
+
+
+text.value{
+    font-size: 200%;
+    fill: white;
+}
+
+text.label{
+    font-size: 100%;
+}
+
+.axis text {
+    font: 10px sans-serif;
+}
+
+.axis path{
+    fill: none;
+    stroke: #000;
+}
+
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.axis .tick line {
+    stroke-width: 1;
+    stroke: rgba(0, 0, 0, 0.2);
+}
+
+.axisHorizontal path{
+    fill: none;
+}
+
+.axisHorizontal line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.axisHorizontal .tick line {
+    stroke-width: 1;
+    stroke: rgba(0, 0, 0, 0.2);
+}
+
+.bar {
+    fill: steelblue;
+    fill-opacity: .9;
+}
+
+.x.axis path {
+    display: none;
+}
+/* HORIZONTAL BAR CHART END */
+
+
+/********************************/
+/********END D3 STYLES***********/
+/********************************/
 
 
 /***************************************/
@@ -342,6 +457,7 @@ text {
   cursor: pointer;
 }
 .calendar-heatmap .label {
+  font-size: 11px;
   cursor: pointer;
   fill: rgb(0, 0, 0);
   font-family: Helvetica, arial, 'Open Sans', sans-serif;
@@ -391,3 +507,5 @@ text {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/********END CALENDAR STYLES************/

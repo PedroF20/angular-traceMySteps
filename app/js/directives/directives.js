@@ -513,15 +513,154 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
             };
         });
-    
-          for(var i = 0; i < trackmapCount; i++) {
-            trackmaps[i].fireEvent('click', function(e) {
-              alert("out of tracks");          
-            });
-          }
-          
       }
     };
+
+}]);
+
+
+app.directive('barChart', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+  return {
+
+      restrict: 'E',
+      scope: true,
+      link: function($scope, $elem, $attr, $http) {
+
+          // DataManagerService.get('/barchart', []).then(function(d) {
+          //   jsonRes=d;
+          //   createBarChart();
+          // });
+
+          // $scope.$watch('value', function(value) {
+          //   console.log(value);
+          // });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientWidth;
+            }, function ( w ) {
+              if ( !w ) { return; }
+              createBarChart();
+            });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientHeight;
+            }, function ( h ) {
+              if ( !h ) { return; }
+              createBarChart();
+            });
+
+          // $scope.$on('$destroy', function() {
+          //   rootScopeBroadcast();
+          //   rootScopeBroadcastLeave();
+          // })
+        
+          /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+          FrequencyData = [
+              {label:"Category 1", value:22},
+              {label:"Category 2", value:33},
+              {label:"Category 3", value:4},
+              {label:"Category 4", value:15},
+              {label:"Category 5", value:36},
+              {label:"Category 6", value:0}
+          ];
+
+          TimeSpentData = [
+              {label:"Category 1", value:10},
+              {label:"Category 2", value:20},
+              {label:"Category 3", value:30},
+              {label:"Category 4", value:5},
+              {label:"Category 5", value:12},
+              {label:"Category 6", value:23}
+          ];
+
+          /******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+          d3.selectAll("input").on("change", selectDataset);
+
+          function selectDataset()
+          {
+              var value = this.value;
+              if (value == "option1")
+              {
+                  createBarChart(FrequencyData);
+              }
+              else if (value == "option2")
+              {
+                  createBarChart(TimeSpentData);
+              }
+          }
+
+          var margin = {top: 20, right: 10, bottom: 20, left: 10},
+              width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+              height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+
+
+          function createBarChart(dataset) {
+
+            $elem[0].svg = null;
+
+            y.domain(dataset.map(function(d) { return d.label; }));
+            x.domain([0, d3.max(dataset, function(d) { return d.value; })]);
+
+            svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+
+            svg.select(".y.axis").remove();
+            svg.select(".x.axis").remove();
+
+            svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("transform", "rotate(0)")
+                    .attr("x", 50)
+                    .attr("dx", ".1em")
+                    .style("text-anchor", "end")
+                    .text("Option %");
+
+
+            var bar = svg.selectAll(".bar")
+                      .data(dataset, function(d) { return d.label; });
+            // new data:
+            bar.enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", function(d) { return x(d.value); })
+                    .attr("y", function(d) { return y(d.label); })
+                    .attr("width", function(d) { return width-x(d.value); })
+                    .attr("height", y.rangeBand());
+
+            bar.on("mousemove", function(d){
+                    div.style("left", d3.event.pageX+10+"px");
+                    div.style("top", d3.event.pageY-25+"px");
+                    div.style("display", "inline-block");
+                    div.html((d.label)+"<br>"+(d.value)+"%");
+                });
+            bar.on("mouseout", function(d){
+                    div.style("display", "none");
+                });
+
+            // removed data:
+            bar.exit().remove();
+
+            // updated data:
+            bar.transition()
+                    .duration(750)
+                    .attr("x", function(d) { return 0; })
+                    .attr("y", function(d) { return y(d.label); })
+                    .attr("width", function(d) { return x(d.value); })
+                    .attr("height", y.rangeBand());
+            
+            $elem[0].svg = svg;
+
+          };
+
+
+      }
+  };
 
 }]);
 

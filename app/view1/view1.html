@@ -11,6 +11,7 @@
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
               <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
               <a class="btn btn-primary" id="add-tracks-button" ng-click="addTracksWidget()">Add Tracks</a>
+              <a class="btn btn-primary" id="add-barchart-button" ng-click="addBarChartWidget()">Add Bar Chart</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All Items</a>
           </div>
       </div>
@@ -63,6 +64,10 @@
             <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>
             <calendar-heatmap class="calendar-heatmap" ng-if="widget.type == 'calendar'"></calendar-heatmap>
             <gps-tracks ng-if="widget.type == 'tracks'"></gps-tracks>
+            <bar-chart ng-if="widget.type == 'bar'">
+              <label id="barchart-opts"><input type="radio" name="dataset" id="dataset" ng-model="value" value="frequency"> More Frequent</label>
+              <label id="barchart-opts"><input type="radio" name="dataset" id="dataset" ng-model="value" value="time"> More Time Spent</label>
+            </bar-chart>
         </li>
     <ul>
 </div>
