@@ -531,7 +531,19 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               {label:"IST", value:4},
               {label:"Casa", value:15},
               {label:"Atrium Saldanha", value:36},
-              {label:"Estádio da Luz", value:0}
+              {label:"Estádio da Luz", value:0},
+              {label:"QWERTY", value:0},
+              {label:"AZERTY", value:14},
+              {label:"AAAAAA", value:20},
+              {label:"BBBBBB", value:30},
+              {label:"CCCCCC", value:40},
+              {label:"DDDDDDD", value:45},
+              {label:"EEEEEE", value:21},
+              {label:"FFFFFFF", value:31},
+              {label:"GGGGGGG", value:18},
+              {label:"eweqwww", value:18},
+              {label:"eqewe", value:18},
+              {label:"fsdfs", value:18},
           ];
 
           TimeSpentData = [
@@ -601,7 +613,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                   createBarChart(TimeSpentData);
               }
           }
-createBarChart(FrequencyData);
           
           function createBarChart(dataset) {
 
@@ -617,9 +628,11 @@ createBarChart(FrequencyData);
               var formatPercent = d3.format("");
 
               var y = d3.scale.ordinal()
-                .rangeRoundBands([height, 0], 0.1, 0.5);
+                .domain(dataset.map(function(d) { return d.label; }))
+                .rangeRoundBands([0, height], 0.1, 0.3);
 
               var x = d3.scale.linear()
+                .domain([0, d3.max(dataset, function(d) { return d.value; })])
                 .range([0, width]);
 
               var xAxis = d3.svg.axis()
@@ -639,9 +652,6 @@ createBarChart(FrequencyData);
                       .attr("class", "x axis")
                       .attr("transform", "translate(0," + height + ")")
                       .call(xAxis);
-
-              y.domain(dataset.map(function(d) { return d.label; }));
-              x.domain([0, d3.max(dataset, function(d) { return d.value; })]);
 
               svg.append("g")
                       .attr("class", "x axis")
@@ -669,7 +679,7 @@ createBarChart(FrequencyData);
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
                       .attr("width", function(d) { return x(d.value); }) // return 0 if want to animate
-                      .attr("height", 25)
+                      .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
 
               svg.selectAll(".bartext")
