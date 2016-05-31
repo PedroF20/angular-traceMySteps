@@ -521,6 +521,7 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
 app.directive('barChart', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
+  var delay=350;
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
@@ -600,113 +601,128 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                   createBarChart(TimeSpentData);
               }
           }
-
+createBarChart(FrequencyData);
           
           function createBarChart(dataset) {
 
-            ///ADD DELAY
+            setTimeout(function() {
 
-            $elem[0].svg = null;
+              $elem[0].svg = null;
 
-            var margin = {top: 20, right: 10, bottom: 120, left: 10},
-                width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
-                height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+              var margin = {top: 20, right: 10, bottom: 120, left: 10},
+                  width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+                  height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
 
-            var div = d3.select("body").append("div").attr("class", "toolTip");
-            var formatPercent = d3.format("");
+              var div = d3.select($elem[0]).append("div").attr("class", "toolTip");
+              var formatPercent = d3.format("");
 
-            var y = d3.scale.ordinal()
-              .rangeRoundBands([height, 0], .2, 0.5);
+              var y = d3.scale.ordinal()
+                .rangeRoundBands([height, 0], 0.1, 0.5);
 
-            var x = d3.scale.linear()
-                    .range([0, width]);
+              var x = d3.scale.linear()
+                .range([0, width]);
 
-            var xAxis = d3.svg.axis()
-                    .scale(x)
-                    .tickSize(-height)
-                    .orient("bottom");
+              var xAxis = d3.svg.axis()
+                      .scale(x)
+                      .tickSize(-height)
+                      .orient("bottom");
 
-            var yAxis = d3.svg.axis()
-                    .scale(y)
-                    .orient("left");
+              d3.select($elem[0]).selectAll("svg").remove()
 
-            d3.select($elem[0]).selectAll("svg").remove()
+              var svg = d3.select($elem[0]).append("svg")
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + margin.top + margin.bottom)
+                      .append("g")
+                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            var svg = d3.select($elem[0]).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+              svg.append("g")
+                      .attr("class", "x axis")
+                      .attr("transform", "translate(0," + height + ")")
+                      .call(xAxis);
 
-            svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
+              y.domain(dataset.map(function(d) { return d.label; }));
+              x.domain([0, d3.max(dataset, function(d) { return d.value; })]);
 
-            d3.select("input[value=\"total\"]").property("checked", true);
+              svg.append("g")
+                      .attr("class", "x axis")
+                      .attr("transform", "translate(0," + height + ")")
+                      .call(xAxis);
 
+              svg.select(".y.axis").remove();
+              svg.select(".x.axis").remove();
 
-            y.domain(dataset.map(function(d) { return d.label; }));
-            x.domain([0, d3.max(dataset, function(d) { return d.value; })]);
+              svg.append("g")
+                      .append("text")
+                      .attr("transform", "rotate(0)")
+                      .attr("x", 170)
+                      .attr("dx", ".1em")
+                      .style("text-anchor", "end")
+                      .text("Frequency of Visit/Time Spent (mins)");
+                      //console.log(dataset);
 
-            svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
+              var bar = svg.selectAll(".bar")
+                        .data(dataset, function(d) { return d.label; })
 
-            svg.select(".y.axis").remove();
-            svg.select(".x.axis").remove();
+              // new data:
+              bar.enter().append("rect")
+                      .attr("class", "bar")
+                      .attr("x", function(d) { return 0; })
+                      .attr("y", function(d) { return y(d.label); })
+                      .attr("width", function(d) { return x(d.value); }) // return 0 if want to animate
+                      .attr("height", 25)
+                      .text(function(d) { return d.label; });
 
-            svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis)
-                    .append("text")
-                    .attr("transform", "rotate(0)")
-                    .attr("x", 170)
-                    .attr("dx", ".1em")
-                    .style("text-anchor", "end")
-                    .text("Frequency of Visit/Time Spent (mins)");
-                    console.log(dataset);
-
-            var bar = svg.selectAll(".bar")
-                      .data(dataset, function(d) { return d.label; });
-            // new data:
-            bar.enter().append("rect")
-                    .attr("class", "bar")
-                    .attr("x", function(d) { return x(d.value); })
-                    .attr("y", function(d) { return y(d.label); })
-                    .attr("width", function(d) { return width-x(d.value); })
-                    .attr("height", y.rangeBand())
-                    .text(function(d) { return d.label; })
-
-            bar.on("mousemove", function(d){
-                    if ( in_transition ) { return; }
-                    div.style("left", d3.event.pageX+10+"px");
-                    div.style("top", d3.event.pageY-25+"px");
-                    div.style("display", "inline-block");
-                    div.html((d.label)+"<br>"+(d.value)+"%");
-                });
-            bar.on("mouseout", function(d){
-                    if ( in_transition ) { return; }
-                    div.style("display", "none");
-                });
-
-            // removed data:
-            bar.exit().remove();
-
-            // updated data:
-            bar.transition()
-                    .duration(750)
-                    .attr("x", function(d) { return 0; })
-                    .attr("y", function(d) { return y(d.label); })
-                    .attr("width", function(d) { return x(d.value); })
-                    .attr("height", y.rangeBand());
-            
-            $elem[0].svg = svg;
-
-          };
+              svg.selectAll(".bartext")
+                      .data(dataset, function(d) { return d.label; })
+                      .enter()
+                      .append("text")
+                      .attr("class", "bartext")
+                      .attr("text-anchor", "middle")
+                      .attr("fill", "white")
+                      .attr("x", function(d,i) {
+                          if (d.value==0) {return x(d.value)+50;}
+                          return x(d.value)/2;
+                      })
+                      .attr("y", function(d,i) {
+                          //if (d.value==0){return};
+                          return y(d.label)+15;
+                      })
+                      .text(function(d){
+                        //if (d.value==0){return};
+                           return d.label;
+                      });
 
 
+              bar.on("mousemove", function(d){
+                      if ( in_transition ) { return; }
+                      div.style("left", d3.event.pageX+"px");
+                      div.style("top", d3.event.pageY-130+"px");
+                      div.style("display", "inline-block");
+                      div.html((d.value)+"%");
+                      // Put an if-cycle to show the label with "x times" if it is frequency
+                      // or "x mins" if it is time spent
+                  });
+              bar.on("mouseout", function(d){
+                      if ( in_transition ) { return; }
+                      div.style("display", "none");
+                  });
+
+              // removed data:
+              bar.exit().remove();
+
+              //animate updated data:
+              // bar.transition()
+              //         .duration(550)
+              //         .attr("x", function(d) { return 0; })
+              //         .attr("y", function(d) { return y(d.label); })
+              //         .attr("width", function(d) { return x(d.value); })
+              //         .attr("height", y.rangeBand());
+              
+              $elem[0].svg = svg;
+
+            }, delay);
+
+          }
       }
   };
 

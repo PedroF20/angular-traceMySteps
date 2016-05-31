@@ -405,6 +405,12 @@ text.label{
     fill-opacity: .9;
 }
 
+.bartext {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  fill-opacity: 1;
+}
+
 .x.axis path {
     display: none;
 }
