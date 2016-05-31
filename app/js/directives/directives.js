@@ -523,6 +523,10 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
   var delay=350;
 
+  var jsonRes1=null;
+  var jsonRes2=null;
+
+
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
           FrequencyData = [
@@ -565,9 +569,12 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           var in_transition = false;
 
-          // DataManagerService.get('/barchart', []).then(function(d) {
-          //   jsonRes=d;
-          //   createBarChart();
+          // DataManagerService.get('/barchartFrequency', []).then(function(d) {
+          //   jsonRes1=d;
+          // });
+
+          // DataManagerService.get('/barchartTime', []).then(function(d) {
+          //   jsonRes2=d;
           // });
 
           // $scope.$watch('value', function(value) {
@@ -606,15 +613,22 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               var value = this.value;
               if (value == "option1")
               {
+                  //createBarChart(jsonRes1);
                   createBarChart(FrequencyData);
               }
               else if (value == "option2")
               {
+                  //createBarChart(jsonRes2);
                   createBarChart(TimeSpentData);
               }
           }
           
           function createBarChart(dataset) {
+
+            dataset = dataset.sort(function(a, b) {  // function to sort the data descendingly
+                              return a.value - b.value;
+                          }).reverse();
+            //console.log(dataset);
 
             setTimeout(function() {
 
@@ -628,9 +642,9 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               var formatPercent = d3.format("");
 
               var y = d3.scale.ordinal()
+                //.domain(mappedDataset.sort(function(a, b) { return mappedDataset[a] - mappedDataset[b]; }))
                 .domain(dataset.map(function(d) { return d.label; }))
                 .rangeRoundBands([0, height], 0.1, 0.3);
-
               var x = d3.scale.linear()
                 .domain([0, d3.max(dataset, function(d) { return d.value; })])
                 .range([0, width]);
