@@ -89,7 +89,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addBarChartWidget = function() {
-		$scope.widgets.push({type: 'bar', name: "My Places", draggable: true, sizeX: 1, sizeY: 3});
+		$scope.widgets.push({type: 'bar', name: "My Places", draggable: true, sizeX: 1, sizeY: 3, maxSizeY:3, maxSizeX:1});
 	};
 
 	$scope.clear = function() {

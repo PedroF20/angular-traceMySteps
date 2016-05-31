@@ -550,6 +550,8 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
       scope: true,
       link: function($scope, $elem, $attr, $http) {
 
+          var in_transition = false;
+
           // DataManagerService.get('/barchart', []).then(function(d) {
           //   jsonRes=d;
           //   createBarChart();
@@ -561,17 +563,22 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
+              in_transition = true;
             }, function ( w ) {
               if ( !w ) { return; }
               //selectDataset(); to be used when corrected the button thing
               createBarChart(FrequencyData);
+              in_transition = false;
             });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
+              in_transition = true;
             }, function ( h ) {
               if ( !h ) { return; }
               //selectDataset(); to be used when corrected the button thing
+              createBarChart(FrequencyData);
+              in_transition = false;
             });
 
           // $scope.$on('$destroy', function() {
@@ -596,6 +603,8 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           
           function createBarChart(dataset) {
+
+            ///ADD DELAY
 
             $elem[0].svg = null;
 
@@ -671,12 +680,14 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                     .text(function(d) { return d.label; })
 
             bar.on("mousemove", function(d){
+                    if ( in_transition ) { return; }
                     div.style("left", d3.event.pageX+10+"px");
                     div.style("top", d3.event.pageY-25+"px");
                     div.style("display", "inline-block");
                     div.html((d.label)+"<br>"+(d.value)+"%");
                 });
             bar.on("mouseout", function(d){
+                    if ( in_transition ) { return; }
                     div.style("display", "none");
                 });
 
