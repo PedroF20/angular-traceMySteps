@@ -505,7 +505,9 @@ text.label{
 
 .calendar-heatmap .heatmap-tooltip span {
   display: inline-block;
-  width: 115px;
+  width: 50%;
+  padding-right: 10px;
+  box-sizing: border-box;
 }
 
 .calendar-heatmap .heatmap-tooltip span,

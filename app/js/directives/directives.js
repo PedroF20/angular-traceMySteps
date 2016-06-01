@@ -606,8 +606,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           //   rootScopeBroadcastLeave();
           // })
 
-          d3.selectAll("input").on("change", selectDataset);
-
           function selectDataset()
           {
               var value = this.value;

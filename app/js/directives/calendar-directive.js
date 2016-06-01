@@ -67,6 +67,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var gutter = 5;
+        var item_gutter = 1;
         var initialWidth = 1000;
         var initialHeight = ($elem[0].parentNode.clientHeight);
         var circle_radius = 10;
@@ -409,7 +410,13 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             // Filter data down to the selected month
             var month_data = data.filter(function (d) {
               return start_of_month <= moment(d.date) && moment(d.date) < end_of_month;
-            });           
+            });
+
+            var max_value = d3.max(month_data, function (d) {
+              return d3.max(d.summary, function (d) {
+                return d.value;
+              });
+            });     
 
             // Define day labels and axis
             var dayLabels = d3.time.days(moment().startOf('week'), moment().endOf('week'));
@@ -446,11 +453,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .attr('total', function (d) {
                 return d.total;
-              })
-              .attr('max', function (d) {
-                return d3.max(d.summary, function (d) {
-                  return d.value;
-                });
               })
               .attr('date', function (d) {
                 return d.date;
@@ -492,8 +494,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 var total = parseInt(d3.select(this.parentNode).attr('total'));
                 var offset = parseInt(d3.select(this.parentNode).attr('offset'));
                 var item_width = d.value * ((width - label_padding) / weekLabels.length - gutter * 5) / total;
-                d3.select(this.parentNode).attr('offset', offset + item_width);
-                return offset;
+                d3.select(this.parentNode).attr('offset', offset + item_width + item_gutter);
+                return offset + item_gutter;
               })
               .attr('width', function (d) {
                 var total = parseInt(d3.select(this.parentNode).attr('total'));
@@ -504,10 +506,9 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return Math.min(dayAxis.rangeBand(), max_block_height);
               })
               .attr('fill', function (d) {
-                var max = parseInt(d3.select(this.parentNode).attr('max'));
                 var color = d3.scale.linear()
                   .range(['#ffffff', '#3b6427' || '#ff4500'])
-                  .domain([-0.15 * max, max]);
+                  .domain([-0.15 * max_value, max_value]);
                 return color(d.value) || '#ff4500';
               })
               .style('opacity', 0)
@@ -551,7 +552,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   return Math.cos( Math.PI * Math.random() ) * transition_duration * 2;
                 })
                .ease('ease-in')
-                .style('opacity', 0.5)
+                .style('opacity', 1)
                 .call(function (transition, callback) {
                   if ( transition.empty() ) {
                     callback();
