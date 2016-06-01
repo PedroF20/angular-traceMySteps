@@ -691,6 +691,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
                       .attr("width", function(d) { return x(d.value); }) // return 0 if want to animate
+                      // for big dataset, limit the nr of bars shown
                       .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
 
