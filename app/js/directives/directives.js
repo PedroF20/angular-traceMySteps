@@ -526,6 +526,9 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
   var jsonRes1=null;
   var jsonRes2=null;
 
+  var resizeFlag=1; // flag for the resize $watch in order to draw the correct graph when resing
+                    // 1->draw frequency 2->draw timespent
+
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
@@ -567,8 +570,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
       scope: true,
       link: function($scope, $elem, $attr, $http) {
 
-          var in_transition = false;
-
           // DataManagerService.get('/barchartFrequency', []).then(function(d) {
           //   jsonRes1=d;
           // });
@@ -583,22 +584,26 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
-              in_transition = true;
             }, function ( w ) {
               if ( !w ) { return; }
-              //selectDataset(); to be used when corrected the button thing
-              createBarChart(FrequencyData);
-              in_transition = false;
+              if(resizeFlag==1) {
+                createBarChart(FrequencyData);
+              }
+              if(resizeFlag==2) {
+                createBarChart(TimeSpentData);
+              }
             });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
-              in_transition = true;
             }, function ( h ) {
               if ( !h ) { return; }
-              //selectDataset(); to be used when corrected the button thing
-              createBarChart(FrequencyData);
-              in_transition = false;
+              if(resizeFlag==1) {
+                createBarChart(FrequencyData);
+              }
+              if(resizeFlag==2) {
+                createBarChart(TimeSpentData);
+              }
             });
 
           // $scope.$on('$destroy', function() {
@@ -606,22 +611,18 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           //   rootScopeBroadcastLeave();
           // })
 
-          function selectDataset()
-          {
-              var value = this.value;
-              if (value == "option1")
-              {
-                  //createBarChart(jsonRes1);
-                  createBarChart(FrequencyData);
+          $scope.$watchGroup(['frequency', 'timespent'], function (val) {
+              if(val[0]==true && val[1]==false) {
+                resizeFlag=1;
+                createBarChart(FrequencyData);
               }
-              else if (value == "option2")
-              {
-                  //createBarChart(jsonRes2);
-                  createBarChart(TimeSpentData);
+              if(val[0]==false && val[1]==true) {
+                resizeFlag=2;
+                createBarChart(TimeSpentData);
               }
-          }
-          
-          function createBarChart(dataset) {
+          });
+      
+          function createBarChart(dataset) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
 
             dataset = dataset.sort(function(a, b) {  // function to sort the data descendingly
                               return a.value - b.value;
@@ -632,7 +633,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
               $elem[0].svg = null;
 
-              var margin = {top: 20, right: 10, bottom: 120, left: 10},
+              var margin = {top: 20, right: 10, bottom: 75, left: 10},
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
                   height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
 
@@ -640,7 +641,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               var formatPercent = d3.format("");
 
               var y = d3.scale.ordinal()
-                //.domain(mappedDataset.sort(function(a, b) { return mappedDataset[a] - mappedDataset[b]; }))
                 .domain(dataset.map(function(d) { return d.label; }))
                 .rangeRoundBands([0, height], 0.1, 0.3);
               var x = d3.scale.linear()
@@ -691,7 +691,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
                       .attr("width", function(d) { return x(d.value); }) // return 0 if want to animate
-                      // for big dataset, limit the nr of bars shown
+                      // for big dataset, limit the nr of bars shown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
 
@@ -717,7 +717,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
 
               bar.on("mousemove", function(d){
-                      if ( in_transition ) { return; }
                       div.style("left", d3.event.pageX+"px");
                       div.style("top", d3.event.pageY-130+"px");
                       div.style("display", "inline-block");
@@ -726,7 +725,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       // or "x mins" if it is time spent
                   });
               bar.on("mouseout", function(d){
-                      if ( in_transition ) { return; }
                       div.style("display", "none");
                   });
 
