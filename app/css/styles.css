@@ -306,6 +306,20 @@ html {
 
 /* HORIZONTAL BAR CHART */
 
+#barchart-frequency {
+  position: relative;
+  left: 7%;
+  top: 12px;
+  /*background-color: #00475B;*/
+}
+
+#barchart-timespent {
+  position: relative;
+  left: 20%;
+  top: 12px;
+  /*background-color: #00475B;*/
+}
+
 polyline{
     opacity: .3;
     stroke: black;
@@ -382,7 +396,7 @@ text.label{
 
 .axis .tick line {
     stroke-width: 1;
-    stroke: rgba(0, 0, 0, 0.2);
+    stroke: rgba(0, 0, 0, 1);
 }
 
 .axisHorizontal path{
@@ -413,6 +427,7 @@ text.label{
 
 .x.axis path {
     display: none;
+    /* comment in order to display the stroke that connects the ticks*/
 }
 /* HORIZONTAL BAR CHART END */
 

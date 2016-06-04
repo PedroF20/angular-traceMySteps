@@ -587,10 +587,10 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             }, function ( w ) {
               if ( !w ) { return; }
               if(resizeFlag==1) {
-                createBarChart(FrequencyData);
+                createBarChart(FrequencyData, resizeFlag);
               }
               if(resizeFlag==2) {
-                createBarChart(TimeSpentData);
+                createBarChart(TimeSpentData, resizeFlag);
               }
             });
 
@@ -599,10 +599,10 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             }, function ( h ) {
               if ( !h ) { return; }
               if(resizeFlag==1) {
-                createBarChart(FrequencyData);
+                createBarChart(FrequencyData, resizeFlag);
               }
               if(resizeFlag==2) {
-                createBarChart(TimeSpentData);
+                createBarChart(TimeSpentData, resizeFlag);
               }
             });
 
@@ -614,15 +614,15 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           $scope.$watchGroup(['frequency', 'timespent'], function (val) {
               if(val[0]==true && val[1]==false) {
                 resizeFlag=1;
-                createBarChart(FrequencyData);
+                createBarChart(FrequencyData, resizeFlag);
               }
               if(val[0]==false && val[1]==true) {
                 resizeFlag=2;
-                createBarChart(TimeSpentData);
+                createBarChart(TimeSpentData, resizeFlag);
               }
           });
       
-          function createBarChart(dataset) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
+          function createBarChart(dataset, resizeFlag) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
 
             dataset = dataset.sort(function(a, b) {  // function to sort the data descendingly
                               return a.value - b.value;
@@ -633,7 +633,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
               $elem[0].svg = null;
 
-              var margin = {top: 20, right: 10, bottom: 75, left: 10},
+              var margin = {top: 33, right: 10, bottom: 75, left: 10},
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
                   height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
 
@@ -649,7 +649,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
               var xAxis = d3.svg.axis()
                       .scale(x)
-                      .tickSize(-height)
+                      //.tickSize(-height)
                       .orient("bottom");
 
               d3.select($elem[0]).selectAll("svg").remove()
@@ -673,14 +673,24 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               svg.select(".y.axis").remove();
               svg.select(".x.axis").remove();
 
-              svg.append("g")
+              if (resizeFlag==1) {
+                svg.append("g")
                       .append("text")
                       .attr("transform", "rotate(0)")
-                      .attr("x", 170)
+                      .attr("x", 78)
                       .attr("dx", ".1em")
                       .style("text-anchor", "end")
-                      .text("Frequency of Visit/Time Spent (mins)");
-                      //console.log(dataset);
+                      .text("Frequency of Visit");
+              }
+              if (resizeFlag==2) {
+                svg.append("g")
+                      .append("text")
+                      .attr("transform", "rotate(0)")
+                      .attr("x", 49)
+                      .attr("dx", ".1em")
+                      .style("text-anchor", "end")
+                      .text("Time Spent");
+              }
 
               var bar = svg.selectAll(".bar")
                         .data(dataset, function(d) { return d.label; })
@@ -690,8 +700,11 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("class", "bar")
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
-                      .attr("width", function(d) { return x(d.value); }) // return 0 if want to animate
+                      .attr("width", function(d) { return x(d.value); }) // decomment bar.transition AND return 0 if want to animate
                       // for big dataset, limit the nr of bars shown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      // ex: bars with width under certain size or bars with d.value under certain value
+                      // if(d.value<100) {return 0;}
+                      // else {return x(d.value);}
                       .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
 
@@ -720,9 +733,14 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       div.style("left", d3.event.pageX+"px");
                       div.style("top", d3.event.pageY-130+"px");
                       div.style("display", "inline-block");
-                      div.html((d.value)+"%");
-                      // Put an if-cycle to show the label with "x times" if it is frequency
-                      // or "x mins" if it is time spent
+                      if (resizeFlag==1) {
+                        div.html((d.value)+" times");
+                      }
+                      if (resizeFlag==2) {
+                        div.html((d.value)+" mins");
+                        // for now "mins" is hardcoded
+                        // have function to format time accordingly (hours/just minutes/etc.)!!!!!!
+                      }
                   });
               bar.on("mouseout", function(d){
                       div.style("display", "none");

@@ -65,10 +65,8 @@
             <calendar-heatmap class="calendar-heatmap" ng-if="widget.type == 'calendar'"></calendar-heatmap>
             <gps-tracks ng-if="widget.type == 'tracks'"></gps-tracks>
             <bar-chart ng-if="widget.type == 'bar'">
-
-              <button class="btn btn-primary btn-xs" id="barchart-opts" ng-click="frequencyDataset()" autocomplete="off">Frequency</button>
-              <button class="btn btn-primary btn-xs" id="barchart-opts" ng-click="timespentDataset()" autocomplete="off">Time Spent</button>
-
+              <button class="btn btn-primary btn-xs" id="barchart-frequency" ng-click="frequencyDataset()" autocomplete="off">Frequency</button>
+              <button class="btn btn-primary btn-xs" id="barchart-timespent" ng-click="timespentDataset()" autocomplete="off">Time Spent</button>
             </bar-chart>
         </li>
     <ul>
