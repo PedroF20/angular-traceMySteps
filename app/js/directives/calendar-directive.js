@@ -481,7 +481,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
   
             var item_width = (width - label_padding) / weekLabels.length - gutter * 5;
             var itemScale = d3.scale.linear()
-              .range([0, item_width]);
+              .rangeRound([0, item_width]);
   
             item_block.selectAll('.item-block-rect')
               .data(function (d) {
@@ -493,14 +493,14 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .attr('x', function (d) {
                 var total = parseInt(d3.select(this.parentNode).attr('total'));
                 var offset = parseInt(d3.select(this.parentNode).attr('offset'));
-                var item_width = d.value * ((width - label_padding) / weekLabels.length - gutter * 5) / total;
-                d3.select(this.parentNode).attr('offset', offset + item_width + item_gutter);
-                return offset + item_gutter;
+                itemScale.domain([0, total]);
+                d3.select(this.parentNode).attr('offset', offset + itemScale(d.value));
+                return offset;
               })
               .attr('width', function (d) {
                 var total = parseInt(d3.select(this.parentNode).attr('total'));
                 itemScale.domain([0, total]);
-                return itemScale(d.value);
+                return itemScale(d.value) - item_gutter;
               })
               .attr('height', function () {
                 return Math.min(dayAxis.rangeBand(), max_block_height);
