@@ -88,7 +88,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addChordWidget = function() {
-		$scope.widgets.push({type: 'chord', name: "Chord Chart", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'chord', name: "Travels to or from a place", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addCalendarWidget = function() {

@@ -767,3 +767,52 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
 }]);
 
+
+
+app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+  var delay=350;
+
+  var matrix = [
+    [11975,  5871, 8916, 2868],
+    [ 1951, 10048, 2060, 6171],
+    [ 8010, 16145, 8090, 8045],
+    [ 1013,   990,  940, 6907]
+  ];
+
+  return {
+        restrict: 'E',
+        scope: true,
+        link: function($scope, $elem, $attr) {
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientWidth;
+            }, function ( w ) {
+              if ( !w ) { return; }
+              createChordGraph();
+            });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientHeight;
+            }, function ( h ) {
+            if ( !h ) { return; }
+            createChordGraph();
+           });
+
+          function createChordGraph () {
+
+            setTimeout(function() {
+
+              $elem[0].svg = null;
+
+              $elem[0].svg = svg;
+
+            }, delay);
+
+          }
+
+      }
+
+    };
+
+}]);
