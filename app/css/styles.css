@@ -290,10 +290,14 @@ html {
   clip-path: url(#clip);
 }
 
-.chord path {
+/*.chord path {
   fill-opacity: .67;
   stroke: #000;
   stroke-width: .5px;
+}*/
+
+.chord {
+  fill-opacity: .67;
 }
 
 .brush .extent {

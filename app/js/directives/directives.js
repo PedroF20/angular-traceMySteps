@@ -772,18 +772,42 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var delay=350;
+  var jsonRes=null;
 
-  var matrix = [
-    [11975,  5871, 8916, 2868],
-    [ 1951, 10048, 2060, 6171],
-    [ 8010, 16145, 8090, 8045],
-    [ 1013,   990,  940, 6907]
-  ];
+/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+var chordData = [{
+                  "from": "INESC",
+                  "to": ["IST", "home", "Atrium Saldanha"]
+                }, {
+                  "from": "home",
+                  "to": ["IST", "INESC"]
+                }, {
+                  "from": "Atrium Saldanha",
+                  "to": ["IST", "INESC", "Choupana caffe"]
+                }, {
+                  "from": "IST",
+                  "to": ["home", "INESC", "Estádio da Luz", "Arco do Cego"]
+                }, {
+                  "from": "Estádio da Luz",
+                  "to": ["home", "Colombo"]
+                }, {
+                  "from": "grandmother's house",
+                  "to": ["home", "Forum Montijo"]
+                }]
+
+
+/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
 
   return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
+
+          // DataManagerService.get('/chord', []).then(function(d) {
+          //   jsonRes=d;
+          // });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -804,6 +828,93 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             setTimeout(function() {
 
               $elem[0].svg = null;
+
+              var margin = {top: 20, right: 10, bottom: 20, left: 10},
+                  width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+                  height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom,
+                  // outerRadius = 400 / 2,
+                  // innerRadius = outerRadius-130;
+                  innerRadius = Math.min(width, height) * .41,
+                  outerRadius = innerRadius * 1.1;
+
+              var fill = d3.scale.category20c();
+
+              var chord = d3.layout.chord()
+                  .padding(.04)
+                  .sortSubgroups(d3.descending)
+                  .sortChords(d3.descending);
+
+              var arc = d3.svg.arc()
+                  .innerRadius(innerRadius)
+                  .outerRadius(innerRadius + 20);
+
+              d3.select($elem[0]).selectAll("svg").remove()
+
+              var svg = d3.select($elem[0]).append("svg")
+                  .attr("width", outerRadius * 2)
+                  .attr("height", outerRadius * 2)
+                  .append("g")
+                  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+              var indexByFromName = d3.map(),
+                  fromNameByIndex = d3.map(),
+                  matrix = [],
+                  n = 0;
+
+              // Compute a unique index for each package name.
+              chordData.forEach(function(d) {
+                if (!indexByFromName.has(d = d.from)) {
+                  fromNameByIndex.set(n, d);
+                  indexByFromName.set(d, n++);
+                }
+              });
+
+              // Construct a square matrix counting package imports.
+              chordData.forEach(function(d) {
+                if(chordData[d] != undefined){
+                  var source = indexByFromName.get(d.from),
+                      row = matrix[source];
+                  if (!row) {
+                   row = matrix[source] = [];
+                   for (var i = -1; ++i < n;) row[i] = 0;
+                  }
+                  d.imports.forEach(function(d) { row[indexByFromName.get(d)]++; });
+                }
+              });
+
+              chord.matrix(matrix);
+
+              var g = svg.selectAll(".group")
+                .data(chord.groups)
+                .enter().append("g")
+                .attr("class", "group");
+
+              g.append("path")
+                  .style("fill", function(d) { return fill(d.index); })
+                  .style("stroke", function(d) { return fill(d.index); })
+                  .attr("d", arc);
+
+              g.append("text")
+                  .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
+                  .attr("dy", ".35em")
+                  .attr("transform", function(d) {
+                    return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                        + "translate(" + (innerRadius + 26) + ")"
+                        + (d.angle > Math.PI ? "rotate(180)" : "");
+                  })
+                  .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+                  .text(function(d) { return nameByIndex.get(d.index); });
+
+              svg.selectAll(".chord")
+                  .data(chord.chords)
+                  .enter().append("path")
+                  .attr("class", "chord")
+                  .style("stroke", function(d) { return d3.rgb(fill(d.source.index)).darker(); })
+                  .style("fill", function(d) { return fill(d.source.index); })
+                  .attr("d", d3.svg.chord().radius(innerRadius));
+
+              d3.select(self.frameElement).style("height", outerRadius * 2 + "px");
+
 
               $elem[0].svg = svg;
 
