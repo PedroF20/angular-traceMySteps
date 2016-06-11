@@ -814,6 +814,8 @@ var chordData = [{
             }, function ( w ) {
               if ( !w ) { return; }
               createChordGraph();
+                          console.log("resize");
+
             });
 
           $scope.$watch(function () {
@@ -837,7 +839,7 @@ var chordData = [{
                   innerRadius = Math.min(width, height) * .41,
                   outerRadius = innerRadius * 1.1;
 
-              var fill = d3.scale.category20c();
+              var fill = d3.scale.category20();
 
               var chord = d3.layout.chord()
                   .padding(.04)
@@ -846,15 +848,15 @@ var chordData = [{
 
               var arc = d3.svg.arc()
                   .innerRadius(innerRadius)
-                  .outerRadius(innerRadius + 20);
+                  .outerRadius(outerRadius);
 
               d3.select($elem[0]).selectAll("svg").remove()
 
               var svg = d3.select($elem[0]).append("svg")
-                  .attr("width", outerRadius * 2)
-                  .attr("height", outerRadius * 2)
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom - 25)
                   .append("g")
-                  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+                  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
               var indexByFromName = d3.map(),
                   fromNameByIndex = d3.map(),
@@ -871,15 +873,14 @@ var chordData = [{
 
               // Construct a square matrix counting package imports.
               chordData.forEach(function(d) {
-                if(chordData[d] != undefined){
                   var source = indexByFromName.get(d.from),
                       row = matrix[source];
+                      //console.log(source);
                   if (!row) {
                    row = matrix[source] = [];
                    for (var i = -1; ++i < n;) row[i] = 0;
                   }
-                  d.imports.forEach(function(d) { row[indexByFromName.get(d)]++; });
-                }
+                  d.to.forEach(function(d) { row[indexByFromName.get(d)]++; });
               });
 
               chord.matrix(matrix);
@@ -890,9 +891,11 @@ var chordData = [{
                 .attr("class", "group");
 
               g.append("path")
-                  .style("fill", function(d) { return fill(d.index); })
-                  .style("stroke", function(d) { return fill(d.index); })
-                  .attr("d", arc);
+                  .attr("fill", function(d) { return fill(d.index); })
+                  .attr("stroke", function(d) { return fill(d.index); })
+                  .attr("d", arc)
+                  .on("mouseover", fadeBroadcast(.1))
+                  .on("mouseout", fadeBroadcastLeave(1));
 
               g.append("text")
                   .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
@@ -903,27 +906,47 @@ var chordData = [{
                         + (d.angle > Math.PI ? "rotate(180)" : "");
                   })
                   .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-                  .text(function(d) { return nameByIndex.get(d.index); });
+                  .text(function(d) { return fromNameByIndex.get(d.index); });
+
+                  // rodar labels 90º para ficarem deitadas ou deixar assim para efeitos de escalabilidade?
+                  // se ficarem deitadas e houver muitas labels, elas vao se sobrepor
+                  // como estao nao ha sobreposicao caso haja muitas labels, apenas ficam cortadas pelo widget
 
               svg.selectAll(".chord")
                   .data(chord.chords)
                   .enter().append("path")
                   .attr("class", "chord")
-                  .style("stroke", function(d) { return d3.rgb(fill(d.source.index)).darker(); })
-                  .style("fill", function(d) { return fill(d.source.index); })
+                  .attr("stroke", function(d) { return d3.rgb(fill(d.source.index)).darker(); })
+                  .attr("fill", function(d) { return fill(d.source.index); })
                   .attr("d", d3.svg.chord().radius(innerRadius));
-
-              d3.select(self.frameElement).style("height", outerRadius * 2 + "px");
-
 
               $elem[0].svg = svg;
 
+              // Returns an event handler for fading a given chord group.
+              function fadeBroadcast(opacity) {
+                return function(g, i) {
+                  svg.selectAll(".chord")
+                      .filter(function(d) { return d.source.index != i && d.target.index != i; })
+                      .transition()
+                      .style("opacity", opacity);
+                      //$rootScope.selectedItem=true;
+                      // $rootScope.$broadcast('rootScope:broadcast', { start : 4, end : 8});
+                };
+              }
+
+              function fadeBroadcastLeave(opacity) {
+                return function(g, i) {
+                  svg.selectAll(".chord")
+                      .filter(function(d) { return d.source.index != i && d.target.index != i; })
+                      .transition()
+                      .style("opacity", opacity);
+                      //$rootScope.selectedItem=false;
+                      // $rootScope.$broadcast('rootScope:broadcast-leave', 'json vazio');
+                };
+              }
+
             }, delay);
-
           }
-
       }
-
     };
-
 }]);
