@@ -778,13 +778,13 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
 var chordData = [{
                   "from": "INESC",
-                  "to": ["IST", "home", "Atrium Saldanha"]
+                  "to": ["IST", "home", "Atrium Saldanha", "Atrium Saldanha", "Atrium Saldanha", "Atrium Saldanha"]
                 }, {
                   "from": "home",
                   "to": ["IST", "INESC"]
                 }, {
                   "from": "Atrium Saldanha",
-                  "to": ["IST", "INESC", "Choupana caffe"]
+                  "to": ["IST", "INESC", "IST", "INESC", "Choupana caffe"]
                 }, {
                   "from": "IST",
                   "to": ["home", "INESC", "Estádio da Luz", "Arco do Cego"]
@@ -838,6 +838,8 @@ var chordData = [{
                   // innerRadius = outerRadius-130;
                   innerRadius = Math.min(width, height) * .41,
                   outerRadius = innerRadius * 1.1;
+
+              var formatPercent = d3.format(".1%");
 
               var fill = d3.scale.category20();
 
@@ -919,6 +921,17 @@ var chordData = [{
                   .attr("stroke", function(d) { return d3.rgb(fill(d.source.index)).darker(); })
                   .attr("fill", function(d) { return fill(d.source.index); })
                   .attr("d", d3.svg.chord().radius(innerRadius));
+
+              svg.selectAll(".chord").append("title").text(function(d) {
+                 return fromNameByIndex.get(d.source.index)
+                 + " → " + fromNameByIndex.get(d.target.index)
+                 + ": " + d.source.value + " travels"
+                 //+ ": " + formatPercent(d.source.value)
+                 + "\n" + fromNameByIndex.get(d.target.index)
+                 + " → " + fromNameByIndex.get(d.source.index)
+                 + ": " + d.target.value + " travels";
+                 //+ ": " + formatPercent(d.target.value);
+                 });
 
               $elem[0].svg = svg;
 
