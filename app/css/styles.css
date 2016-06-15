@@ -123,6 +123,18 @@ html {
     right: 90px;
 }
 
+#add-rangedbar-button {
+    position: absolute;
+    top: 500px;
+    right: 90px;
+}
+
+#add-arcdiagram-button {
+    position: absolute;
+    top: 550px;
+    right: 90px;
+}
+
 #clear-items-button {
     position: absolute;
     top: 250px;

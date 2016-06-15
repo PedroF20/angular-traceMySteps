@@ -532,35 +532,81 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
-          FrequencyData = [
-              {label:"Rialva", value:22},
-              {label:"INESC", value:33},
-              {label:"IST", value:4},
-              {label:"Casa", value:15},
-              {label:"Atrium Saldanha", value:36},
-              {label:"Estádio da Luz", value:0},
-              {label:"QWERTY", value:0},
-              {label:"AZERTY", value:14},
-              {label:"AAAAAA", value:20},
-              {label:"BBBBBB", value:30},
-              {label:"CCCCCC", value:40},
-              {label:"DDDDDDD", value:45},
-              {label:"EEEEEE", value:21},
-              {label:"FFFFFFF", value:31},
-              {label:"GGGGGGG", value:18},
-              {label:"eweqwww", value:18},
-              {label:"eqewe", value:18},
-              {label:"fsdfs", value:18},
-          ];
+          FrequencyData = [{
+                            label: "Rialva",
+                            value: 22
+                          }, {
+                            label: "INESC",
+                            value: 33
+                          }, {
+                            label: "IST",
+                            value: 4
+                          }, {
+                            label: "Casa",
+                            value: 15
+                          }, {
+                            label: "Atrium Saldanha",
+                            value: 36
+                          }, {
+                            label: "Estádio da Luz",
+                            value: 0
+                          }, {
+                            label: "QWERTY",
+                            value: 0
+                          }, {
+                            label: "AZERTY",
+                            value: 14
+                          }, {
+                            label: "AAAAAA",
+                            value: 20
+                          }, {
+                            label: "BBBBBB",
+                            value: 30
+                          }, {
+                            label: "CCCCCC",
+                            value: 40
+                          }, {
+                            label: "DDDDDDD",
+                            value: 45
+                          }, {
+                            label: "EEEEEE",
+                            value: 21
+                          }, {
+                            label: "FFFFFFF",
+                            value: 31
+                          }, {
+                            label: "GGGGGGG",
+                            value: 18
+                          }, {
+                            label: "eweqwww",
+                            value: 18
+                          }, {
+                            label: "eqewe",
+                            value: 18
+                          }, {
+                            label: "fsdfs",
+                            value: 18
+                          }];
 
-          TimeSpentData = [
-              {label:"Rialva", value:10},
-              {label:"INESC", value:20},
-              {label:"IST", value:30},
-              {label:"Casa", value:5},
-              {label:"Atrium Saldanha", value:12},
-              {label:"Estádio da Luz", value:23}
-          ];
+          TimeSpentData = [{
+                            label: "Rialva",
+                            value: 10
+                          }, {
+                            label: "INESC",
+                            value: 20
+                          }, {
+                            label: "IST",
+                            value: 30
+                          }, {
+                            label: "Casa",
+                            value: 5
+                          }, {
+                            label: "Atrium Saldanha",
+                            value: 12
+                          }, {
+                            label: "Estádio da Luz",
+                            value: 23
+                          }];
 
 /******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
@@ -576,10 +622,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           // DataManagerService.get('/barchartTime', []).then(function(d) {
           //   jsonRes2=d;
-          // });
-
-          // $scope.$watch('value', function(value) {
-          //   console.log(value);
           // });
 
           $scope.$watch(function () {
@@ -724,7 +766,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                           return y(d.label)+15;
                       })
                       .text(function(d){
-                        //if (d.value==0){return};
+                        //if (d.value==0){return}; use together with limitation of the nr of bars shown
                            return d.label;
                       });
 
@@ -896,7 +938,7 @@ var chordData = [{
                   .attr("fill", function(d) { return fill(d.index); })
                   .attr("stroke", function(d) { return fill(d.index); })
                   .attr("d", arc)
-                  .on("mouseover", fadeBroadcast(.1))
+                  .on("click", fadeBroadcast(.1)) //put counter for to decide which function the clicking calls
                   .on("mouseout", fadeBroadcastLeave(1));
 
               g.append("text")
@@ -910,9 +952,8 @@ var chordData = [{
                   .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
                   .text(function(d) { return fromNameByIndex.get(d.index); });
 
-                  // rodar labels 90º para ficarem deitadas ou deixar assim para efeitos de escalabilidade?
-                  // se ficarem deitadas e houver muitas labels, elas vao se sobrepor
-                  // como estao nao ha sobreposicao caso haja muitas labels, apenas ficam cortadas pelo widget
+                  // as labels não aparecem se o elemento tiver um nr de travels abaixo de um threshold
+                  // ou elemento não aparece de todo
 
               svg.selectAll(".chord")
                   .data(chord.chords)
@@ -926,11 +967,9 @@ var chordData = [{
                  return fromNameByIndex.get(d.source.index)
                  + " → " + fromNameByIndex.get(d.target.index)
                  + ": " + d.source.value + " travels"
-                 //+ ": " + formatPercent(d.source.value)
                  + "\n" + fromNameByIndex.get(d.target.index)
                  + " → " + fromNameByIndex.get(d.source.index)
                  + ": " + d.target.value + " travels";
-                 //+ ": " + formatPercent(d.target.value);
                  });
 
               $elem[0].svg = svg;
@@ -962,4 +1001,140 @@ var chordData = [{
           }
       }
     };
+}]);
+
+
+
+app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+  var delay=350;
+  var jsonRes=null;
+
+/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+// var nodes =
+
+// var edges = 
+
+
+/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+
+  return {
+        restrict: 'E',
+        scope: true,
+        link: function($scope, $elem, $attr) {
+
+          // DataManagerService.get('/arc', []).then(function(d) {
+          //   jsonRes=d;
+          // });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientWidth;
+            }, function ( w ) {
+              if ( !w ) { return; }
+              createArcGraph();
+            });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientHeight;
+            }, function ( h ) {
+            if ( !h ) { return; }
+            createArcGraph();
+           });
+
+
+          function createChordGraph () {
+
+            setTimeout(function() {
+
+              $elem[0].svg = null;
+
+              var margin = {top: 20, right: 10, bottom: 20, left: 10},
+                  width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+                  height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+
+              d3.select($elem[0]).selectAll("svg").remove()
+
+              var svg = d3.select($elem[0]).append("svg")
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + margin.top + margin.bottom)
+                      .append("g")
+                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+              var nodeHash = {};
+
+              for (x in nodes) {
+                nodeHash[nodes[x].id] = nodes[x];
+                nodes[x].x = parseInt(x) * 40;
+              }
+              for (x in edges) {
+                edges[x].weight = parseInt(edges[x].weight);
+                edges[x].source = nodeHash[edges[x].source];
+                edges[x].target = nodeHash[edges[x].target];
+              }
+
+              linkScale = d3.scale.linear().domain(d3.extent(edges, function (d) {return d.weight})).range([5,10])
+
+              var arcG = d3.select("svg").append("g")
+                            .attr("id", "arcG")
+                            .attr("transform", "translate(50,250)");
+
+              arcG.selectAll("path")
+                  .data(edges)
+                  .enter()
+                  .append("path")
+                  .style("stroke", "black")
+                  .style("stroke-width", function(d) {return d.weight * 2})
+                  .style("opacity", .25)
+                  .style("fill", "none")
+                  .attr("d", arc)
+                  .on("mouseover", edgeOver)
+
+              arcG.selectAll("circle")
+                  .data(nodes)
+                  .enter()
+                  .append("circle")
+                  .attr("r", 10)
+                  .style("fill", "lightgray")
+                  .style("stroke", "black")
+                  .style("stroke-width", "1px")
+                  .attr("cx", function (d) {return d.x})
+                  .on("mouseover", nodeOver)
+
+               function arc(d,i) {
+                  var draw = d3.svg.line().interpolate("basis");
+                  var midX = (d.source.x + d.target.x) / 2;
+                  var midY = (d.source.x - d.target.x) * 2;
+                  return draw([[d.source.x,0],[midX,midY],[d.target.x,0]])
+                }
+                
+                function shapedEdge(d,i) {
+                  var draw = d3.svg.line().interpolate("basis");
+                  var sw = linkScale(d.weight)
+                  var midX = (d.source.x + d.target.x) / 2;
+                  var midY = d.source.x - d.target.x - sw;
+                  var midY2 = d.source.x - d.target.x + sw;
+                  return draw([[d.source.x,0],[midX,midY],[d.target.x + (sw*1.5),0],[d.target.x - (sw*1.5),0],[midX,midY2],[d.source.x,0]])
+                }
+                
+                function nodeOver(d,i) {
+                  d3.selectAll("circle").style("fill", function (p) {return p == d ? "red" : "lightgray"})
+                  d3.selectAll("path").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
+                }
+
+                function edgeOver(d) {
+                  d3.selectAll("path").style("stroke", function(p) {return p == d ? "red" : "black"})
+                  d3.selectAll("circle").style("fill", function(p) {return p == d.source ? "blue" : p == d.target ? "green" : "lightgray"})
+                }
+      
+
+              $elem[0].svg = svg;
+
+
+            }, delay);
+          }
+        }
+      };
+
 }]);

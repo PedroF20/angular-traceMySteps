@@ -104,6 +104,14 @@ angular.module('myApp.view1', ['ngRoute'])
 		$scope.widgets.push({type: 'bar', name: "My Places", draggable: true, sizeX: 1, sizeY: 3, maxSizeY:3, maxSizeX:1});
 	};
 
+	$scope.addRangedBarWidget = function() {
+		$scope.widgets.push({type: 'ranged', name: "My Stays", draggable: true, sizeX: 3, sizeY: 2, maxSizeY:3, maxSizeX:3});
+	};
+
+	$scope.addArcDiagramWidget = function() {
+		$scope.widgets.push({type: 'arc', name: "My Trips", draggable: true, sizeX: 2, sizeY: 2, maxSizeY:2, maxSizeX:2});
+	};
+
 	$scope.clear = function() {
 		$scope.widgets = [];
 	};
