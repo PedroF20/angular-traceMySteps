@@ -5,7 +5,6 @@
           <div style="padding:20px">
               <h2 id="panel-title">Visualizations</h2>
               <a ng-click="toggle()" class="glyphicon glyphicon-remove-circle" ></a>
-              <a class="btn btn-primary" id="add-area-button" ng-click="addAreaWidget()">Add Area Graph</a>
               <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Hexbin Graph</a>
               <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
@@ -55,12 +54,6 @@
                 </div>
             </div>
             
-            <area-graph ng-if="widget.type == 'area'" list_of_hours="{{widget.hours}}" day-start="{{context.lowerValue}}" 
-                                                      day-end="{{context.upperValue}}" hour-start="{{context.hourStart}}" 
-                                                      hour-end="{{context.hourEnd}}">
-              <div range-slider id="inner_range_slider" floor="0" ceiling="2400" step= "30" dragstop="true" 
-                          ng-model-low="context.hourStart" ng-model-high="context.hourEnd"></div>
-            </area-graph>
             <chord-graph ng-if="widget.type == 'chord'"></chord-graph>
             <hexbin-graph ng-if="widget.type == 'hexbin'"></hexbin-graph>
             <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>

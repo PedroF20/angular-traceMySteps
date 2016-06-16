@@ -70,14 +70,6 @@ angular.module('myApp.view1', ['ngRoute'])
 	// LET THE TYPE ATTRIBUTE DECIDE WHICH GRAPH IS GOING TO BE DRAWN. THEN EACH GRAPH ONLY CONTROLS
 	// ITS CONTEXT (AND THUS LESS VARIABLES, BECAUSE THEY ONLY OBSERVE WHAT IS IMPORTANT TO THEM)
 	
-	$scope.addAreaWidget = function() {
-
-		$scope.widgets.push({type: 'area', name: "Area Chart", draggable: true, sizeX: 2, sizeY: 2});
-		//we can later use the row and column attributes
-    	//to put the new Items where we desire
-    	//we can also add a mechanism to help identify individual boxes
-    	//in order for them to be easily accessible
-	}
 
 	$scope.addHexbinWidget = function() {
 		$scope.widgets.push({type: 'hexbin', name: "Hexbin Chart", draggable: true, sizeX: 2, sizeY: 2});

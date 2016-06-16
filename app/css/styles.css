@@ -81,11 +81,6 @@ html {
     font-size: 30px;
 }
 
-#add-area-button {
-    position: absolute;
-    top: 200px;
-    right: 90px;
-}
 
 #add-hex-button {
     position: absolute;
@@ -101,43 +96,43 @@ html {
 
 #add-chord-button {
     position: absolute;
-    top: 300px;
+    top: 250px;
     right: 90px;
 }
 
 #add-calendar-button {
     position: absolute;
-    top: 350px;
+    top: 300px;
     right: 90px;
 }
 
 #add-tracks-button {
     position: absolute;
-    top: 400px;
+    top: 350px;
     right: 90px;
 }
 
 #add-barchart-button {
     position: absolute;
-    top: 450px;
+    top: 400px;
     right: 90px;
 }
 
 #add-rangedbar-button {
     position: absolute;
-    top: 500px;
+    top: 450px;
     right: 90px;
 }
 
 #add-arcdiagram-button {
     position: absolute;
-    top: 550px;
+    top: 500px;
     right: 90px;
 }
 
 #clear-items-button {
     position: absolute;
-    top: 250px;
+    top: 200px;
     left: 73px;
 }
 
@@ -281,13 +276,13 @@ html {
 
 /* AREA EXAMPLE */
 
-.axis path, .axis line {
+/*.axis path, .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-.area1 { fill: #595959; }
+.area1 { fill: #595959; }*/
 
 /*.selectedArea {
   fill: #000000 !important;
@@ -302,22 +297,27 @@ html {
   clip-path: url(#clip);
 }
 
-/*.chord path {
-  fill-opacity: .67;
-  stroke: #000;
-  stroke-width: .5px;
-}*/
-
-.chord {
-  fill-opacity: .67;
-}
-
 .brush .extent {
   stroke: #fff;
   fill-opacity: .125;
   shape-rendering: crispEdges;
 }
 /* AREA GRADIENT GRAPH END */
+
+
+/* CHORD GRAPH */
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+.chord {
+  fill-opacity: .67;
+}
+
+/* CHORD GRAPH END */
 
 
 /* HORIZONTAL BAR CHART */
@@ -446,6 +446,26 @@ text.label{
     /* comment in order to display the stroke that connects the ticks*/
 }
 /* HORIZONTAL BAR CHART END */
+
+
+/* ARC DIAGRAM */
+
+.tick line {
+  shape-rendering: crispEdges;
+  stroke: #000;
+}
+
+line.minor  {
+  stroke: #777;
+  stroke-dasharray: 2,2;
+}
+
+path.domain {
+  fill: none;
+  stroke: black;
+}
+
+/* ARC DIAGRAM END */
 
 
 /********************************/

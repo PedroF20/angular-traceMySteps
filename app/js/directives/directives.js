@@ -856,8 +856,6 @@ var chordData = [{
             }, function ( w ) {
               if ( !w ) { return; }
               createChordGraph();
-                          console.log("resize");
-
             });
 
           $scope.$watch(function () {
@@ -1012,9 +1010,45 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
-// var nodes =
+ var nodes = [{ 
+                id: "Rialva"
+              }, {
+                id: "INESC"
+              }, {
+                id: "IST"
+              }, {
+                id: "home"
+              }, {
+                id: "Atrium Saldanha"
+              }, {
+                id: "Estádio da Luz"
+              }];
 
-// var edges = 
+  var edges = [{ 
+                source: "Rialva",
+                target: "Estádio da Luz",
+                frequency: 2
+              }, {
+                source: "INESC",
+                target: "home",
+                frequency: 6
+              }, {
+                source: "IST",
+                target: "home",
+                frequency: 3
+              }, {
+                source: "home",
+                target: "INESC",
+                frequency: 8
+              }, {
+                source: "Atrium Saldanha",
+                target: "IST",
+                frequency: 4
+              }, {
+                source: "Estádio da Luz",
+                target: "home",
+                frequency: 1
+              }];
 
 
 /******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
@@ -1029,22 +1063,26 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           //   jsonRes=d;
           // });
 
-          $scope.$watch(function () {
-              return $elem[0].parentNode.clientWidth;
-            }, function ( w ) {
-              if ( !w ) { return; }
+          $scope.$watchGroup([$elem[0].parentNode.clientWidth, $elem[0].parentNode.clientHeight], function(h, w) {
+              if ( !w || !h) { return; }
               createArcGraph();
-            });
+          });
 
-          $scope.$watch(function () {
-              return $elem[0].parentNode.clientHeight;
-            }, function ( h ) {
-            if ( !h ) { return; }
-            createArcGraph();
-           });
+          // $scope.$watch(function () {
+          //     return $elem[0].parentNode.clientWidth;
+          //   }, function ( w ) {
+          //     if ( !w ) { return; }
+          //     createChordGraph();
+          //   });
 
+          // $scope.$watch(function () {
+          //     return $elem[0].parentNode.clientHeight;
+          //   }, function ( h ) {
+          //   if ( !h ) { return; }
+          //   createChordGraph();
+          //  });
 
-          function createChordGraph () {
+          function createArcGraph () {
 
             setTimeout(function() {
 
@@ -1053,6 +1091,21 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               var margin = {top: 20, right: 10, bottom: 20, left: 10},
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
                   height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+              
+              expEdges = edges;
+              expNodes = nodes;
+              
+              var nodeHash = {};
+              for (x in nodes) {
+                nodeHash[nodes[x].id] = nodes[x];
+                nodes[x].x = parseInt(x) * 50;
+              }
+              for (x in edges) {
+                edges[x].source = nodeHash[edges[x].source];
+                edges[x].target = nodeHash[edges[x].target];
+                console.log(edges[x].source);
+                console.log(edges[x].target);
+              }
 
               d3.select($elem[0]).selectAll("svg").remove()
 
@@ -1062,75 +1115,54 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                       .append("g")
                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-              var nodeHash = {};
-
-              for (x in nodes) {
-                nodeHash[nodes[x].id] = nodes[x];
-                nodes[x].x = parseInt(x) * 40;
-              }
-              for (x in edges) {
-                edges[x].weight = parseInt(edges[x].weight);
-                edges[x].source = nodeHash[edges[x].source];
-                edges[x].target = nodeHash[edges[x].target];
-              }
-
-              linkScale = d3.scale.linear().domain(d3.extent(edges, function (d) {return d.weight})).range([5,10])
-
-              var arcG = d3.select("svg").append("g")
-                            .attr("id", "arcG")
-                            .attr("transform", "translate(50,250)");
+              
+              var arcG = svg.append("g")
+                        .attr("id", "arcG")
+                        .attr("transform", "translate(50,250)");
 
               arcG.selectAll("path")
-                  .data(edges)
-                  .enter()
-                  .append("path")
-                  .style("stroke", "black")
-                  .style("stroke-width", function(d) {return d.weight * 2})
-                  .style("opacity", .25)
-                  .style("fill", "none")
-                  .attr("d", arc)
-                  .on("mouseover", edgeOver)
-
+                .data(edges)
+                .enter()
+                .append("path")
+                .attr("id", "arcpath")
+                .style("stroke", "black")
+                .style("stroke-width", function(d) {return d.frequency * 2})
+                .style("opacity", .25)
+                .style("fill", "none")
+                .attr("d", arc)
+                .on("mouseover", edgeOver)
+              
               arcG.selectAll("circle")
-                  .data(nodes)
-                  .enter()
-                  .append("circle")
-                  .attr("r", 10)
-                  .style("fill", "lightgray")
-                  .style("stroke", "black")
-                  .style("stroke-width", "1px")
-                  .attr("cx", function (d) {return d.x})
-                  .on("mouseover", nodeOver)
-
-               function arc(d,i) {
-                  var draw = d3.svg.line().interpolate("basis");
-                  var midX = (d.source.x + d.target.x) / 2;
-                  var midY = (d.source.x - d.target.x) * 2;
-                  return draw([[d.source.x,0],[midX,midY],[d.target.x,0]])
-                }
-                
-                function shapedEdge(d,i) {
-                  var draw = d3.svg.line().interpolate("basis");
-                  var sw = linkScale(d.weight)
-                  var midX = (d.source.x + d.target.x) / 2;
-                  var midY = d.source.x - d.target.x - sw;
-                  var midY2 = d.source.x - d.target.x + sw;
-                  return draw([[d.source.x,0],[midX,midY],[d.target.x + (sw*1.5),0],[d.target.x - (sw*1.5),0],[midX,midY2],[d.source.x,0]])
-                }
-                
-                function nodeOver(d,i) {
-                  d3.selectAll("circle").style("fill", function (p) {return p == d ? "red" : "lightgray"})
-                  d3.selectAll("path").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
-                }
-
-                function edgeOver(d) {
-                  d3.selectAll("path").style("stroke", function(p) {return p == d ? "red" : "black"})
-                  d3.selectAll("circle").style("fill", function(p) {return p == d.source ? "blue" : p == d.target ? "green" : "lightgray"})
-                }
-      
-
-              $elem[0].svg = svg;
-
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("id", "arccircle")
+                .attr("r", 10)
+                .style("fill", "lightgray")
+                .style("stroke", "black")
+                .style("stroke-width", "1px")
+                .attr("cx", function (d) {return d.x})
+                .on("mouseover", nodeOver)
+              
+              function arc(d,i) {
+                var draw = d3.svg.line().interpolate("basis");
+                //console.log(d.source);
+                var midX = (d.source.x + d.target.x) / 2;
+                var midY = d.source.x - d.target.x;
+                return draw([[d.source.x,0],[midX,midY],[d.target.x,0]])
+              }
+              
+              function nodeOver(d,i) {
+                d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "red" : "lightgray"})
+                d3.selectAll("#arcpath").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
+              }
+              
+              function edgeOver(d) {
+                d3.selectAll("#arcpath").style("stroke", function(p) {return p == d ? "red" : "black"})
+                d3.selectAll("#arccircle").style("fill", function(p) {return p == d.source ? "blue" : p == d.target ? "green" : "lightgray"})
+              }
+                      
+                $elem[0].svg = svg;
 
             }, delay);
           }
