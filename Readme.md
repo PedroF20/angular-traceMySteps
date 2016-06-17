@@ -8,19 +8,21 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 <s>1) Bind first four visualizations as proof-of-concept.</s>
 
-2) Change from a faux database/backend to the real deal.
+2) Change from a faux database/backend to the real backend.
 
-3) Add more visualizations.
+3) Connect the new backend with the frontend.
 
-4) Bind all the visualizations.
+4) Add more visualizations.
 
-5) Optimize code & performance; Correct eventual bugs.
+5) Bind all the visualizations.
 
-6) Style the webapp.
+6) Optimize code, performance & styling - Correct eventual bugs.
 
 7) Perform heuristic and user tests.
 
 8) Deploy the webapp.
+
+9) Write its paper.
 
 ### Minor bugs: 
 
