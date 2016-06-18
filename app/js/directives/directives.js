@@ -1197,12 +1197,16 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                   arrow.append("text")
                   .attr('x', (width/2)-90)
                   .attr('y', (height/1.1)-3)
-                  .text("From-To Direction: ")
+                  .text("From-To Direction:")
 
                   arrow.append("text")
                   .attr('x', (width/2)-90)
                   .attr('y', (1400/height)-3)
-                  .text("From-To Direction: ")
+                  .text("From-To Direction:")
+
+              var div = d3.select($elem[0]).append("div") 
+                  .attr("class", "arc-tooltip")       
+                  .style("opacity", 0);
 
               var arcG = svg.append("g")
                         .attr("id", "arcG")
@@ -1220,6 +1224,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("fill", "none")
                 .attr("d", arc)
                 .on("mouseover", edgeOver)
+                .on("mouseout", function(d) {    
+                    div.transition()    
+                        .duration(100)    
+                        .style("opacity", 0); 
+                });
               
               arcG.selectAll("circle")
                 .data(nodes)
@@ -1232,7 +1241,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("stroke-width", "1px")
                 .attr("cx", function (d) {return d.x}) // fix width responsiveness
                 .on("mouseover", nodeOver) // or change circles to squares ("rect")
-              
+                .on("mouseout", function(d) {    
+                    div.transition()    
+                        .duration(100)    
+                        .style("opacity", 0); 
+                });
 
               function arc(d,i) {
                 var draw = d3.svg.line().interpolate("basis");

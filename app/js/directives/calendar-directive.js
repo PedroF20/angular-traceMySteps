@@ -289,8 +289,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             var today = moment().endOf('day');
             var todayYearAgo = moment().startOf('day').subtract(1, 'year');
             var monthLabels = d3.time.months(todayYearAgo.startOf('month'), today);
-            var monthAxis = d3.scale.linear()
-              .range([label_padding, width])
+            var monthScale = d3.scale.linear()
+              .range([0, width])
               .domain([0, monthLabels.length]);
             labels.selectAll('.label-month').remove();
             labels.selectAll('.label-month')
@@ -305,7 +305,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return d.toLocaleDateString('en-us', {month: 'short'});
               })
               .attr('x', function (d, i) {
-                return monthAxis(i);
+                return monthScale(i) + (monthScale(i) - monthScale(i-1)) / 2;
               })
               .attr('y', label_padding / 2)
               .on('mouseenter', function (d) {
