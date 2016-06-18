@@ -101,7 +101,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addArcDiagramWidget = function() {
-		$scope.widgets.push({type: 'arc', name: "My Trips", draggable: true, sizeX: 2, sizeY: 2, maxSizeY:2, maxSizeX:2});
+		$scope.widgets.push({type: 'arc', name: "My Trips", draggable: true, sizeX: 5, sizeY: 2, maxSizeY:2, maxSizeX:6, minSizeY:2, minSizeX:3});
 	};
 
 	$scope.clear = function() {

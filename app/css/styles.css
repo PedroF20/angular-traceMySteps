@@ -465,6 +465,16 @@ path.domain {
   stroke: black;
 }
 
+.button-direction-1 {
+  font-size: 15px;
+  opacity: 1;
+}
+
+.button-direction-2 {
+  font-size: 15px;
+  opacity: 1;
+}
+
 /* ARC DIAGRAM END */
 
 
