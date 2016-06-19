@@ -1204,8 +1204,8 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                   .attr('y', (1400/height)-3)
                   .text("From-To Direction:")
 
-              var div = d3.select($elem[0]).append("div") 
-                  .attr("class", "arc-tooltip")       
+              var div = d3.select($elem[0]).append('div') 
+                  .attr("class", "arc-tooltip")      
                   .style("opacity", 0);
 
               var arcG = svg.append("g")
@@ -1264,11 +1264,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("opacity", .9);    
                 div.html(d.id)
                 .style("height", 30 + "px") 
-                .style("left", (d3.event.pageX) + "px")
+                .style("left", (d3.event.pageX-20) + "px")
                 //.style("left", d3.select(this).attr("cx") + "px")     
-                .style("top", (d3.event.pageY - 120) + "px");
+                .style("top", (height/2) + "px");
               }
-              
+          
               function edgeOver(d) {
                 d3.selectAll("#arcpath").style("stroke", function(p) {return p == d ? "red" : "black"})
                 d3.selectAll("#arccircle").style("fill", function(p) {return p == d.source ? "#000ED4" : p == d.target ? "#43941C" : "lightgray"})
@@ -1278,7 +1278,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 div.html("From: " + d.source.id + "<br>" + "To: " + d.target.id)
                 .style("height", 70 + "px")
                 .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 120) + "px");
+                .style("top", (height/2) + "px");
               }
               
               $elem[0].svg = svg;

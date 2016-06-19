@@ -479,7 +479,8 @@ div.arc-tooltip {
     position: absolute;     
     text-align: center;     
     width: 80px;          
-    padding: 2px;       
+    padding: 2px;
+    z-index: 9999;       
     font: 12px sans-serif;    
     background: black; 
     border: 0px;    
@@ -560,7 +561,7 @@ div.arc-tooltip {
 .calendar-heatmap .heatmap-tooltip {
   pointer-events: none;
   position: absolute;
-  z-index: 9999;
+  /*z-index: 9999;*/
   width: 300px;
   max-width: 300px;
   overflow: hidden;
