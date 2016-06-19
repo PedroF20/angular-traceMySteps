@@ -1261,6 +1261,13 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
                 d3.selectAll("#arcpath").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
+                div.transition()    
+                .duration(100)    
+                .style("opacity", .9);    
+                div.html(d.id)  
+                .style("left", (d3.event.pageX) + "px")
+                //.style("left", d3.select(this).attr("cx") + "px")     
+                .style("top", (d3.event.pageY - 120) + "px");
               }
               
               function edgeOver(d) {
