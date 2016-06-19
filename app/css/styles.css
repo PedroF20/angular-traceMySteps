@@ -479,7 +479,6 @@ div.arc-tooltip {
     position: absolute;     
     text-align: center;     
     width: 80px;          
-    height: 30px;         
     padding: 2px;       
     font: 12px sans-serif;    
     background: black; 
@@ -487,6 +486,7 @@ div.arc-tooltip {
     border-radius: 8px;     
     pointer-events: none;     
 }
+
 
 /* ARC DIAGRAM END */
 

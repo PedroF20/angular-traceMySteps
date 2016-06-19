@@ -1255,8 +1255,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 // ex: elementos < 10, (1200/height)->(200/height)
                 return draw([[d.source.x,0],[midX,midY],[d.target.x,0]])
               }
-
-              // meter html tooltip
               
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
@@ -1264,7 +1262,8 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 div.transition()    
                 .duration(100)    
                 .style("opacity", .9);    
-                div.html(d.id)  
+                div.html(d.id)
+                .style("height", 30 + "px") 
                 .style("left", (d3.event.pageX) + "px")
                 //.style("left", d3.select(this).attr("cx") + "px")     
                 .style("top", (d3.event.pageY - 120) + "px");
@@ -1273,6 +1272,13 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               function edgeOver(d) {
                 d3.selectAll("#arcpath").style("stroke", function(p) {return p == d ? "red" : "black"})
                 d3.selectAll("#arccircle").style("fill", function(p) {return p == d.source ? "#000ED4" : p == d.target ? "#43941C" : "lightgray"})
+                div.transition()    
+                .duration(100)    
+                .style("opacity", .9);    
+                div.html("From: " + d.source.id + "<br>" + "To: " + d.target.id)
+                .style("height", 70 + "px")
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 120) + "px");
               }
               
               $elem[0].svg = svg;
