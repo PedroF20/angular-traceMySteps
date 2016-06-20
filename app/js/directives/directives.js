@@ -1289,3 +1289,86 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
       };
 
 }]);
+
+
+
+app.directive('rangedBar', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+
+  var delay=350;
+  var jsonRes=null;
+
+/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+
+  return {
+        restrict: 'E',
+        scope: true,
+        link: function($scope, $elem, $attr) {
+
+          // DataManagerService.get('/rangedbar', []).then(function(d) {
+          //   jsonRes=d;
+          // });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientWidth;
+            }, function ( w ) {
+              if ( !w ) { return; }
+              createRangedBarGraph();
+            });
+
+          $scope.$watch(function () {
+              return $elem[0].parentNode.clientHeight;
+            }, function ( h ) {
+            if ( !h ) { return; }
+            createRangedBarGraph();
+           });
+
+          function createRangedBarGraph () {
+
+            setTimeout(function() {
+
+              $elem[0].svg = null;
+
+              var margin = {top: 20, right: 10, bottom: 20, left: 25},
+                  width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
+                  height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+
+              var y = d3.scale.ordinal()
+                  .domain(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
+                  .rangePoints([0, height], 1.2);
+
+               d3.select($elem[0]).selectAll("svg").remove()
+
+              var svg = d3.select($elem[0]).append("svg")
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + (margin.top) + margin.bottom-25)
+                      .append("g")
+                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+              var yAxis = d3.svg.axis()
+                  .scale(y)
+                  .orient("left");
+
+
+
+              svg.append("g")
+                  .attr("class", "y axis")
+                  .attr("transform", "translate(" + (margin.left-15) + "," + (margin.top-35) + ")")
+                  .call(yAxis);
+
+
+
+
+
+
+              $elem[0].svg = svg;
+
+            }, delay);
+          }
+        }
+      };
+
+}]);
+
