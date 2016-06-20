@@ -83,8 +83,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
         // Initialize current overview type and history
         $scope.overview = $scope.overview || 'year';
-        $scope.history = [];
-        $scope.selected;
+        $scope.history = ['year'];
+        $scope.selected = {};
 
         d3.select($elem[0]).selectAll("svg").remove()
         // Initialize svg element
@@ -109,7 +109,9 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
           item_size = (((width - label_padding) / moment().diff(moment().subtract(1, 'year'), 'weeks')) - gutter);
           height = label_padding + 7 * (item_size + gutter);
           svg.attr({'width': width, 'height': height});
-          drawChart();
+          if ( !!data && !!data[0].summary ) {
+              drawChart();
+            }
         });
 
         var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, response) {
@@ -720,6 +722,11 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
             // Add current overview to the history
             $scope.history.push($scope.overview);
+
+            // Initialize selected date to today if it was not set
+            if ( !!$scope.selected ) {
+                $scope.selected = $scope.data[$scope.data.length - 1];
+            }
   
             var project_labels = $scope.selected.summary.map(function (project) {
               return project.name;
