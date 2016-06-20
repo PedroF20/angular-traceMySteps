@@ -1336,7 +1336,7 @@ app.directive('rangedBar', ['DataManagerService', '$rootScope', function (DataMa
                   height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
 
               var y = d3.scale.ordinal()
-                  .domain(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
+                  .domain(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
                   .rangePoints([0, height], 1.2);
 
                d3.select($elem[0]).selectAll("svg").remove()
