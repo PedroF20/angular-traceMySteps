@@ -162,7 +162,9 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             $elem[0].svg = null;
 
             // Add current overview to the history
-            $scope.history.push($scope.overview);
+            if ( $scope.history[$scope.history.length-1] !== $scope.overview ) {
+              $scope.history.push($scope.overview);
+            }
 
             var first_date = moment(data[0].date);
             var max_value = d3.max(data, function (d) {
@@ -464,7 +466,9 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             $elem[0].svg = null;
 
             // Add current overview to the history
-            $scope.history.push($scope.overview);
+            if ( $scope.history[$scope.history.length-1] !== $scope.overview ) {
+              $scope.history.push($scope.overview);
+            }
 
             // Define beginning and end of the month
             var start_of_month = moment($scope.selected.date).startOf('month');
@@ -512,7 +516,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 return Math.min(dayScale.rangeBand(), max_block_height);
               })
               .attr('transform', function (d) {
-                return 'translate(' + weekScale(moment(d.date).week()) + ',' + (dayScale(moment(d.date).weekday()) + 5) + ')';
+                return 'translate(' + weekScale(moment(d.date).week()) + ',' + ((dayScale(moment(d.date).weekday()) + dayScale.rangeBand() / 1.75) - 15)+ ')';
               })
               .attr('total', function (d) {
                 return d.total;
@@ -726,10 +730,12 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             $elem[0].svg = null;
 
             // Add current overview to the history
-            $scope.history.push($scope.overview);
+            if ( $scope.history[$scope.history.length-1] !== $scope.overview ) {
+              $scope.history.push($scope.overview);
+            }
 
             // Initialize selected date to today if it was not set
-            if ( !!$scope.selected ) {
+            if ( !Object.keys($scope.selected).length ) {
                 $scope.selected = data[data.length - 1];
             }
   
