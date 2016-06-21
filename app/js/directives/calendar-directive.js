@@ -317,10 +317,10 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .transition()
                 .delay(function () {
-                  return ( in_transition ) ? transition_duration / 2: 0;
+                  return (Math.cos(Math.PI * Math.random()) + 1) * transition_duration;
                 })
                 .duration(function () {
-                  return Math.cos( Math.PI * Math.random() ) * transition_duration * 2;
+                  return transition_duration;
                 })
                 .ease('ease-in')
                 .style('opacity', 1)
@@ -605,10 +605,10 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .transition()
                 .delay(function () {
-                  return ( in_transition ) ? transition_duration / 2: 0;
+                  return (Math.cos(Math.PI * Math.random()) + 1) * transition_duration;
                 })
                 .duration(function () {
-                  return Math.cos( Math.PI * Math.random() ) * transition_duration * 2;
+                  return transition_duration;
                 })
                .ease('ease-in')
                 .style('opacity', 1)
@@ -725,7 +725,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
             // Initialize selected date to today if it was not set
             if ( !!$scope.selected ) {
-                $scope.selected = $scope.data[$scope.data.length - 1];
+                $scope.selected = data[data.length - 1];
             }
   
             var project_labels = $scope.selected.summary.map(function (project) {
@@ -795,10 +795,10 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .transition()
                 .delay( function () {
-                  return ( in_transition ) ? transition_duration / 2 : 0;
+                  return (Math.cos(Math.PI * Math.random()) + 1) * transition_duration;
                 })
                 .duration(function () {
-                  return Math.cos( Math.PI * Math.random() ) * transition_duration * 2;
+                  return transition_duration;
                 })
                 .duration(transition_duration)
                 .ease('ease-in')
