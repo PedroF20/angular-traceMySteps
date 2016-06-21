@@ -1,6 +1,7 @@
 app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var delay=350;
+  var jsonRes=null;
 
   // **************************** EXAMPLE DATA ***********************
 
@@ -64,6 +65,10 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       scope: true,
       replace: true,
       link: function ($scope, $elem, $attr) {
+
+        // DataManagerService.get('/calendar', []).then(function(d) {
+        //   jsonRes=d;
+        // });
 
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var gutter = 5;

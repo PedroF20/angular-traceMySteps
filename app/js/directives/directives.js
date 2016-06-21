@@ -7,6 +7,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 	var latFn = d3.random.normal(center[0], 0.5);
 	var longFn = d3.random.normal(center[1], 0.5);
 	var data = [];
+  var jsonRes=null;
 	var mapCount=0;
 
 	function generateData(){
@@ -21,6 +22,11 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
+
+        // DataManagerService.get('/hexbin', []).then(function(d) {
+        //   jsonRes=d;
+        //   createAreaGradientGraph();
+        // });
 
 
 				var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -427,6 +433,8 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
     return (num % 2) == 1;
   }
 
+  var jsonRes=null;
+
   var trackmaps = [];
   var trackmapCount=0;
   var geo = [];
@@ -440,6 +448,11 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr, $http) {
+
+        // DataManagerService.get('/gpstracks', []).then(function(d) {
+        //   jsonRes=d;
+        //   createAreaGradientGraph();
+        // });
 
 
         $scope.$watch(function () {
