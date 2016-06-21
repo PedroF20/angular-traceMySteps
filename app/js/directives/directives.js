@@ -1348,9 +1348,14 @@ app.directive('rangedBar', ['DataManagerService', '$rootScope', function (DataMa
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
                   height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
 
+              var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+
               var y = d3.scale.ordinal()
                   .domain(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
                   .rangePoints([0, height], 1.2);
+
+              var x = d3.time.scale()
+                  .range([0, width]);
 
                d3.select($elem[0]).selectAll("svg").remove()
 
@@ -1364,12 +1369,22 @@ app.directive('rangedBar', ['DataManagerService', '$rootScope', function (DataMa
                   .scale(y)
                   .orient("left");
 
+              var xAxis = d3.svg.axis()
+                  .scale(x)
+                  .orient("bottom")
+                  .tickFormat(d3.time.format("%H"));
+
 
 
               svg.append("g")
                   .attr("class", "y axis")
-                  .attr("transform", "translate(" + (margin.left-15) + "," + (margin.top-35) + ")")
+                  .attr("transform", "translate(" + (margin.left-20) + "," + (margin.top-35) + ")")
                   .call(yAxis);
+
+              svg.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(" + (margin.left-20) + "," + (height-23) + ")")
+                  .call(xAxis);
 
 
 
