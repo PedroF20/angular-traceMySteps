@@ -84,47 +84,47 @@ html {
 
 #add-hex-button {
     position: absolute;
-    top: 150px;
+    top: 200px;
     right: 90px;
 }
 
-#add-gradient-button {
+#add-hextracks-button {
     position: absolute;
     top: 100px;
     right: 90px;
 }
 
-#add-chord-button {
+#add-gradient-button {
     position: absolute;
-    top: 250px;
+    top: 150px;
     right: 90px;
 }
 
-#add-calendar-button {
+#add-chord-button {
     position: absolute;
     top: 300px;
     right: 90px;
 }
 
-#add-tracks-button {
+#add-calendar-button {
     position: absolute;
     top: 350px;
     right: 90px;
 }
 
-#add-barchart-button {
+#add-tracks-button {
     position: absolute;
     top: 400px;
     right: 90px;
 }
 
-#add-rangedbar-button {
+#add-barchart-button {
     position: absolute;
     top: 450px;
     right: 90px;
 }
 
-#add-arcdiagram-button {
+#add-rangedbar-button {
     position: absolute;
     top: 500px;
     right: 90px;
@@ -132,7 +132,13 @@ html {
 
 #clear-items-button {
     position: absolute;
-    top: 200px;
+    top: 550px;
+    right: 90px;
+}
+
+#add-arcdiagram-button {
+    position: absolute;
+    top: 250px;
     left: 73px;
 }
 

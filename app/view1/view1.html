@@ -5,7 +5,8 @@
           <div style="padding:20px">
               <h2 id="panel-title">Visualizations</h2>
               <a ng-click="toggle()" class="glyphicon glyphicon-remove-circle" ></a>
-              <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Hexbin Graph</a>
+              <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Places Hexbin Graph</a>
+              <a class="btn btn-primary" id="add-hextracks-button" ng-click="addHexbinTracksWidget()">Add Tracks Hexbin Graph</a>
               <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
               <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
               <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
@@ -56,6 +57,7 @@
             
             <chord-graph ng-if="widget.type == 'chord'"></chord-graph>
             <hexbin-graph ng-if="widget.type == 'hexbin'"></hexbin-graph>
+            <hexbintracks-graph ng-if="widget.type == 'hexbintracks'"></hexbintracks-graph>
             <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>
             <calendar-heatmap class="calendar-heatmap" ng-if="widget.type == 'calendar'"></calendar-heatmap>
             <gps-tracks ng-if="widget.type == 'tracks'"></gps-tracks>

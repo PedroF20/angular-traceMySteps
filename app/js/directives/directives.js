@@ -23,9 +23,9 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        // DataManagerService.get('/hexbin', []).then(function(d) {
+        // DataManagerService.get('/hexbinPlaces', []).then(function(d) {
         //   jsonRes=d;
-        //   createAreaGradientGraph();
+        //   createHexbinGraph();
         // });
 
 

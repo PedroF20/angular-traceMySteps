@@ -72,7 +72,11 @@ angular.module('myApp.view1', ['ngRoute'])
 	
 
 	$scope.addHexbinWidget = function() {
-		$scope.widgets.push({type: 'hexbin', name: "Hexbin Chart", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'hexbin', name: "Hexbin Places Chart", draggable: true, sizeX: 2, sizeY: 2});
+	};
+
+	$scope.addHexbinTracksWidget = function() {
+		$scope.widgets.push({type: 'hexbintracks', name: "Hexbin Tracks Chart", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addGradientWidget = function() {
@@ -85,7 +89,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 	$scope.addCalendarWidget = function() {
 		$scope.widgets.push({type: 'calendar', name: "Calendar: Frequency of places visited", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
-	 	maxSizeY:1, maxSizeX:5});
+	 	maxSizeY:2, maxSizeX:5});
 	};
 
 	$scope.addTracksWidget = function() {
