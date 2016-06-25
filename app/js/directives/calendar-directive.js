@@ -874,11 +874,13 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                 tooltip_html += '<div>on ' + moment(date).format('dddd, MMM Do YYYY') + '</div>';
   
                 // Calculate tooltip position
-                var x = weekScale(moment(date).week()) + tooltip_padding;
+                var total = parseInt(d3.select(this.parentNode).attr('total'));
+                itemScale.domain([0, total]);
+                var x = parseInt(d3.select(this).attr('x')) + itemScale(d.value) / 4 + tooltip_width / 4;
                 while ( width - x < (tooltip_width + tooltip_padding * 3) ) {
                   x -= 10;
                 }
-                var y = dayScale(moment(date).weekday()) + tooltip_padding * 2;
+                var y = dayScale(moment(date).weekday()) + tooltip_padding * 1.5;
   
                 // Show tooltip
                 tooltip.html(tooltip_html)
