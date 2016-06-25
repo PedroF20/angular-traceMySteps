@@ -236,6 +236,9 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
 	var delay=350;
 
+  // CHANGE TO "TIME SPENT ON MOVEMENT". IT IS THE SAME AS "TIME SPENT ON TRIPS"
+  // WHICH IS EASY TO CALCULATE: FOR EACH DATE WE PASS THE AMOUNT OF TIME SPENT ON TRIPS
+
 	var jsonRes=null;
 
 
