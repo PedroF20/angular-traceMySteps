@@ -111,7 +111,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         }, function ( w ) {
           if ( !w ) { return; }
           width = w < 1000 ? 1000 : w;
-          item_size = (((width - label_padding) / moment().diff(moment().subtract(1, 'year'), 'weeks')) - gutter);
+          item_size = ((width - label_padding) / (moment().weeksInYear() + 1) - gutter);
           height = label_padding + 7 * (item_size + gutter);
           svg.attr({'width': width, 'height': height});
           if ( !!data && !!data[0].summary ) {
@@ -200,7 +200,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .attr('rx', function (d) {
                 return calcItemSize(d);
               })
-              .attr('rx', function (d) {
+              .attr('ry', function (d) {
                 return calcItemSize(d);
               })
               .attr('x', function (d) {
