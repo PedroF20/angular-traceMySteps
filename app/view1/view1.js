@@ -33,7 +33,10 @@ angular.module('myApp.view1', ['ngRoute'])
 	}
 
 	$scope.gridsterOpts = {
-	    columns: 6, // the width of the grid, in columns
+	    columns: 6, // the width of the grid, in columns 
+	    // 7 columns if we want to adjust grid placeholder to the window and thus
+	    // remove initial page scrolling
+	    // may need to adjust graphs widths, heights and margins, though
 	    margins: [10, 10], // the pixel distance between each widget
 	    swapping: true,
 	    rowHeight: 'match', // 120 if we want to adjust to the window
@@ -101,7 +104,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addStaysGraphWidget = function() {
-		$scope.widgets.push({type: 'stays', name: "My Stays", draggable: true, sizeX: 4, sizeY: 2, maxSizeY:2, maxSizeX:5, minSizeY:2, minSizeX:3});
+		$scope.widgets.push({type: 'stays', name: "My Stays", draggable: true, sizeX: 4, sizeY: 2, maxSizeY:2, maxSizeX:5, minSizeY:2, minSizeX:4});
 	};
 
 	$scope.addArcDiagramWidget = function() {
