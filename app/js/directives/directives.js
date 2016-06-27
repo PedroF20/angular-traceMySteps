@@ -968,6 +968,9 @@ var chordData = [{
                 }, {
                   "from": "grandmother's house",
                   "to": ["home", "Forum Montijo"]
+                }, {
+                  "from": "INESC",
+                  "to": ["home", "Forum Montijo"]
                 }]
 
 
@@ -1424,12 +1427,855 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 
 
 
-app.directive('rangedBar', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
+app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var delay=350;
   var jsonRes=null;
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
+
+  var accidents=[  
+                 {  
+                    day:2,
+                    hour:1,
+                    count:127
+                 },
+                 {  
+                    day:4,
+                    hour:1,
+                    count:141
+                 },
+                 {  
+                    day:1,
+                    hour:1,
+                    count:134
+                 },
+                 {  
+                    day:5,
+                    hour:1,
+                    count:174
+                 },
+                 {  
+                    day:3,
+                    hour:1,
+                    count:131
+                 },
+                 {  
+                    day:6,
+                    hour:1,
+                    count:333
+                 },
+                 {  
+                    day:7,
+                    hour:1,
+                    count:311
+                 },
+                 {  
+                    day:2,
+                    hour:2,
+                    count:79
+                 },
+                 {  
+                    day:4,
+                    hour:2,
+                    count:99
+                 },
+                 {  
+                    day:1,
+                    hour:2,
+                    count:117
+                 },
+                 {  
+                    day:5,
+                    hour:2,
+                    count:123
+                 },
+                 {  
+                    day:3,
+                    hour:2,
+                    count:92
+                 },
+                 {  
+                    day:6,
+                    hour:2,
+                    count:257
+                 },
+                 {  
+                    day:7,
+                    hour:2,
+                    count:293
+                 },
+                 {  
+                    day:2,
+                    hour:3,
+                    count:55
+                 },
+                 {  
+                    day:4,
+                    hour:3,
+                    count:73
+                 },
+                 {  
+                    day:1,
+                    hour:3,
+                    count:107
+                 },
+                 {  
+                    day:5,
+                    hour:3,
+                    count:89
+                 },
+                 {  
+                    day:3,
+                    hour:3,
+                    count:66
+                 },
+                 {  
+                    day:6,
+                    hour:3,
+                    count:185
+                 },
+                 {  
+                    day:7,
+                    hour:3,
+                    count:262
+                 },
+                 {  
+                    day:2,
+                    hour:4,
+                    count:39
+                 },
+                 {  
+                    day:4,
+                    hour:4,
+                    count:67
+                 },
+                 {  
+                    day:1,
+                    hour:4,
+                    count:59
+                 },
+                 {  
+                    day:5,
+                    hour:4,
+                    count:83
+                 },
+                 {  
+                    day:3,
+                    hour:4,
+                    count:45
+                 },
+                 {  
+                    day:6,
+                    hour:4,
+                    count:180
+                 },
+                 {  
+                    day:7,
+                    hour:4,
+                    count:220
+                 },
+                 {  
+                    day:2,
+                    hour:5,
+                    count:48
+                 },
+                 {  
+                    day:4,
+                    hour:5,
+                    count:57
+                 },
+                 {  
+                    day:1,
+                    hour:5,
+                    count:73
+                 },
+                 {  
+                    day:5,
+                    hour:5,
+                    count:76
+                 },
+                 {  
+                    day:3,
+                    hour:5,
+                    count:72
+                 },
+                 {  
+                    day:6,
+                    hour:5,
+                    count:168
+                 },
+                 {  
+                    day:7,
+                    hour:5,
+                    count:199
+                 },
+                 {  
+                    day:2,
+                    hour:6,
+                    count:129
+                 },
+                 {  
+                    day:4,
+                    hour:6,
+                    count:102
+                 },
+                 {  
+                    day:1,
+                    hour:6,
+                    count:129
+                 },
+                 {  
+                    day:5,
+                    hour:6,
+                    count:140
+                 },
+                 {  
+                    day:3,
+                    hour:6,
+                    count:117
+                 },
+                 {  
+                    day:6,
+                    hour:6,
+                    count:148
+                 },
+                 {  
+                    day:7,
+                    hour:6,
+                    count:193
+                 },
+                 {  
+                    day:2,
+                    hour:7,
+                    count:314
+                 },
+                 {  
+                    day:4,
+                    hour:7,
+                    count:284
+                 },
+                 {  
+                    day:1,
+                    hour:7,
+                    count:367
+                 },
+                 {  
+                    day:5,
+                    hour:7,
+                    count:270
+                 },
+                 {  
+                    day:3,
+                    hour:7,
+                    count:310
+                 },
+                 {  
+                    day:6,
+                    hour:7,
+                    count:179
+                 },
+                 {  
+                    day:7,
+                    hour:7,
+                    count:192
+                 },
+                 {  
+                    day:2,
+                    hour:8,
+                    count:806
+                 },
+                 {  
+                    day:4,
+                    hour:8,
+                    count:811
+                 },
+                 {  
+                    day:1,
+                    hour:8,
+                    count:850
+                 },
+                 {  
+                    day:5,
+                    hour:8,
+                    count:609
+                 },
+                 {  
+                    day:3,
+                    hour:8,
+                    count:846
+                 },
+                 {  
+                    day:6,
+                    hour:8,
+                    count:208
+                 },
+                 {  
+                    day:7,
+                    hour:8,
+                    count:144
+                 },
+                 {  
+                    day:2,
+                    hour:9,
+                    count:1209
+                 },
+                 {  
+                    day:4,
+                    hour:9,
+                    count:1214
+                 },
+                 {  
+                    day:1,
+                    hour:9,
+                    count:1205
+                 },
+                 {  
+                    day:5,
+                    hour:9,
+                    count:960
+                 },
+                 {  
+                    day:3,
+                    hour:9,
+                    count:1073
+                 },
+                 {  
+                    day:6,
+                    hour:9,
+                    count:286
+                 },
+                 {  
+                    day:7,
+                    hour:9,
+                    count:152
+                 },
+                 {  
+                    day:2,
+                    hour:10,
+                    count:750
+                 },
+                 {  
+                    day:4,
+                    hour:10,
+                    count:808
+                 },
+                 {  
+                    day:1,
+                    hour:10,
+                    count:610
+                 },
+                 {  
+                    day:5,
+                    hour:10,
+                    count:655
+                 },
+                 {  
+                    day:3,
+                    hour:10,
+                    count:684
+                 },
+                 {  
+                    day:6,
+                    hour:10,
+                    count:482
+                 },
+                 {  
+                    day:7,
+                    hour:10,
+                    count:253
+                 },
+                 {  
+                    day:2,
+                    hour:11,
+                    count:591
+                 },
+                 {  
+                    day:4,
+                    hour:11,
+                    count:593
+                 },
+                 {  
+                    day:1,
+                    hour:11,
+                    count:573
+                 },
+                 {  
+                    day:5,
+                    hour:11,
+                    count:695
+                 },
+                 {  
+                    day:3,
+                    hour:11,
+                    count:622
+                 },
+                 {  
+                    day:6,
+                    hour:11,
+                    count:676
+                 },
+                 {  
+                    day:7,
+                    hour:11,
+                    count:326
+                 },
+                 {  
+                    day:2,
+                    hour:12,
+                    count:653
+                 },
+                 {  
+                    day:4,
+                    hour:12,
+                    count:679
+                 },
+                 {  
+                    day:1,
+                    hour:12,
+                    count:639
+                 },
+                 {  
+                    day:5,
+                    hour:12,
+                    count:736
+                 },
+                 {  
+                    day:3,
+                    hour:12,
+                    count:687
+                 },
+                 {  
+                    day:6,
+                    hour:12,
+                    count:858
+                 },
+                 {  
+                    day:7,
+                    hour:12,
+                    count:402
+                 },
+                 {  
+                    day:2,
+                    hour:13,
+                    count:738
+                 },
+                 {  
+                    day:4,
+                    hour:13,
+                    count:749
+                 },
+                 {  
+                    day:1,
+                    hour:13,
+                    count:631
+                 },
+                 {  
+                    day:5,
+                    hour:13,
+                    count:908
+                 },
+                 {  
+                    day:3,
+                    hour:13,
+                    count:888
+                 },
+                 {  
+                    day:6,
+                    hour:13,
+                    count:880
+                 },
+                 {  
+                    day:7,
+                    hour:13,
+                    count:507
+                 },
+                 {  
+                    day:2,
+                    hour:14,
+                    count:792
+                 },
+                 {  
+                    day:4,
+                    hour:14,
+                    count:847
+                 },
+                 {  
+                    day:1,
+                    hour:14,
+                    count:752
+                 },
+                 {  
+                    day:5,
+                    hour:14,
+                    count:1033
+                 },
+                 {  
+                    day:3,
+                    hour:14,
+                    count:942
+                 },
+                 {  
+                    day:6,
+                    hour:14,
+                    count:983
+                 },
+                 {  
+                    day:7,
+                    hour:14,
+                    count:636
+                 },
+                 {  
+                    day:2,
+                    hour:15,
+                    count:906
+                 },
+                 {  
+                    day:4,
+                    hour:15,
+                    count:1031
+                 },
+                 {  
+                    day:1,
+                    hour:15,
+                    count:954
+                 },
+                 {  
+                    day:5,
+                    hour:15,
+                    count:1199
+                 },
+                 {  
+                    day:3,
+                    hour:15,
+                    count:1014
+                 },
+                 {  
+                    day:6,
+                    hour:15,
+                    count:1125
+                 },
+                 {  
+                    day:7,
+                    hour:15,
+                    count:712
+                 },
+                 {  
+                    day:2,
+                    hour:16,
+                    count:1101
+                 },
+                 {  
+                    day:4,
+                    hour:16,
+                    count:1158
+                 },
+                 {  
+                    day:1,
+                    hour:16,
+                    count:1029
+                 },
+                 {  
+                    day:5,
+                    hour:16,
+                    count:1364
+                 },
+                 {  
+                    day:3,
+                    hour:16,
+                    count:1068
+                 },
+                 {  
+                    day:6,
+                    hour:16,
+                    count:1062
+                 },
+                 {  
+                    day:7,
+                    hour:16,
+                    count:736
+                 },
+                 {  
+                    day:2,
+                    hour:17,
+                    count:1303
+                 },
+                 {  
+                    day:4,
+                    hour:17,
+                    count:1426
+                 },
+                 {  
+                    day:1,
+                    hour:17,
+                    count:1270
+                 },
+                 {  
+                    day:5,
+                    hour:17,
+                    count:1455
+                 },
+                 {  
+                    day:3,
+                    hour:17,
+                    count:1407
+                 },
+                 {  
+                    day:6,
+                    hour:17,
+                    count:883
+                 },
+                 {  
+                    day:7,
+                    hour:17,
+                    count:666
+                 },
+                 {  
+                    day:2,
+                    hour:18,
+                    count:1549
+                 },
+                 {  
+                    day:4,
+                    hour:18,
+                    count:1653
+                 },
+                 {  
+                    day:1,
+                    hour:18,
+                    count:1350
+                 },
+                 {  
+                    day:5,
+                    hour:18,
+                    count:1502
+                 },
+                 {  
+                    day:3,
+                    hour:18,
+                    count:1507
+                 },
+                 {  
+                    day:6,
+                    hour:18,
+                    count:830
+                 },
+                 {  
+                    day:7,
+                    hour:18,
+                    count:652
+                 },
+                 {  
+                    day:2,
+                    hour:19,
+                    count:998
+                 },
+                 {  
+                    day:4,
+                    hour:19,
+                    count:1070
+                 },
+                 {  
+                    day:1,
+                    hour:19,
+                    count:787
+                 },
+                 {  
+                    day:5,
+                    hour:19,
+                    count:1027
+                 },
+                 {  
+                    day:3,
+                    hour:19,
+                    count:1019
+                 },
+                 {  
+                    day:6,
+                    hour:19,
+                    count:575
+                 },
+                 {  
+                    day:7,
+                    hour:19,
+                    count:519
+                 },
+                 {  
+                    day:2,
+                    hour:20,
+                    count:661
+                 },
+                 {  
+                    day:4,
+                    hour:20,
+                    count:756
+                 },
+                 {  
+                    day:1,
+                    hour:20,
+                    count:596
+                 },
+                 {  
+                    day:5,
+                    hour:20,
+                    count:730
+                 },
+                 {  
+                    day:3,
+                    hour:20,
+                    count:648
+                 },
+                 {  
+                    day:6,
+                    hour:20,
+                    count:494
+                 },
+                 {  
+                    day:7,
+                    hour:20,
+                    count:486
+                 },
+                 {  
+                    day:2,
+                    hour:21,
+                    count:431
+                 },
+                 {  
+                    day:4,
+                    hour:21,
+                    count:539
+                 },
+                 {  
+                    day:1,
+                    hour:21,
+                    count:430
+                 },
+                 {  
+                    day:5,
+                    hour:21,
+                    count:509
+                 },
+                 {  
+                    day:3,
+                    hour:21,
+                    count:457
+                 },
+                 {  
+                    day:6,
+                    hour:21,
+                    count:443
+                 },
+                 {  
+                    day:7,
+                    hour:21,
+                    count:421
+                 },
+                 {  
+                    day:2,
+                    hour:22,
+                    count:352
+                 },
+                 {  
+                    day:4,
+                    hour:22,
+                    count:428
+                 },
+                 {  
+                    day:1,
+                    hour:22,
+                    count:362
+                 },
+                 {  
+                    day:5,
+                    hour:22,
+                    count:462
+                 },
+                 {  
+                    day:3,
+                    hour:22,
+                    count:390
+                 },
+                 {  
+                    day:6,
+                    hour:22,
+                    count:379
+                 },
+                 {  
+                    day:7,
+                    hour:22,
+                    count:324
+                 },
+                 {  
+                    day:2,
+                    hour:23,
+                    count:329
+                 },
+                 {  
+                    day:4,
+                    hour:23,
+                    count:381
+                 },
+                 {  
+                    day:1,
+                    hour:23,
+                    count:293
+                 },
+                 {  
+                    day:5,
+                    hour:23,
+                    count:393
+                 },
+                 {  
+                    day:3,
+                    hour:23,
+                    count:313
+                 },
+                 {  
+                    day:6,
+                    hour:23,
+                    count:374
+                 },
+                 {  
+                    day:7,
+                    hour:23,
+                    count:288
+                 },
+                 {  
+                    day:2,
+                    hour:24,
+                    count:211
+                 },
+                 {  
+                    day:4,
+                    hour:24,
+                    count:249
+                 },
+                 {  
+                    day:1,
+                    hour:24,
+                    count:204
+                 },
+                 {  
+                    day:5,
+                    hour:24,
+                    count:417
+                 },
+                 {  
+                    day:3,
+                    hour:24,
+                    count:211
+                 },
+                 {  
+                    day:6,
+                    hour:24,
+                    count:379
+                 },
+                 {  
+                    day:7,
+                    hour:24,
+                    count:203
+                 }
+              ];
 
 /******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
@@ -1447,65 +2293,80 @@ app.directive('rangedBar', ['DataManagerService', '$rootScope', function (DataMa
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
-              createRangedBarGraph();
+              createStaysGraph();
             });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
             if ( !h ) { return; }
-            createRangedBarGraph();
+            createStaysGraph();
            });
 
-          function createRangedBarGraph () {
+          function createStaysGraph () {
 
             setTimeout(function() {
 
               $elem[0].svg = null;
+              
+              var days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+                  times = d3.range(24);
 
-              var margin = {top: 20, right: 10, bottom: 20, left: 25},
+              var margin = {top: 70, right: 10, bottom: 20, left: 25},
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
-                  height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+                  //height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom;
+                  gridSize = Math.floor(width / times.length),
+                  height = gridSize * (days.length);
 
-              var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
-
-              var y = d3.scale.ordinal()
-                  .domain(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
-                  .rangePoints([0, height], 1.2);
-
-              var x = d3.time.scale()
-                  .range([0, width]);
-
-               d3.select($elem[0]).selectAll("svg").remove()
+              d3.select($elem[0]).selectAll("svg").remove()
 
               var svg = d3.select($elem[0]).append("svg")
                       .attr("width", width + margin.left + margin.right)
-                      .attr("height", height + (margin.top) + margin.bottom-25)
+                      .attr("height", height + margin.top + margin.bottom)
                       .append("g")
                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-              var yAxis = d3.svg.axis()
-                  .scale(y)
-                  .orient("left");
+              //Reset the overall font size
+              var newFontSize = width * 62.5 / 900;
+              d3.select("html").style("font-size", newFontSize + "%");
 
-              var xAxis = d3.svg.axis()
-                  .scale(x)
-                  .orient("bottom")
-                  .tickFormat(d3.time.format("%H"));
+              var colorScale = d3.scale.linear()
+                  .domain([0, d3.max(accidents, function(d) {return d.count; })/2, d3.max(accidents, function(d) {return d.count; })])
+                  .range(["#FFFFDD", "#3E9583", "#1F2D86"])
 
+              var dayLabels = svg.selectAll(".dayLabel")
+                  .data(days)
+                  .enter().append("text")
+                  .text(function (d) { return d; })
+                  .attr("x", 0)
+                  .attr("y", function (d, i) { return i * gridSize; })
+                  .style("text-anchor", "end")
+                  .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 
+              var timeLabels = svg.selectAll(".timeLabel")
+                  .data(times)
+                  .enter().append("text")
+                  .attr("class", "hour-size")
+                  .text(function(d) { return d + "h"; })
+                  .attr("x", function(d, i) { return i * gridSize; })
+                  .attr("y", 0)
+                  .style("text-anchor", "middle")
+                  .attr("transform", "translate(" + gridSize / 2 + ", -6)")
 
-              svg.append("g")
-                  .attr("class", "y axis")
-                  .attr("transform", "translate(" + (margin.left-20) + "," + (margin.top-35) + ")")
-                  .call(yAxis);
-
-              svg.append("g")
-                  .attr("class", "x axis")
-                  .attr("transform", "translate(" + (margin.left-20) + "," + (height-23) + ")")
-                  .call(xAxis);
-
-
+              var heatMap = svg.selectAll(".hour")
+                  .data(accidents)
+                  .enter().append("rect")
+                  .attr("x", function(d) { return (d.hour - 1) * gridSize; })
+                  .attr("y", function(d) { return (d.day - 1) * gridSize; })
+                  //.attr("rx", 4)
+                  // .attr("ry", 4)
+                  .attr("class", "hour bordered")
+                  .attr("width", gridSize)
+                  .attr("height", gridSize)
+                  .style("stroke", "white")
+                  .style("stroke-opacity", 0.6)
+                  .style("stroke-width", 0.8)
+                  .style("fill", function(d) { return colorScale(d.count); });
 
 
 

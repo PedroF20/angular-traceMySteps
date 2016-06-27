@@ -12,7 +12,7 @@
               <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
               <a class="btn btn-primary" id="add-tracks-button" ng-click="addTracksWidget()">Add Tracks</a>
               <a class="btn btn-primary" id="add-barchart-button" ng-click="addBarChartWidget()">Add Bar Chart</a>
-              <a class="btn btn-primary" id="add-rangedbar-button" ng-click="addRangedBarWidget()">Add Ranged Bar</a>
+              <a class="btn btn-primary" id="add-staysgraph-button" ng-click="addStaysGraphWidget()">Add Stays Graph</a>
               <a class="btn btn-primary" id="add-arcdiagram-button" ng-click="addArcDiagramWidget()">Add Arc Diagram</a>
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All Items</a>
           </div>
@@ -65,7 +65,7 @@
               <button class="btn btn-primary btn-xs" id="barchart-frequency" ng-click="frequencyDataset()" autocomplete="off">Frequency</button>
               <button class="btn btn-primary btn-xs" id="barchart-timespent" ng-click="timespentDataset()" autocomplete="off">Time Spent</button>
             </bar-chart>
-            <ranged-bar ng-if="widget.type == 'ranged'"></ranged-bar>
+            <stays-graph ng-if="widget.type == 'stays'"></stays-graph>
             <arc-diagram ng-if="widget.type == 'arc'"></arc-diagram>
         </li>
     <ul>

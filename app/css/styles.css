@@ -124,7 +124,7 @@ html {
     right: 90px;
 }
 
-#add-rangedbar-button {
+#add-staysgraph-button {
     position: absolute;
     top: 500px;
     right: 90px;
@@ -496,6 +496,18 @@ div.arc-tooltip {
 
 
 /* ARC DIAGRAM END */
+
+.hour-size {
+  font-size:12px;
+}
+
+
+/* STAYS GRAPH */
+
+
+
+
+/* STAYS GRAPH END */
 
 
 /********************************/
