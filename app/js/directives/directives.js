@@ -1267,6 +1267,15 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           //   jsonResNodes=d;
           // });
 
+          function getNodePos(el) {
+              var body = d3.select($elem[0]).node();
+
+              for (var lx = 0, ly = 0;
+                   el != null && el != body;
+                   lx += (el.offsetLeft || el.clientLeft), ly += (el.offsetTop || el.clientTop), el = (el.offsetParent || el.parentNode))
+                  ;
+              return {x: lx, y: ly};
+          }
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -1339,7 +1348,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                   .attr('y', (1400/height)-3)
                   .text("From-To Direction:")
 
-              var div = d3.select($elem[0]).append('div') 
+              var tooltip = d3.select($elem[0]).append('div') 
                   .attr("class", "arc-tooltip")      
                   .style("opacity", 0);
 
@@ -1360,7 +1369,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .attr("d", arc)
                 .on("mouseover", edgeOver)
                 .on("mouseout", function(d) {    
-                    div.transition()    
+                    tooltip.transition()    
                         .duration(100)    
                         .style("opacity", 0); 
                 });
@@ -1377,7 +1386,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .attr("cx", function (d) {return d.x}) // fix width responsiveness
                 .on("mouseover", nodeOver) // or change circles to squares ("rect")
                 .on("mouseout", function(d) {    
-                    div.transition()    
+                    tooltip.transition()    
                         .duration(100)    
                         .style("opacity", 0); 
                 });
@@ -1394,26 +1403,85 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
                 d3.selectAll("#arcpath").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
-                div.transition()    
-                .duration(100)    
-                .style("opacity", .9);    
-                div.html(d.id)
-                .style("height", 30 + "px") 
-                .style("left", (d3.event.pageX-20) + "px")
-                //.style("left", d3.select(this).attr("cx") + "px")     
-                .style("top", (height/2) + "px");
+                tooltip.style('display', 'block').transition()    
+                  .duration(100)    
+                  .style("opacity", .9);    
+                tooltip.html(d.id)
+                  .style("height", 30 + "px")
+                  .style("width", 90 + "px");
+                    // Show tooltip in absolutely positioned DIV, which position is calculated 
+                    // taking screen size+scroll into consideration
+                    var dist = { x: 10, y: 10 };
+                    var body_sel = d3.select($elem[0]);
+                    var body = { w: body_sel.node().offsetWidth, h: body_sel.node().offsetHeight };
+                    var doc = { w: document.width, h: document.height };
+                    var svgpos = getNodePos(d3.select("svg").node());
+                    var scr = { x: window.scrollX, y: window.scrollY, w: window.innerWidth, h: window.innerHeight };
+                    var m = d3.mouse(d3.select("svg").node());
+                     scr.x = window.scrollX;
+                     scr.y = window.scrollY;
+                     m[0] += svgpos.x;
+                     m[1] += svgpos.y;
+                         tooltip.style("right", "");
+                         tooltip.style("left", "");
+                         tooltip.style("bottom", "");
+                         tooltip.style("top", "");
+                     if (m[0] > scr.x + scr.w / 2) {
+                         tooltip.style("right", (body.w - m[0] + dist.x) + "px");
+                     }
+                     else {
+                         tooltip.style("left", (m[0] + dist.x) + "px");
+                     }
+
+                     if (m[1] > scr.y + scr.h / 2) {
+                         tooltip.style("bottom", (body.h - m[1] + dist.y) + "px");
+                     }
+                     else {
+                         tooltip.style("top", (m[1] + dist.y) + "px");
+                     }
+                     tooltip.style("visibility", "visible");
               }
           
               function edgeOver(d) {
                 d3.selectAll("#arcpath").style("stroke", function(p) {return p == d ? "red" : "black"})
                 d3.selectAll("#arccircle").style("fill", function(p) {return p == d.source ? "#000ED4" : p == d.target ? "#43941C" : "lightgray"})
-                div.transition()    
-                .duration(100)    
-                .style("opacity", .9);    
-                div.html("From: " + d.source.id + "<br>" + "To: " + d.target.id)
-                .style("height", 70 + "px")
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (height/2) + "px");
+                tooltip.style('display', 'block').transition()    
+                  .duration(100)    
+                  .style("opacity", .9);    
+                tooltip.html("From: " + d.source.id + "<br>" + "To: " + d.target.id)
+                  .style("width", 120 + "px")
+                  .style("height", 50 + "px");
+                    // Show tooltip in absolutely positioned DIV, which position is calculated 
+                    // taking screen size+scroll into consideration
+                    var dist = { x: 10, y: 10 };
+                    var body_sel = d3.select($elem[0]);
+                    var body = { w: body_sel.node().offsetWidth, h: body_sel.node().offsetHeight };
+                    var doc = { w: document.width, h: document.height };
+                    var svgpos = getNodePos(d3.select("svg").node());
+                    var scr = { x: window.scrollX, y: window.scrollY, w: window.innerWidth, h: window.innerHeight };
+                    var m = d3.mouse(d3.select("svg").node());
+                     scr.x = window.scrollX;
+                     scr.y = window.scrollY;
+                     m[0] += svgpos.x;
+                     m[1] += svgpos.y;
+                         tooltip.style("right", "");
+                         tooltip.style("left", "");
+                         tooltip.style("bottom", "");
+                         tooltip.style("top", "");
+                     if (m[0] > scr.x + scr.w / 2) {
+                         tooltip.style("right", (body.w - m[0] + dist.x) + "px");
+                     }
+                     else {
+                         tooltip.style("left", (m[0] + dist.x) + "px");
+                     }
+
+                     if (m[1] > scr.y + scr.h / 2) {
+                         tooltip.style("bottom", (body.h - m[1] + dist.y) + "px");
+                     }
+                     else {
+                         tooltip.style("top", (m[1] + dist.y) + "px");
+                     }
+                     tooltip.style("visibility", "visible");
               }
               
               $elem[0].svg = svg;
@@ -1432,848 +1500,862 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
   var delay=350;
   var jsonRes=null;
 
+  function makeid() { // funcao temporaria para criar labels aleatorias, em vez de estar a
+                      // adicionar novas linhas com o nome "label" ao json das stays
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for( var i=0; i < 5; i++ )
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+      return text;
+  }
+
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
-  var accidents=[  
+var stays=[  
                  {  
-                    day:2,
-                    hour:1,
-                    count:127
+                    day:2, // day 1: sunday, day 2: monday, etc.
+                    hour:1, // // 1-1 ate 1-1.59 -> corresponde ao intervalo 0 ate 0.59
+                    // "primeira hora do dia" - fazer esta associaçao no backend
+                    // ex: if 00<=hour<=00.59 -> hour=1
+                    time_spent:127 //in minutes - shown in hours on the tooltip if >60
+                    // label: "home"  in the future, this attr is also needed
                  },
                  {  
                     day:4,
                     hour:1,
-                    count:141
+                    time_spent:141
                  },
                  {  
                     day:1,
                     hour:1,
-                    count:134
+                    time_spent:134
                  },
                  {  
                     day:5,
                     hour:1,
-                    count:174
+                    time_spent:174
                  },
                  {  
                     day:3,
                     hour:1,
-                    count:131
+                    time_spent:131
                  },
                  {  
                     day:6,
                     hour:1,
-                    count:333
+                    time_spent:333
                  },
                  {  
                     day:7,
                     hour:1,
-                    count:311
+                    time_spent:311
                  },
                  {  
                     day:2,
                     hour:2,
-                    count:79
+                    time_spent:79
                  },
                  {  
                     day:4,
                     hour:2,
-                    count:99
+                    time_spent:99
                  },
                  {  
                     day:1,
                     hour:2,
-                    count:117
+                    time_spent:117
                  },
                  {  
                     day:5,
                     hour:2,
-                    count:123
+                    time_spent:123
                  },
                  {  
                     day:3,
                     hour:2,
-                    count:92
+                    time_spent:92
                  },
                  {  
                     day:6,
                     hour:2,
-                    count:257
+                    time_spent:257
                  },
                  {  
                     day:7,
                     hour:2,
-                    count:293
+                    time_spent:293
                  },
                  {  
                     day:2,
                     hour:3,
-                    count:55
+                    time_spent:55
                  },
                  {  
                     day:4,
                     hour:3,
-                    count:73
+                    time_spent:73
                  },
                  {  
                     day:1,
                     hour:3,
-                    count:107
+                    time_spent:107
                  },
                  {  
                     day:5,
                     hour:3,
-                    count:89
+                    time_spent:89
                  },
                  {  
                     day:3,
                     hour:3,
-                    count:66
+                    time_spent:66
                  },
                  {  
                     day:6,
                     hour:3,
-                    count:185
+                    time_spent:185
                  },
                  {  
                     day:7,
                     hour:3,
-                    count:262
+                    time_spent:262
                  },
                  {  
                     day:2,
                     hour:4,
-                    count:39
+                    time_spent:39
                  },
                  {  
                     day:4,
                     hour:4,
-                    count:67
+                    time_spent:67
                  },
                  {  
                     day:1,
                     hour:4,
-                    count:59
+                    time_spent:59
                  },
                  {  
                     day:5,
                     hour:4,
-                    count:83
+                    time_spent:83
                  },
                  {  
                     day:3,
                     hour:4,
-                    count:45
+                    time_spent:45
                  },
                  {  
                     day:6,
                     hour:4,
-                    count:180
+                    time_spent:180
                  },
                  {  
                     day:7,
                     hour:4,
-                    count:220
+                    time_spent:220
                  },
                  {  
                     day:2,
                     hour:5,
-                    count:48
+                    time_spent:48
                  },
                  {  
                     day:4,
                     hour:5,
-                    count:57
+                    time_spent:57
                  },
                  {  
                     day:1,
                     hour:5,
-                    count:73
+                    time_spent:73
                  },
                  {  
                     day:5,
                     hour:5,
-                    count:76
+                    time_spent:76
                  },
                  {  
                     day:3,
                     hour:5,
-                    count:72
+                    time_spent:72
                  },
                  {  
                     day:6,
                     hour:5,
-                    count:168
+                    time_spent:168
                  },
                  {  
                     day:7,
                     hour:5,
-                    count:199
+                    time_spent:199
                  },
                  {  
                     day:2,
                     hour:6,
-                    count:129
+                    time_spent:129
                  },
                  {  
                     day:4,
                     hour:6,
-                    count:102
+                    time_spent:102
                  },
                  {  
                     day:1,
                     hour:6,
-                    count:129
+                    time_spent:129
                  },
                  {  
                     day:5,
                     hour:6,
-                    count:140
+                    time_spent:140
                  },
                  {  
                     day:3,
                     hour:6,
-                    count:117
+                    time_spent:117
                  },
                  {  
                     day:6,
                     hour:6,
-                    count:148
+                    time_spent:148
                  },
                  {  
                     day:7,
                     hour:6,
-                    count:193
+                    time_spent:193
                  },
                  {  
                     day:2,
                     hour:7,
-                    count:314
+                    time_spent:314
                  },
                  {  
                     day:4,
                     hour:7,
-                    count:284
+                    time_spent:284
                  },
                  {  
                     day:1,
                     hour:7,
-                    count:367
+                    time_spent:367
                  },
                  {  
                     day:5,
                     hour:7,
-                    count:270
+                    time_spent:270
                  },
                  {  
                     day:3,
                     hour:7,
-                    count:310
+                    time_spent:310
                  },
                  {  
                     day:6,
                     hour:7,
-                    count:179
+                    time_spent:179
                  },
                  {  
                     day:7,
                     hour:7,
-                    count:192
+                    time_spent:192
                  },
                  {  
                     day:2,
                     hour:8,
-                    count:806
+                    time_spent:806
                  },
                  {  
                     day:4,
                     hour:8,
-                    count:811
+                    time_spent:811
                  },
                  {  
                     day:1,
                     hour:8,
-                    count:850
+                    time_spent:850
                  },
                  {  
                     day:5,
                     hour:8,
-                    count:609
+                    time_spent:609
                  },
                  {  
                     day:3,
                     hour:8,
-                    count:846
+                    time_spent:846
                  },
                  {  
                     day:6,
                     hour:8,
-                    count:208
+                    time_spent:208
                  },
                  {  
                     day:7,
                     hour:8,
-                    count:144
+                    time_spent:144
                  },
                  {  
                     day:2,
                     hour:9,
-                    count:1209
+                    time_spent:1209
                  },
                  {  
                     day:4,
                     hour:9,
-                    count:1214
+                    time_spent:1214
                  },
                  {  
                     day:1,
                     hour:9,
-                    count:1205
+                    time_spent:1205
                  },
                  {  
                     day:5,
                     hour:9,
-                    count:960
+                    time_spent:960
                  },
                  {  
                     day:3,
                     hour:9,
-                    count:1073
+                    time_spent:1073
                  },
                  {  
                     day:6,
                     hour:9,
-                    count:286
+                    time_spent:286
                  },
                  {  
                     day:7,
                     hour:9,
-                    count:152
+                    time_spent:152
                  },
                  {  
                     day:2,
                     hour:10,
-                    count:750
+                    time_spent:750
                  },
                  {  
                     day:4,
                     hour:10,
-                    count:808
+                    time_spent:808
                  },
                  {  
                     day:1,
                     hour:10,
-                    count:610
+                    time_spent:610
                  },
                  {  
                     day:5,
                     hour:10,
-                    count:655
+                    time_spent:655
                  },
                  {  
                     day:3,
                     hour:10,
-                    count:684
+                    time_spent:684
                  },
                  {  
                     day:6,
                     hour:10,
-                    count:482
+                    time_spent:482
                  },
                  {  
                     day:7,
                     hour:10,
-                    count:253
+                    time_spent:253
                  },
                  {  
                     day:2,
                     hour:11,
-                    count:591
+                    time_spent:591
                  },
                  {  
                     day:4,
                     hour:11,
-                    count:593
+                    time_spent:593
                  },
                  {  
                     day:1,
                     hour:11,
-                    count:573
+                    time_spent:573
                  },
                  {  
                     day:5,
                     hour:11,
-                    count:695
+                    time_spent:695
                  },
                  {  
                     day:3,
                     hour:11,
-                    count:622
+                    time_spent:622
                  },
                  {  
                     day:6,
                     hour:11,
-                    count:676
+                    time_spent:676
                  },
                  {  
                     day:7,
                     hour:11,
-                    count:326
+                    time_spent:326
                  },
                  {  
                     day:2,
                     hour:12,
-                    count:653
+                    time_spent:653
                  },
                  {  
                     day:4,
                     hour:12,
-                    count:679
+                    time_spent:679
                  },
                  {  
                     day:1,
                     hour:12,
-                    count:639
+                    time_spent:639
                  },
                  {  
                     day:5,
                     hour:12,
-                    count:736
+                    time_spent:736
                  },
                  {  
                     day:3,
                     hour:12,
-                    count:687
+                    time_spent:687
                  },
                  {  
                     day:6,
                     hour:12,
-                    count:858
+                    time_spent:858
                  },
                  {  
                     day:7,
                     hour:12,
-                    count:402
+                    time_spent:402
                  },
                  {  
                     day:2,
                     hour:13,
-                    count:738
+                    time_spent:738
                  },
                  {  
                     day:4,
                     hour:13,
-                    count:749
+                    time_spent:749
                  },
                  {  
                     day:1,
                     hour:13,
-                    count:631
+                    time_spent:631
                  },
                  {  
                     day:5,
                     hour:13,
-                    count:908
+                    time_spent:908
                  },
                  {  
                     day:3,
                     hour:13,
-                    count:888
+                    time_spent:888
                  },
                  {  
                     day:6,
                     hour:13,
-                    count:880
+                    time_spent:880
                  },
                  {  
                     day:7,
                     hour:13,
-                    count:507
+                    time_spent:507
                  },
                  {  
                     day:2,
                     hour:14,
-                    count:792
+                    time_spent:792
                  },
                  {  
                     day:4,
                     hour:14,
-                    count:847
+                    time_spent:847
                  },
                  {  
                     day:1,
                     hour:14,
-                    count:752
+                    time_spent:752
                  },
                  {  
                     day:5,
                     hour:14,
-                    count:1033
+                    time_spent:1033
                  },
                  {  
                     day:3,
                     hour:14,
-                    count:942
+                    time_spent:942
                  },
                  {  
                     day:6,
                     hour:14,
-                    count:983
+                    time_spent:983
                  },
                  {  
                     day:7,
                     hour:14,
-                    count:636
+                    time_spent:636
                  },
                  {  
                     day:2,
                     hour:15,
-                    count:906
+                    time_spent:906
                  },
                  {  
                     day:4,
                     hour:15,
-                    count:1031
+                    time_spent:1031
                  },
                  {  
                     day:1,
                     hour:15,
-                    count:954
+                    time_spent:954
                  },
                  {  
                     day:5,
                     hour:15,
-                    count:1199
+                    time_spent:1199
                  },
                  {  
                     day:3,
                     hour:15,
-                    count:1014
+                    time_spent:1014
                  },
                  {  
                     day:6,
                     hour:15,
-                    count:1125
+                    time_spent:1125
                  },
                  {  
                     day:7,
                     hour:15,
-                    count:712
+                    time_spent:712
                  },
                  {  
                     day:2,
                     hour:16,
-                    count:1101
+                    time_spent:1101
                  },
                  {  
                     day:4,
                     hour:16,
-                    count:1158
+                    time_spent:1158
                  },
                  {  
                     day:1,
                     hour:16,
-                    count:1029
+                    time_spent:1029
                  },
                  {  
                     day:5,
                     hour:16,
-                    count:1364
+                    time_spent:1364
                  },
                  {  
                     day:3,
                     hour:16,
-                    count:1068
+                    time_spent:1068
                  },
                  {  
                     day:6,
                     hour:16,
-                    count:1062
+                    time_spent:1062
                  },
                  {  
                     day:7,
                     hour:16,
-                    count:736
+                    time_spent:736
                  },
                  {  
                     day:2,
                     hour:17,
-                    count:1303
+                    time_spent:1303
                  },
                  {  
                     day:4,
                     hour:17,
-                    count:1426
+                    time_spent:1426
                  },
                  {  
                     day:1,
                     hour:17,
-                    count:1270
+                    time_spent:1270
                  },
                  {  
                     day:5,
                     hour:17,
-                    count:1455
+                    time_spent:1455
                  },
                  {  
                     day:3,
                     hour:17,
-                    count:1407
+                    time_spent:1407
                  },
                  {  
                     day:6,
                     hour:17,
-                    count:883
+                    time_spent:883
                  },
                  {  
                     day:7,
                     hour:17,
-                    count:666
+                    time_spent:666
                  },
                  {  
                     day:2,
                     hour:18,
-                    count:1549
+                    time_spent:1549
                  },
                  {  
                     day:4,
                     hour:18,
-                    count:1653
+                    time_spent:1653
                  },
                  {  
                     day:1,
                     hour:18,
-                    count:1350
+                    time_spent:1350
                  },
                  {  
                     day:5,
                     hour:18,
-                    count:1502
+                    time_spent:1502
                  },
                  {  
                     day:3,
                     hour:18,
-                    count:1507
+                    time_spent:1507
                  },
                  {  
                     day:6,
                     hour:18,
-                    count:830
+                    time_spent:830
                  },
                  {  
                     day:7,
                     hour:18,
-                    count:652
+                    time_spent:652
                  },
                  {  
                     day:2,
                     hour:19,
-                    count:998
+                    time_spent:998
                  },
                  {  
                     day:4,
                     hour:19,
-                    count:1070
+                    time_spent:1070
                  },
                  {  
                     day:1,
                     hour:19,
-                    count:787
+                    time_spent:787
                  },
                  {  
                     day:5,
                     hour:19,
-                    count:1027
+                    time_spent:1027
                  },
                  {  
                     day:3,
                     hour:19,
-                    count:1019
+                    time_spent:1019
                  },
                  {  
                     day:6,
                     hour:19,
-                    count:575
+                    time_spent:575
                  },
                  {  
                     day:7,
                     hour:19,
-                    count:519
+                    time_spent:519
                  },
                  {  
                     day:2,
                     hour:20,
-                    count:661
+                    time_spent:661
                  },
                  {  
                     day:4,
                     hour:20,
-                    count:756
+                    time_spent:756
                  },
                  {  
                     day:1,
                     hour:20,
-                    count:596
+                    time_spent:596
                  },
                  {  
                     day:5,
                     hour:20,
-                    count:730
+                    time_spent:730
                  },
                  {  
                     day:3,
                     hour:20,
-                    count:648
+                    time_spent:648
                  },
                  {  
                     day:6,
                     hour:20,
-                    count:494
+                    time_spent:494
                  },
                  {  
                     day:7,
                     hour:20,
-                    count:486
+                    time_spent:486
                  },
                  {  
                     day:2,
                     hour:21,
-                    count:431
+                    time_spent:431
                  },
                  {  
                     day:4,
                     hour:21,
-                    count:539
+                    time_spent:539
                  },
                  {  
                     day:1,
                     hour:21,
-                    count:430
+                    time_spent:430
                  },
                  {  
                     day:5,
                     hour:21,
-                    count:509
+                    time_spent:509
                  },
                  {  
                     day:3,
                     hour:21,
-                    count:457
+                    time_spent:457
                  },
                  {  
                     day:6,
                     hour:21,
-                    count:443
+                    time_spent:443
                  },
                  {  
                     day:7,
                     hour:21,
-                    count:421
+                    time_spent:421
                  },
                  {  
                     day:2,
                     hour:22,
-                    count:352
+                    time_spent:352
                  },
                  {  
                     day:4,
                     hour:22,
-                    count:428
+                    time_spent:428
                  },
                  {  
                     day:1,
                     hour:22,
-                    count:362
+                    time_spent:362
                  },
                  {  
                     day:5,
                     hour:22,
-                    count:462
+                    time_spent:462
                  },
                  {  
                     day:3,
                     hour:22,
-                    count:390
+                    time_spent:390
                  },
                  {  
                     day:6,
                     hour:22,
-                    count:379
+                    time_spent:379
                  },
                  {  
                     day:7,
                     hour:22,
-                    count:324
+                    time_spent:324
                  },
                  {  
                     day:2,
                     hour:23,
-                    count:329
+                    time_spent:329
                  },
                  {  
                     day:4,
                     hour:23,
-                    count:381
+                    time_spent:381
                  },
                  {  
                     day:1,
                     hour:23,
-                    count:293
+                    time_spent:293
                  },
                  {  
                     day:5,
                     hour:23,
-                    count:393
+                    time_spent:393
                  },
                  {  
                     day:3,
                     hour:23,
-                    count:313
+                    time_spent:313
                  },
                  {  
                     day:6,
                     hour:23,
-                    count:374
+                    time_spent:374
                  },
                  {  
                     day:7,
                     hour:23,
-                    count:288
+                    time_spent:288
                  },
                  {  
                     day:2,
-                    hour:24,
-                    count:211
+                    hour:24, // 24-1 ate 24-1.59 -> corresponde ao intervalo 23 ate 23.59
+                    time_spent:211
                  },
                  {  
                     day:4,
                     hour:24,
-                    count:249
+                    time_spent:249
                  },
                  {  
                     day:1,
                     hour:24,
-                    count:204
+                    time_spent:204
                  },
                  {  
                     day:5,
                     hour:24,
-                    count:417
+                    time_spent:417
                  },
                  {  
                     day:3,
                     hour:24,
-                    count:211
+                    time_spent:211
                  },
                  {  
                     day:6,
                     hour:24,
-                    count:379
+                    time_spent:379
                  },
                  {  
                     day:7,
                     hour:24,
-                    count:203
+                    time_spent:203
                  }
               ];
 
@@ -2285,9 +2367,19 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          // DataManagerService.get('/rangedbar', []).then(function(d) {
+          // DataManagerService.get('/staysgraph', []).then(function(d) {
           //   jsonRes=d;
           // });
+          
+          function getNodePos(el) {
+              var body = d3.select($elem[0]).node();
+
+              for (var lx = 0, ly = 0;
+                   el != null && el != body;
+                   lx += (el.offsetLeft || el.clientLeft), ly += (el.offsetTop || el.clientTop), el = (el.offsetParent || el.parentNode))
+                  ;
+              return {x: lx, y: ly};
+          }
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -2309,7 +2401,8 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
 
               $elem[0].svg = null;
               
-              var days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+              //var days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+              var days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
                   times = d3.range(24);
 
               var margin = {top: 70, right: 10, bottom: 20, left: 25},
@@ -2326,12 +2419,16 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
                       .append("g")
                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+              var tooltip = d3.select($elem[0]).append('div') 
+                  .attr("class", "stays-tooltip")      
+                  .style("opacity", 0);
+
               //Reset the overall font size
               var newFontSize = width * 62.5 / 900;
               d3.select("html").style("font-size", newFontSize + "%");
 
               var colorScale = d3.scale.linear()
-                  .domain([0, d3.max(accidents, function(d) {return d.count; })/2, d3.max(accidents, function(d) {return d.count; })])
+                  .domain([0, d3.max(stays, function(d) {return d.time_spent; })/2, d3.max(stays, function(d) {return d.time_spent; })])
                   .range(["#FFFFDD", "#3E9583", "#1F2D86"])
 
               var dayLabels = svg.selectAll(".dayLabel")
@@ -2354,7 +2451,7 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
                   .attr("transform", "translate(" + gridSize / 2 + ", -6)")
 
               var heatMap = svg.selectAll(".hour")
-                  .data(accidents)
+                  .data(stays)
                   .enter().append("rect")
                   .attr("x", function(d) { return (d.hour - 1) * gridSize; })
                   .attr("y", function(d) { return (d.day - 1) * gridSize; })
@@ -2366,10 +2463,67 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
                   .style("stroke", "white")
                   .style("stroke-opacity", 0.6)
                   .style("stroke-width", 0.8)
-                  .style("fill", function(d) { return colorScale(d.count); });
+                  .style("fill", function(d) { return colorScale(d.time_spent); })
+                  .on("mouseover", function(d, i) {
+                      
+                      // Construct tooltip
+                      var tooltip_html = '';
+                      tooltip_html += '<div class="header"><strong>' + 'Stays' + ' </strong></div>';
+                      
+                      // Add info to the tooltip
+                      angular.forEach(d.summary, function (d) {
+                        tooltip_html += '<div><span><strong>' + makeid() + '</strong></span>';
+                        tooltip_html += '<span>' + d.time_spent + '</span></div>';
+                      });
+                      
+                      // Set tooltip width
+                      tooltip.html(tooltip_html).style("width", 300 + "px");
 
+                        // Show tooltip in absolutely positioned DIV, which position is calculated 
+                        // taking screen size+scroll into consideration
+                        var dist = { x: 10, y: 10 };
+                        var body_sel = d3.select($elem[0]);
+                        var body = { w: body_sel.node().offsetWidth, h: body_sel.node().offsetHeight };
+                        var doc = { w: document.width, h: document.height };
+                        var svgpos = getNodePos(d3.select("svg").node());
+                        var scr = { x: window.scrollX, y: window.scrollY, w: window.innerWidth, h: window.innerHeight };
+                        var m = d3.mouse(d3.select("svg").node());
+                         scr.x = window.scrollX;
+                         scr.y = window.scrollY;
+                         m[0] += svgpos.x;
+                         m[1] += svgpos.y;
+                             tooltip.style("right", "");
+                             tooltip.style("left", "");
+                             tooltip.style("bottom", "");
+                             tooltip.style("top", "");
+                         if (m[0] > scr.x + scr.w / 2) {
+                             tooltip.style("right", (body.w - m[0] + dist.x) + "px");
+                         }
+                         else {
+                             tooltip.style("left", (m[0] + dist.x) + "px");
+                         }
 
-
+                         if (m[1] > scr.y + scr.h / 2) {
+                             tooltip.style("bottom", (body.h - m[1] + dist.y) + "px");
+                         }
+                         else {
+                             tooltip.style("top", (m[1] + dist.y) + "px");
+                         }
+                         tooltip.style("visibility", "visible");
+                        
+                        // Tooltip transition and more styling
+                        tooltip.style('display', 'block')
+                        .transition()
+                          .ease('ease-in')
+                          .duration(100)    
+                          .style("opacity", .9);
+                  })
+                  .on("mouseout", function(d) {    
+                      tooltip.transition()
+                              .duration(100)
+                              .ease('ease-in')
+                              .style('opacity', 0); 
+                  });
 
               $elem[0].svg = svg;
 
