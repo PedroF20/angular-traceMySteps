@@ -1267,16 +1267,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           //   jsonResNodes=d;
           // });
 
-          function getNodePos(el) {
-              var body = d3.select($elem[0]).node();
-
-              for (var lx = 0, ly = 0;
-                   el != null && el != body;
-                   lx += (el.offsetLeft || el.clientLeft), ly += (el.offsetTop || el.clientTop), el = (el.offsetParent || el.parentNode))
-                  ;
-              return {x: lx, y: ly};
-          }
-
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
@@ -1403,85 +1393,25 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
                 d3.selectAll("#arcpath").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
-                tooltip.style('display', 'block').transition()    
-                  .duration(100)    
-                  .style("opacity", .9);    
+                tooltip.transition()    
+                .duration(100)    
+                .style("opacity", .9);    
                 tooltip.html(d.id)
-                  .style("height", 30 + "px")
-                  .style("width", 90 + "px");
-                    // Show tooltip in absolutely positioned DIV, which position is calculated 
-                    // taking screen size+scroll into consideration
-                    var dist = { x: 10, y: 10 };
-                    var body_sel = d3.select($elem[0]);
-                    var body = { w: body_sel.node().offsetWidth, h: body_sel.node().offsetHeight };
-                    var doc = { w: document.width, h: document.height };
-                    var svgpos = getNodePos(d3.select("svg").node());
-                    var scr = { x: window.scrollX, y: window.scrollY, w: window.innerWidth, h: window.innerHeight };
-                    var m = d3.mouse(d3.select("svg").node());
-                     scr.x = window.scrollX;
-                     scr.y = window.scrollY;
-                     m[0] += svgpos.x;
-                     m[1] += svgpos.y;
-                         tooltip.style("right", "");
-                         tooltip.style("left", "");
-                         tooltip.style("bottom", "");
-                         tooltip.style("top", "");
-                     if (m[0] > scr.x + scr.w / 2) {
-                         tooltip.style("right", (body.w - m[0] + dist.x) + "px");
-                     }
-                     else {
-                         tooltip.style("left", (m[0] + dist.x) + "px");
-                     }
-
-                     if (m[1] > scr.y + scr.h / 2) {
-                         tooltip.style("bottom", (body.h - m[1] + dist.y) + "px");
-                     }
-                     else {
-                         tooltip.style("top", (m[1] + dist.y) + "px");
-                     }
-                     tooltip.style("visibility", "visible");
+                .style("height", 30 + "px") 
+                .style("left", (d3.event.layerX+10) + "px")
+                .style("top", (d3.event.layerY+10) + "px");
               }
           
               function edgeOver(d) {
                 d3.selectAll("#arcpath").style("stroke", function(p) {return p == d ? "red" : "black"})
                 d3.selectAll("#arccircle").style("fill", function(p) {return p == d.source ? "#000ED4" : p == d.target ? "#43941C" : "lightgray"})
-                tooltip.style('display', 'block').transition()    
-                  .duration(100)    
-                  .style("opacity", .9);    
+                tooltip.transition()    
+                .duration(100)    
+                .style("opacity", .9);    
                 tooltip.html("From: " + d.source.id + "<br>" + "To: " + d.target.id)
-                  .style("width", 120 + "px")
-                  .style("height", 50 + "px");
-                    // Show tooltip in absolutely positioned DIV, which position is calculated 
-                    // taking screen size+scroll into consideration
-                    var dist = { x: 10, y: 10 };
-                    var body_sel = d3.select($elem[0]);
-                    var body = { w: body_sel.node().offsetWidth, h: body_sel.node().offsetHeight };
-                    var doc = { w: document.width, h: document.height };
-                    var svgpos = getNodePos(d3.select("svg").node());
-                    var scr = { x: window.scrollX, y: window.scrollY, w: window.innerWidth, h: window.innerHeight };
-                    var m = d3.mouse(d3.select("svg").node());
-                     scr.x = window.scrollX;
-                     scr.y = window.scrollY;
-                     m[0] += svgpos.x;
-                     m[1] += svgpos.y;
-                         tooltip.style("right", "");
-                         tooltip.style("left", "");
-                         tooltip.style("bottom", "");
-                         tooltip.style("top", "");
-                     if (m[0] > scr.x + scr.w / 2) {
-                         tooltip.style("right", (body.w - m[0] + dist.x) + "px");
-                     }
-                     else {
-                         tooltip.style("left", (m[0] + dist.x) + "px");
-                     }
-
-                     if (m[1] > scr.y + scr.h / 2) {
-                         tooltip.style("bottom", (body.h - m[1] + dist.y) + "px");
-                     }
-                     else {
-                         tooltip.style("top", (m[1] + dist.y) + "px");
-                     }
-                     tooltip.style("visibility", "visible");
+                .style("height", 70 + "px")
+                .style("left", (d3.event.layerX+10) + "px")
+                .style("top", (d3.event.layerY+10) + "px");
               }
               
               $elem[0].svg = svg;
@@ -2477,46 +2407,17 @@ var stays=[
                       });
                       
                       // Set tooltip width
-                      tooltip.html(tooltip_html).style("width", 300 + "px");
+                      tooltip.html(tooltip_html)
+                        .style("width", 300 + "px")
+                        .style("left", (d3.event.layerX+10) + "px")
+                        .style("top", (d3.event.layerY+10) + "px");
 
-                        // Show tooltip in absolutely positioned DIV, which position is calculated 
-                        // taking screen size+scroll into consideration
-                        var dist = { x: 10, y: 10 };
-                        var body_sel = d3.select($elem[0]);
-                        var body = { w: body_sel.node().offsetWidth, h: body_sel.node().offsetHeight };
-                        var doc = { w: document.width, h: document.height };
-                        var svgpos = getNodePos(d3.select("svg").node());
-                        var scr = { x: window.scrollX, y: window.scrollY, w: window.innerWidth, h: window.innerHeight };
-                        var m = d3.mouse(d3.select("svg").node());
-                         scr.x = window.scrollX;
-                         scr.y = window.scrollY;
-                         m[0] += svgpos.x;
-                         m[1] += svgpos.y;
-                             tooltip.style("right", "");
-                             tooltip.style("left", "");
-                             tooltip.style("bottom", "");
-                             tooltip.style("top", "");
-                         if (m[0] > scr.x + scr.w / 2) {
-                             tooltip.style("right", (body.w - m[0] + dist.x) + "px");
-                         }
-                         else {
-                             tooltip.style("left", (m[0] + dist.x) + "px");
-                         }
-
-                         if (m[1] > scr.y + scr.h / 2) {
-                             tooltip.style("bottom", (body.h - m[1] + dist.y) + "px");
-                         }
-                         else {
-                             tooltip.style("top", (m[1] + dist.y) + "px");
-                         }
-                         tooltip.style("visibility", "visible");
-                        
-                        // Tooltip transition and more styling
-                        tooltip.style('display', 'block')
-                        .transition()
-                          .ease('ease-in')
-                          .duration(100)    
-                          .style("opacity", .9);
+                      // Tooltip transition and more styling
+                      tooltip.style('display', 'block')
+                      .transition()
+                        .ease('ease-in')
+                        .duration(100)    
+                        .style("opacity", .9);
                   })
                   .on("mouseout", function(d) {    
                       tooltip.transition()

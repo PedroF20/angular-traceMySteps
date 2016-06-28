@@ -482,15 +482,16 @@ path.domain {
 }
 
 div.arc-tooltip { 
+    overflow: hidden;
     position: absolute;     
     text-align: center;     
-    width: 80px;          
     padding: 2px;
     z-index: 9999;       
     font: 12px sans-serif;    
     background: black; 
     border: 0px;    
-    border-radius: 8px;     
+    border-radius: 8px;
+    font-family: Helvetica, arial, 'Open Sans', sans-serif;     
     pointer-events: none;     
 }
 
