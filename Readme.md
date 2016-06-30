@@ -12,7 +12,7 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 3) Connect the new backend with the frontend.
 
-4) Add more visualizations.
+<s>4) Add more visualizations.</s>
 
 5) Bind all the visualizations.
 
@@ -28,9 +28,12 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 <s>1) Calendar tooltip bug (Gets cropped when shown outside of svg).</s>
 
-2) Calendar resize bug (Not urgent, calendar is supposed to be of fixed position).
+<s>2) Calendar resize bug (Not urgent, **calendar is supposed to be of fixed position**).</s>
 
 3) Individual widget pin bug (can't disable the dragging of an individual grid item).
+
+4) Arc Graph is drawn once, but when it is removed and added again to the grid, the arc function
+    does not compute edges and nodes.
 
 ### Steps to run:
 
