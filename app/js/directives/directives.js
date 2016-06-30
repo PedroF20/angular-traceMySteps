@@ -1266,7 +1266,8 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           // DataManagerService.get('/arcnodes', []).then(function(d) {
           //   jsonResNodes=d;
           // });
-
+          
+          
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
@@ -1292,10 +1293,8 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           for (x in edges) {
             edges[x].source = nodeHash[edges[x].source];
             edges[x].target = nodeHash[edges[x].target];
-             //console.log(edges[x].source);
-             //console.log(edges[x].target);
           }
-          
+        
           function createArcGraph () {
 
             setTimeout(function() {
@@ -1347,6 +1346,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                         .attr("transform", "translate(" + (2/-width) + "," + (height/2) + ")"); 
                         //.attr("transform", "translate(50,250)");
 
+
               arcG.selectAll("path")
                 .data(edges)
                 .enter()
@@ -1363,6 +1363,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                         .duration(100)    
                         .style("opacity", 0); 
                 });
+
               
               arcG.selectAll("circle")
                 .data(nodes)
@@ -1383,11 +1384,15 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 
               function arc(d,i) {
                 var draw = d3.svg.line().interpolate("basis");
+                console.log(d);
+                console.log(i)
                 var midX = (d.source.x + d.target.x) / 2;
                 var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
+                // console.log(midX);
+                // console.log(midY);
                 // colocar divisão diferente para cada intervalo de nr de elementos
                 // ex: elementos < 10, (1200/height)->(200/height)
-                return draw([[d.source.x,0],[midX,midY],[d.target.x,0]])
+                return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
               }
               
               function nodeOver(d,i) {
@@ -1449,843 +1454,33 @@ var stays=[
                     hour:1, // // 1-1 ate 1-1.59 -> corresponde ao intervalo 0 ate 0.59
                     // "primeira hora do dia" - fazer esta associaçao no backend
                     // ex: if 00<=hour<=00.59 -> hour=1
-                    time_spent:127 //in minutes - shown in hours on the tooltip if >60
-                    // label: "home"  in the future, this attr is also needed
+                    time_spent:57,// in minutes - maximo de 60 pois o bloco e de 1 hr
+                    label: "home" // sitio onde aconteceu a stay ou a stay "mais importante"
+                    // no caso de haver varias stays para um bloco, mostrar a maior
                  },
                  {  
                     day:4,
                     hour:1,
-                    time_spent:141
+                    time_spent:41,
+                    label: "inesc"
                  },
                  {  
                     day:1,
                     hour:1,
-                    time_spent:134
-                 },
-                 {  
-                    day:5,
-                    hour:1,
-                    time_spent:174
-                 },
-                 {  
-                    day:3,
-                    hour:1,
-                    time_spent:131
-                 },
-                 {  
-                    day:6,
-                    hour:1,
-                    time_spent:333
-                 },
-                 {  
-                    day:7,
-                    hour:1,
-                    time_spent:311
-                 },
-                 {  
-                    day:2,
-                    hour:2,
-                    time_spent:79
-                 },
-                 {  
-                    day:4,
-                    hour:2,
-                    time_spent:99
+                    time_spent:21,
+                    label:"atrium saldanha"
                  },
                  {  
                     day:1,
                     hour:2,
-                    time_spent:117
-                 },
-                 {  
-                    day:5,
-                    hour:2,
-                    time_spent:123
-                 },
-                 {  
-                    day:3,
-                    hour:2,
-                    time_spent:92
-                 },
-                 {  
-                    day:6,
-                    hour:2,
-                    time_spent:257
-                 },
-                 {  
-                    day:7,
-                    hour:2,
-                    time_spent:293
-                 },
-                 {  
-                    day:2,
-                    hour:3,
-                    time_spent:55
-                 },
-                 {  
-                    day:4,
-                    hour:3,
-                    time_spent:73
+                    time_spent:1,
+                    label:"atrium saldanha"
                  },
                  {  
                     day:1,
                     hour:3,
-                    time_spent:107
-                 },
-                 {  
-                    day:5,
-                    hour:3,
-                    time_spent:89
-                 },
-                 {  
-                    day:3,
-                    hour:3,
-                    time_spent:66
-                 },
-                 {  
-                    day:6,
-                    hour:3,
-                    time_spent:185
-                 },
-                 {  
-                    day:7,
-                    hour:3,
-                    time_spent:262
-                 },
-                 {  
-                    day:2,
-                    hour:4,
-                    time_spent:39
-                 },
-                 {  
-                    day:4,
-                    hour:4,
-                    time_spent:67
-                 },
-                 {  
-                    day:1,
-                    hour:4,
-                    time_spent:59
-                 },
-                 {  
-                    day:5,
-                    hour:4,
-                    time_spent:83
-                 },
-                 {  
-                    day:3,
-                    hour:4,
-                    time_spent:45
-                 },
-                 {  
-                    day:6,
-                    hour:4,
-                    time_spent:180
-                 },
-                 {  
-                    day:7,
-                    hour:4,
-                    time_spent:220
-                 },
-                 {  
-                    day:2,
-                    hour:5,
-                    time_spent:48
-                 },
-                 {  
-                    day:4,
-                    hour:5,
-                    time_spent:57
-                 },
-                 {  
-                    day:1,
-                    hour:5,
-                    time_spent:73
-                 },
-                 {  
-                    day:5,
-                    hour:5,
-                    time_spent:76
-                 },
-                 {  
-                    day:3,
-                    hour:5,
-                    time_spent:72
-                 },
-                 {  
-                    day:6,
-                    hour:5,
-                    time_spent:168
-                 },
-                 {  
-                    day:7,
-                    hour:5,
-                    time_spent:199
-                 },
-                 {  
-                    day:2,
-                    hour:6,
-                    time_spent:129
-                 },
-                 {  
-                    day:4,
-                    hour:6,
-                    time_spent:102
-                 },
-                 {  
-                    day:1,
-                    hour:6,
-                    time_spent:129
-                 },
-                 {  
-                    day:5,
-                    hour:6,
-                    time_spent:140
-                 },
-                 {  
-                    day:3,
-                    hour:6,
-                    time_spent:117
-                 },
-                 {  
-                    day:6,
-                    hour:6,
-                    time_spent:148
-                 },
-                 {  
-                    day:7,
-                    hour:6,
-                    time_spent:193
-                 },
-                 {  
-                    day:2,
-                    hour:7,
-                    time_spent:314
-                 },
-                 {  
-                    day:4,
-                    hour:7,
-                    time_spent:284
-                 },
-                 {  
-                    day:1,
-                    hour:7,
-                    time_spent:367
-                 },
-                 {  
-                    day:5,
-                    hour:7,
-                    time_spent:270
-                 },
-                 {  
-                    day:3,
-                    hour:7,
-                    time_spent:310
-                 },
-                 {  
-                    day:6,
-                    hour:7,
-                    time_spent:179
-                 },
-                 {  
-                    day:7,
-                    hour:7,
-                    time_spent:192
-                 },
-                 {  
-                    day:2,
-                    hour:8,
-                    time_spent:806
-                 },
-                 {  
-                    day:4,
-                    hour:8,
-                    time_spent:811
-                 },
-                 {  
-                    day:1,
-                    hour:8,
-                    time_spent:850
-                 },
-                 {  
-                    day:5,
-                    hour:8,
-                    time_spent:609
-                 },
-                 {  
-                    day:3,
-                    hour:8,
-                    time_spent:846
-                 },
-                 {  
-                    day:6,
-                    hour:8,
-                    time_spent:208
-                 },
-                 {  
-                    day:7,
-                    hour:8,
-                    time_spent:144
-                 },
-                 {  
-                    day:2,
-                    hour:9,
-                    time_spent:1209
-                 },
-                 {  
-                    day:4,
-                    hour:9,
-                    time_spent:1214
-                 },
-                 {  
-                    day:1,
-                    hour:9,
-                    time_spent:1205
-                 },
-                 {  
-                    day:5,
-                    hour:9,
-                    time_spent:960
-                 },
-                 {  
-                    day:3,
-                    hour:9,
-                    time_spent:1073
-                 },
-                 {  
-                    day:6,
-                    hour:9,
-                    time_spent:286
-                 },
-                 {  
-                    day:7,
-                    hour:9,
-                    time_spent:152
-                 },
-                 {  
-                    day:2,
-                    hour:10,
-                    time_spent:750
-                 },
-                 {  
-                    day:4,
-                    hour:10,
-                    time_spent:808
-                 },
-                 {  
-                    day:1,
-                    hour:10,
-                    time_spent:610
-                 },
-                 {  
-                    day:5,
-                    hour:10,
-                    time_spent:655
-                 },
-                 {  
-                    day:3,
-                    hour:10,
-                    time_spent:684
-                 },
-                 {  
-                    day:6,
-                    hour:10,
-                    time_spent:482
-                 },
-                 {  
-                    day:7,
-                    hour:10,
-                    time_spent:253
-                 },
-                 {  
-                    day:2,
-                    hour:11,
-                    time_spent:591
-                 },
-                 {  
-                    day:4,
-                    hour:11,
-                    time_spent:593
-                 },
-                 {  
-                    day:1,
-                    hour:11,
-                    time_spent:573
-                 },
-                 {  
-                    day:5,
-                    hour:11,
-                    time_spent:695
-                 },
-                 {  
-                    day:3,
-                    hour:11,
-                    time_spent:622
-                 },
-                 {  
-                    day:6,
-                    hour:11,
-                    time_spent:676
-                 },
-                 {  
-                    day:7,
-                    hour:11,
-                    time_spent:326
-                 },
-                 {  
-                    day:2,
-                    hour:12,
-                    time_spent:653
-                 },
-                 {  
-                    day:4,
-                    hour:12,
-                    time_spent:679
-                 },
-                 {  
-                    day:1,
-                    hour:12,
-                    time_spent:639
-                 },
-                 {  
-                    day:5,
-                    hour:12,
-                    time_spent:736
-                 },
-                 {  
-                    day:3,
-                    hour:12,
-                    time_spent:687
-                 },
-                 {  
-                    day:6,
-                    hour:12,
-                    time_spent:858
-                 },
-                 {  
-                    day:7,
-                    hour:12,
-                    time_spent:402
-                 },
-                 {  
-                    day:2,
-                    hour:13,
-                    time_spent:738
-                 },
-                 {  
-                    day:4,
-                    hour:13,
-                    time_spent:749
-                 },
-                 {  
-                    day:1,
-                    hour:13,
-                    time_spent:631
-                 },
-                 {  
-                    day:5,
-                    hour:13,
-                    time_spent:908
-                 },
-                 {  
-                    day:3,
-                    hour:13,
-                    time_spent:888
-                 },
-                 {  
-                    day:6,
-                    hour:13,
-                    time_spent:880
-                 },
-                 {  
-                    day:7,
-                    hour:13,
-                    time_spent:507
-                 },
-                 {  
-                    day:2,
-                    hour:14,
-                    time_spent:792
-                 },
-                 {  
-                    day:4,
-                    hour:14,
-                    time_spent:847
-                 },
-                 {  
-                    day:1,
-                    hour:14,
-                    time_spent:752
-                 },
-                 {  
-                    day:5,
-                    hour:14,
-                    time_spent:1033
-                 },
-                 {  
-                    day:3,
-                    hour:14,
-                    time_spent:942
-                 },
-                 {  
-                    day:6,
-                    hour:14,
-                    time_spent:983
-                 },
-                 {  
-                    day:7,
-                    hour:14,
-                    time_spent:636
-                 },
-                 {  
-                    day:2,
-                    hour:15,
-                    time_spent:906
-                 },
-                 {  
-                    day:4,
-                    hour:15,
-                    time_spent:1031
-                 },
-                 {  
-                    day:1,
-                    hour:15,
-                    time_spent:954
-                 },
-                 {  
-                    day:5,
-                    hour:15,
-                    time_spent:1199
-                 },
-                 {  
-                    day:3,
-                    hour:15,
-                    time_spent:1014
-                 },
-                 {  
-                    day:6,
-                    hour:15,
-                    time_spent:1125
-                 },
-                 {  
-                    day:7,
-                    hour:15,
-                    time_spent:712
-                 },
-                 {  
-                    day:2,
-                    hour:16,
-                    time_spent:1101
-                 },
-                 {  
-                    day:4,
-                    hour:16,
-                    time_spent:1158
-                 },
-                 {  
-                    day:1,
-                    hour:16,
-                    time_spent:1029
-                 },
-                 {  
-                    day:5,
-                    hour:16,
-                    time_spent:1364
-                 },
-                 {  
-                    day:3,
-                    hour:16,
-                    time_spent:1068
-                 },
-                 {  
-                    day:6,
-                    hour:16,
-                    time_spent:1062
-                 },
-                 {  
-                    day:7,
-                    hour:16,
-                    time_spent:736
-                 },
-                 {  
-                    day:2,
-                    hour:17,
-                    time_spent:1303
-                 },
-                 {  
-                    day:4,
-                    hour:17,
-                    time_spent:1426
-                 },
-                 {  
-                    day:1,
-                    hour:17,
-                    time_spent:1270
-                 },
-                 {  
-                    day:5,
-                    hour:17,
-                    time_spent:1455
-                 },
-                 {  
-                    day:3,
-                    hour:17,
-                    time_spent:1407
-                 },
-                 {  
-                    day:6,
-                    hour:17,
-                    time_spent:883
-                 },
-                 {  
-                    day:7,
-                    hour:17,
-                    time_spent:666
-                 },
-                 {  
-                    day:2,
-                    hour:18,
-                    time_spent:1549
-                 },
-                 {  
-                    day:4,
-                    hour:18,
-                    time_spent:1653
-                 },
-                 {  
-                    day:1,
-                    hour:18,
-                    time_spent:1350
-                 },
-                 {  
-                    day:5,
-                    hour:18,
-                    time_spent:1502
-                 },
-                 {  
-                    day:3,
-                    hour:18,
-                    time_spent:1507
-                 },
-                 {  
-                    day:6,
-                    hour:18,
-                    time_spent:830
-                 },
-                 {  
-                    day:7,
-                    hour:18,
-                    time_spent:652
-                 },
-                 {  
-                    day:2,
-                    hour:19,
-                    time_spent:998
-                 },
-                 {  
-                    day:4,
-                    hour:19,
-                    time_spent:1070
-                 },
-                 {  
-                    day:1,
-                    hour:19,
-                    time_spent:787
-                 },
-                 {  
-                    day:5,
-                    hour:19,
-                    time_spent:1027
-                 },
-                 {  
-                    day:3,
-                    hour:19,
-                    time_spent:1019
-                 },
-                 {  
-                    day:6,
-                    hour:19,
-                    time_spent:575
-                 },
-                 {  
-                    day:7,
-                    hour:19,
-                    time_spent:519
-                 },
-                 {  
-                    day:2,
-                    hour:20,
-                    time_spent:661
-                 },
-                 {  
-                    day:4,
-                    hour:20,
-                    time_spent:756
-                 },
-                 {  
-                    day:1,
-                    hour:20,
-                    time_spent:596
-                 },
-                 {  
-                    day:5,
-                    hour:20,
-                    time_spent:730
-                 },
-                 {  
-                    day:3,
-                    hour:20,
-                    time_spent:648
-                 },
-                 {  
-                    day:6,
-                    hour:20,
-                    time_spent:494
-                 },
-                 {  
-                    day:7,
-                    hour:20,
-                    time_spent:486
-                 },
-                 {  
-                    day:2,
-                    hour:21,
-                    time_spent:431
-                 },
-                 {  
-                    day:4,
-                    hour:21,
-                    time_spent:539
-                 },
-                 {  
-                    day:1,
-                    hour:21,
-                    time_spent:430
-                 },
-                 {  
-                    day:5,
-                    hour:21,
-                    time_spent:509
-                 },
-                 {  
-                    day:3,
-                    hour:21,
-                    time_spent:457
-                 },
-                 {  
-                    day:6,
-                    hour:21,
-                    time_spent:443
-                 },
-                 {  
-                    day:7,
-                    hour:21,
-                    time_spent:421
-                 },
-                 {  
-                    day:2,
-                    hour:22,
-                    time_spent:352
-                 },
-                 {  
-                    day:4,
-                    hour:22,
-                    time_spent:428
-                 },
-                 {  
-                    day:1,
-                    hour:22,
-                    time_spent:362
-                 },
-                 {  
-                    day:5,
-                    hour:22,
-                    time_spent:462
-                 },
-                 {  
-                    day:3,
-                    hour:22,
-                    time_spent:390
-                 },
-                 {  
-                    day:6,
-                    hour:22,
-                    time_spent:379
-                 },
-                 {  
-                    day:7,
-                    hour:22,
-                    time_spent:324
-                 },
-                 {  
-                    day:2,
-                    hour:23,
-                    time_spent:329
-                 },
-                 {  
-                    day:4,
-                    hour:23,
-                    time_spent:381
-                 },
-                 {  
-                    day:1,
-                    hour:23,
-                    time_spent:293
-                 },
-                 {  
-                    day:5,
-                    hour:23,
-                    time_spent:393
-                 },
-                 {  
-                    day:3,
-                    hour:23,
-                    time_spent:313
-                 },
-                 {  
-                    day:6,
-                    hour:23,
-                    time_spent:374
-                 },
-                 {  
-                    day:7,
-                    hour:23,
-                    time_spent:288
-                 },
-                 {  
-                    day:2,
-                    hour:24, // 24-1 ate 24-1.59 -> corresponde ao intervalo 23 ate 23.59
-                    time_spent:211
-                 },
-                 {  
-                    day:4,
-                    hour:24,
-                    time_spent:249
-                 },
-                 {  
-                    day:1,
-                    hour:24,
-                    time_spent:204
-                 },
-                 {  
-                    day:5,
-                    hour:24,
-                    time_spent:417
-                 },
-                 {  
-                    day:3,
-                    hour:24,
-                    time_spent:211
-                 },
-                 {  
-                    day:6,
-                    hour:24,
-                    time_spent:379
-                 },
-                 {  
-                    day:7,
-                    hour:24,
-                    time_spent:203
+                    time_spent:10,
+                    label:"ist"
                  }
               ];
 
@@ -2349,10 +1544,6 @@ var stays=[
                       .append("g")
                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-              var tooltip = d3.select($elem[0]).append('div') 
-                  .attr("class", "stays-tooltip")      
-                  .style("opacity", 0);
-
               //Reset the overall font size
               var newFontSize = width * 62.5 / 900;
               d3.select("html").style("font-size", newFontSize + "%");
@@ -2383,48 +1574,52 @@ var stays=[
               var heatMap = svg.selectAll(".hour")
                   .data(stays)
                   .enter().append("rect")
+
+                    //----attach data to rect---
+                   .attr("data", function(d, i) { return d.label;})
+                   .attr("data2", function(d, i) { return d.time_spent;})
+                   .attr("onmouseover","showData(evt)")
+                   .attr("onmouseout","hideData(evt)")
                   .attr("x", function(d) { return (d.hour - 1) * gridSize; })
                   .attr("y", function(d) { return (d.day - 1) * gridSize; })
-                  //.attr("rx", 4)
-                  // .attr("ry", 4)
                   .attr("class", "hour bordered")
                   .attr("width", gridSize)
                   .attr("height", gridSize)
                   .style("stroke", "white")
                   .style("stroke-opacity", 0.6)
                   .style("stroke-width", 0.8)
-                  .style("fill", function(d) { return colorScale(d.time_spent); })
-                  .on("mouseover", function(d, i) {
-                      
-                      // Construct tooltip
-                      var tooltip_html = '';
-                      tooltip_html += '<div class="header"><strong>' + 'Stays' + ' </strong></div>';
-                      
-                      // Add info to the tooltip
-                      angular.forEach(d.summary, function (d) {
-                        tooltip_html += '<div><span><strong>' + makeid() + '</strong></span>';
-                        tooltip_html += '<span>' + d.time_spent + '</span></div>';
-                      });
-                      
-                      // Set tooltip width
-                      tooltip.html(tooltip_html)
-                        .style("width", 300 + "px")
-                        .style("left", (d3.event.layerX+10) + "px")
-                        .style("top", (d3.event.layerY+10) + "px");
+                  .style("fill", function(d) { return colorScale(d.time_spent); });
 
-                      // Tooltip transition and more styling
-                      tooltip.style('display', 'block')
-                      .transition()
-                        .ease('ease-in')
-                        .duration(100)    
-                        .style("opacity", .9);
-                  })
-                  .on("mouseout", function(d) {    
-                      tooltip.transition()
-                              .duration(100)
-                              .ease('ease-in')
-                              .style('opacity', 0); 
-                  });
+                  window.showData = function(evt) {
+                      var target=evt.target
+                      target.setAttribute("opacity",".8")
+
+                      //---locate dataDiv near cursor--
+                      var x = evt.layerX;
+                      var y = evt.layerY;
+
+                      dataDiv.style.width=200+"px"
+                      dataDiv.style.left=10+x+"px"
+                      dataDiv.style.top=10+y+"px"
+                      //---data--
+                      var data=target.getAttribute("data")
+                      var data2=target.getAttribute("data2")
+
+                      //---format as desired---
+                      var html=data
+                      var html2=data2
+                      dataDiv.innerHTML = '<div class="header"><strong>' + 'Stays' + ' </strong></div><br>'
+                                            + '<div><span><strong>' + html + '</strong></span>' + '<span>' 
+                                            + '&nbsp' + '&nbsp' + '&nbsp'+ '&nbsp' + '&nbsp'
+                                            + html2 + ' minutes' + '</span></div>';
+                      dataDiv.style.visibility="visible"
+
+                  }
+                  window.hideData = function(evt) {
+                      dataDiv.style.visibility="hidden"
+                      var target=evt.target
+                      target.removeAttribute("opacity")
+                  }
 
               $elem[0].svg = svg;
 

@@ -65,7 +65,9 @@
               <button class="btn btn-primary btn-xs" id="barchart-frequency" ng-click="frequencyDataset()" autocomplete="off">Frequency</button>
               <button class="btn btn-primary btn-xs" id="barchart-timespent" ng-click="timespentDataset()" autocomplete="off">Time Spent</button>
             </bar-chart>
-            <stays-graph ng-if="widget.type == 'stays'"></stays-graph>
+            <stays-graph ng-if="widget.type == 'stays'">
+              <div  id=dataDiv class="stays-tooltip" ></div>
+            </stays-graph>
             <arc-diagram ng-if="widget.type == 'arc'"></arc-diagram>
         </li>
     <ul>

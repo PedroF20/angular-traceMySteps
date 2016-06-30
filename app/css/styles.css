@@ -502,7 +502,8 @@ div.arc-tooltip {
   font-size:12px;
 }
 
-div.stays-tooltip { 
+.stays-tooltip { 
+  visibility:hidden;
   pointer-events: none;
   position: absolute;
   z-index: 9999;
@@ -514,7 +515,7 @@ div.stays-tooltip {
   line-height: 14px;
   color: rgb(51, 51, 51);
   font-family: Helvetica, arial, 'Open Sans', sans-serif;
-  background: rgb(255, 255, 255);     
+  background: rgba(255, 255, 255, 0.9);     
 }
 
 /* STAYS GRAPH */
