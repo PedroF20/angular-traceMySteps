@@ -1267,7 +1267,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           //   jsonResNodes=d;
           // });
           
-          
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
@@ -1294,6 +1293,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             edges[x].source = nodeHash[edges[x].source];
             edges[x].target = nodeHash[edges[x].target];
           }
+
         
           function createArcGraph () {
 
@@ -1356,7 +1356,19 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("stroke-width", function(d) {return d.frequency * 2})
                 .style("opacity", .25)
                 .style("fill", "none")
-                .attr("d", arc)
+                .attr("d", function (d) {
+
+                    var draw = d3.svg.line().interpolate("basis");
+                    // console.log(d);
+                    // console.log(i)
+                    var midX = (d.source.x + d.target.x) / 2;
+                    var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
+                    // console.log(midX);
+                    // console.log(midY);
+                    // colocar divisão diferente para cada intervalo de nr de elementos
+                    // ex: elementos < 10, (1200/height)->(200/height)
+                    return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
+                })
                 .on("mouseover", edgeOver)
                 .on("mouseout", function(d) {    
                     tooltip.transition()    
@@ -1364,7 +1376,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                         .style("opacity", 0); 
                 });
 
-              
               arcG.selectAll("circle")
                 .data(nodes)
                 .enter()
@@ -1382,18 +1393,19 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                         .style("opacity", 0); 
                 });
 
-              function arc(d,i) {
-                var draw = d3.svg.line().interpolate("basis");
-                console.log(d);
-                console.log(i)
-                var midX = (d.source.x + d.target.x) / 2;
-                var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
-                // console.log(midX);
-                // console.log(midY);
-                // colocar divisão diferente para cada intervalo de nr de elementos
-                // ex: elementos < 10, (1200/height)->(200/height)
-                return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
-              }
+
+              // function arc(d,i) {
+              //   var draw = d3.svg.line().interpolate("basis");
+              //   // console.log(d);
+              //   // console.log(i)
+              //   var midX = (d.source.x + d.target.x) / 2;
+              //   var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
+              //   // console.log(midX);
+              //   // console.log(midY);
+              //   // colocar divisão diferente para cada intervalo de nr de elementos
+              //   // ex: elementos < 10, (1200/height)->(200/height)
+              //   return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
+              // }
               
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
