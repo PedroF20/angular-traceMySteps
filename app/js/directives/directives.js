@@ -948,43 +948,14 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
   var delay=350;
   var jsonRes=null;
 
-/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-var chordData = [{
-                  "from": "INESC",
-                  "to": ["IST", "home", "Atrium Saldanha", "Atrium Saldanha", "Atrium Saldanha", "Atrium Saldanha"]
-                }, {
-                  "from": "home",
-                  "to": ["IST", "INESC"]
-                }, {
-                  "from": "Atrium Saldanha",
-                  "to": ["IST", "INESC", "IST", "INESC", "Choupana caffe"]
-                }, {
-                  "from": "IST",
-                  "to": ["home", "INESC", "Estádio da Luz", "Arco do Cego"]
-                }, {
-                  "from": "Estádio da Luz",
-                  "to": ["home", "Colombo"]
-                }, {
-                  "from": "grandmother's house",
-                  "to": ["home", "Forum Montijo"]
-                }, {
-                  "from": "INESC",
-                  "to": ["home", "Forum Montijo"]
-                }]
-
-
-/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-
   return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          // DataManagerService.get('/chord', []).then(function(d) {
-          //   jsonRes=d;
-          // });
+          DataManagerService.get('/chord', []).then(function(d) {
+            jsonRes=d;
+          });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -1000,13 +971,14 @@ var chordData = [{
             createChordGraph();
            });
 
+
           function createChordGraph () {
 
             setTimeout(function() {
 
               $elem[0].svg = null;
 
-              var margin = {top: 20, right: 10, bottom: 20, left: 10},
+              var margin = {top: 20, right: 0, bottom: 20, left: 0},
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
                   height = $elem[0].parentNode.clientHeight - margin.top - margin.bottom,
                   // outerRadius = 400 / 2,
@@ -1027,6 +999,12 @@ var chordData = [{
                   .innerRadius(innerRadius)
                   .outerRadius(outerRadius);
 
+              var transformation = [];
+
+              var transformation = jsonRes.map(el => (
+                { from: el.from, to: el.to }
+              ));
+
               d3.select($elem[0]).selectAll("svg").remove()
 
               var svg = d3.select($elem[0]).append("svg")
@@ -1040,24 +1018,26 @@ var chordData = [{
                   matrix = [],
                   n = 0;
 
-              // Compute a unique index for each package name.
-              chordData.forEach(function(d) {
+              // Compute a unique index for each trip.
+              transformation.forEach(function(d) {
                 if (!indexByFromName.has(d = d.from)) {
                   fromNameByIndex.set(n, d);
                   indexByFromName.set(d, n++);
                 }
               });
 
-              // Construct a square matrix counting package imports.
-              chordData.forEach(function(d) {
+              // Best to have the transformation used.
+              // It secures all the data is processed first before used
+              // Construct a square matrix counting trips.
+              transformation.forEach(function(d) {
                   var source = indexByFromName.get(d.from),
                       row = matrix[source];
-                      //console.log(source);
                   if (!row) {
                    row = matrix[source] = [];
                    for (var i = -1; ++i < n;) row[i] = 0;
                   }
-                  d.to.forEach(function(d) { row[indexByFromName.get(d)]++; });
+                  //d.to.forEach(function(d) { row[indexByFromName.get(d)]++; });
+                  row[indexByFromName.get(d.to)]++;
               });
 
               chord.matrix(matrix);
@@ -1147,107 +1127,107 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
  var nodes = [{ 
-                id: "Rialva"
+                "id": "Rialva"
               }, {
-                id: "INESC"
+                "id": "INESC"
               }, {
-                id: "IST alameda"
+                "id": "IST alameda"
               }, {
-                id: "home"
+                "id": "home"
               }, {
-                id: "Atrium Saldanha"
+                "id": "Atrium Saldanha"
               }, {
-                id: "grandmother's house"
+                "id": "grandmother's house"
               }, {
-                id: "friend's house"
+                "id": "friend's house"
               }, {
-                id: "airport"
+                "id": "airport"
               }, {
-                id: "beach"
+                "id": "beach"
               }, {
-                id: "alameda station"
+                "id": "alameda station"
               }, {
-                id: "saldanha station"
+                "id": "saldanha station"
               }, {
-                id: "dolce vita monumental"
+                "id": "dolce vita monumental"
               }, {
-                id: "choupana caffe"
+                "id": "choupana caffe"
               }, {
-                id: "forum montijo"
+                "id": "forum montijo"
               }, {
-                id: "domus bar"
+                "id": "domus bar"
               }, {
-                id: "IST taguspark"
+                "id": "IST taguspark"
               }, {
-                id: "INCM"
+                "id": "INCM"
               }, {
-                id: "Estádio da Luz"
+                "id": "Estádio da Luz"
               }];
 
   var edges = [{ 
-                source: "Rialva",
-                target: "Estádio da Luz",
-                frequency: 5
+                "source": "Rialva",
+                "target": "Estádio da Luz",
+                "frequency": 5
               }, {
-                source: "INESC",
-                target: "home",
-                frequency: 6
+                "source": "INESC",
+                "target": "home",
+                "frequency": 6
               }, {
-                source: "IST alameda",
-                target: "home",
-                frequency: 3
+                "source": "IST alameda",
+                "target": "home",
+                "frequency": 3
               }, {
-                source: "home",
-                target: "INESC",
-                frequency: 8
+                "source": "home",
+                "target": "INESC",
+                "frequency": 8
               }, {
-                source: "Atrium Saldanha",
-                target: "IST alameda",
-                frequency: 4
+                "source": "Atrium Saldanha",
+                "target": "IST alameda",
+                "frequency": 4
               }, {
-                source: "home",
-                target: "grandmother's house",
-                frequency: 9
+                "source": "home",
+                "target": "grandmother's house",
+                "frequency": 9
               }, {
-                source: "home",
-                target: "domus bar",
-                frequency: 3
+                "source": "home",
+                "target": "domus bar",
+                "frequency": 3
               }, {
-                source: "IST alameda",
-                target: "dolce vita monumental",
-                frequency: 6
+                "source": "IST alameda",
+                "target": "dolce vita monumental",
+                "frequency": 6
               }, {
-                source: "IST alameda",
-                target: "IST taguspark",
-                frequency: 3
+                "source": "IST alameda",
+                "target": "IST taguspark",
+                "frequency": 3
               }, {
-                source: "IST taguspark",
-                target: "IST alameda",
-                frequency: 2
+                "source": "IST taguspark",
+                "target": "IST alameda",
+                "frequency": 2
               }, {
-                source: "alameda station",
-                target: "saldanha station",
-                frequency: 1
+                "source": "alameda station",
+                "target": "saldanha station",
+                "frequency": 1
               }, {
-                source: "home",
-                target: "airport",
-                frequency: 1
+                "source": "home",
+                "target": "airport",
+                "frequency": 1
               }, {
-                source: "INESC",
-                target: "INCM",
-                frequency: 7
+                "source": "INESC",
+                "target": "INCM",
+                "frequency": 7
               }, {
-                source: "forum montijo",
-                target: "home",
-                frequency: 6
+                "source": "forum montijo",
+                "target": "home",
+                "frequency": 6
               }, {
-                source: "INESC",
-                target: "choupana caffe",
-                frequency: 2
+                "source": "INESC",
+                "target": "choupana caffe",
+                "frequency": 2
               }, {
-                source: "home",
-                target: "beach",
-                frequency: 2
+                "source": "home",
+                "target": "beach",
+                "frequency": 2
               }];
 
 
