@@ -1243,9 +1243,9 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           //   jsonResEdges=d;
           // });
 
-          // DataManagerService.get('/arcnodes', []).then(function(d) {
-          //   jsonResNodes=d;
-          // });
+          DataManagerService.get('/arcnodes', []).then(function(d) {
+            jsonResNodes=d;
+          });
           
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -1262,12 +1262,12 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
            });
           
           expEdges = edges;
-          expNodes = nodes;
+          expNodes = jsonResNodes;
           
           var nodeHash = {};
-          for (x in nodes) {
-            nodeHash[nodes[x].id] = nodes[x];
-            nodes[x].x = parseInt(x) * 50;
+          for (x in jsonResNodes) {
+            nodeHash[jsonResNodes[x].id] = jsonResNodes[x];
+            jsonResNodes[x].x = parseInt(x) * 50;
           }
           for (x in edges) {
             edges[x].source = nodeHash[edges[x].source];
@@ -1326,6 +1326,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                         .attr("transform", "translate(" + (2/-width) + "," + (height/2) + ")"); 
                         //.attr("transform", "translate(50,250)");
 
+              var transformation = [];
+
+              var transformation = jsonResNodes.map(el => (
+                { id: el.id}
+              ));
 
               arcG.selectAll("path")
                 .data(edges)
@@ -1339,7 +1344,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .attr("d", function (d) {
 
                     var draw = d3.svg.line().interpolate("basis");
-                    // console.log(d);
+                     console.log(d);
                     // console.log(i)
                     var midX = (d.source.x + d.target.x) / 2;
                     var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
@@ -1356,8 +1361,10 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                         .style("opacity", 0); 
                 });
 
+              
+
               arcG.selectAll("circle")
-                .data(nodes)
+                .data(jsonResNodes)
                 .enter()
                 .append("circle")
                 .attr("id", "arccircle")
