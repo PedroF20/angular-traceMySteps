@@ -655,70 +655,20 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
   var delay=350;
 
-  var jsonRes1=null;
-  var jsonRes2=null;
+  var jsonResFrequency=null;
+  var jsonResTime=null;
 
   var resizeFlag=1; // flag for the resize $watch in order to draw the correct graph when resing
                     // 1->draw frequency 2->draw timespent
 
+  function datasetSort (dataset) {
+      result = dataset.sort(function(a, b) {  // function to sort the data descendingly
+                        return a.value - b.value;
+                    }).reverse();
+      return result;
+  }
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-          FrequencyData = [{
-                            label: "Rialva",
-                            value: 22
-                          }, {
-                            label: "INESC",
-                            value: 33
-                          }, {
-                            label: "IST",
-                            value: 4
-                          }, {
-                            label: "Casa",
-                            value: 15
-                          }, {
-                            label: "Atrium Saldanha",
-                            value: 36
-                          }, {
-                            label: "Estádio da Luz",
-                            value: 0
-                          }, {
-                            label: "QWERTY",
-                            value: 0
-                          }, {
-                            label: "AZERTY",
-                            value: 14
-                          }, {
-                            label: "AAAAAA",
-                            value: 20
-                          }, {
-                            label: "BBBBBB",
-                            value: 30
-                          }, {
-                            label: "CCCCCC",
-                            value: 40
-                          }, {
-                            label: "DDDDDDD",
-                            value: 45
-                          }, {
-                            label: "EEEEEE",
-                            value: 21
-                          }, {
-                            label: "FFFFFFF",
-                            value: 31
-                          }, {
-                            label: "GGGGGGG",
-                            value: 18
-                          }, {
-                            label: "eweqwww",
-                            value: 18
-                          }, {
-                            label: "eqewe",
-                            value: 18
-                          }, {
-                            label: "fsdfs",
-                            value: 18
-                          }];
 
           TimeSpentData = [{
                             label: "Rialva",
@@ -727,8 +677,11 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                             label: "INESC",
                             value: 20
                           }, {
-                            label: "IST",
+                            label: "ist",
                             value: 30
+                          }, {
+                            label: "ist",
+                            value: 40
                           }, {
                             label: "Casa",
                             value: 5
@@ -748,23 +701,37 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
       scope: true,
       link: function($scope, $elem, $attr, $http) {
 
-          // DataManagerService.get('/barchartFrequency', []).then(function(d) {
-          //   jsonRes1=d;
-          // });
+          DataManagerService.get('/barchartFrequency', []).then(function(d) {
+            jsonResFrequency=d;
+            datasetSort(jsonResFrequency);
+          });
 
           // DataManagerService.get('/barchartTime', []).then(function(d) {
-          //   jsonRes2=d;
+          //  jsonResTime=d;
+          //  concatenateStays(jsonResTime);
           // });
+
+          function concatenateStays(list_of_stays) {
+
+            // somar os tempos de stays com a mesma label
+            // ou fazer isto no backend
+            // procurar sobre iterador/comparador em python
+
+
+            datasetSort(result);
+            return result;
+          }
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
               if(resizeFlag==1) {
-                createBarChart(FrequencyData, resizeFlag);
+                createBarChart(jsonResFrequency, resizeFlag);
               }
               if(resizeFlag==2) {
                 createBarChart(TimeSpentData, resizeFlag);
+                //createBarChart(jsonResTime, resizeFlag);
               }
             });
 
@@ -773,10 +740,11 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             }, function ( h ) {
               if ( !h ) { return; }
               if(resizeFlag==1) {
-                createBarChart(FrequencyData, resizeFlag);
+                createBarChart(jsonResFrequency, resizeFlag);
               }
               if(resizeFlag==2) {
                 createBarChart(TimeSpentData, resizeFlag);
+                //createBarChart(jsonResTime, resizeFlag);
               }
             });
 
@@ -788,20 +756,16 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           $scope.$watchGroup(['frequency', 'timespent'], function (val) {
               if(val[0]==true && val[1]==false) {
                 resizeFlag=1;
-                createBarChart(FrequencyData, resizeFlag);
+                createBarChart(jsonResFrequency, resizeFlag);
               }
               if(val[0]==false && val[1]==true) {
                 resizeFlag=2;
                 createBarChart(TimeSpentData, resizeFlag);
+                //createBarChart(jsonResTime, resizeFlag);
               }
           });
       
           function createBarChart(dataset, resizeFlag) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
-
-            dataset = dataset.sort(function(a, b) {  // function to sort the data descendingly
-                              return a.value - b.value;
-                          }).reverse();
-            //console.log(dataset);
 
             setTimeout(function() {
 
@@ -874,10 +838,10 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("class", "bar")
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
-                      .attr("width", function(d) { return x(d.value); }) // decomment bar.transition AND return 0 if want to animate
+                      .attr("width", function(d) { console.dir(d);return x(d.value); }) // decomment bar.transition AND here return 0 if want to animate
                       // for big dataset, limit the nr of bars shown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       // ex: bars with width under certain size or bars with d.value under certain value
-                      // if(d.value<100) {return 0;}
+                      // if(d.value<10) {return 0;}
                       // else {return x(d.value);}
                       .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
@@ -890,22 +854,22 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("text-anchor", "middle")
                       .attr("fill", "white")
                       .attr("x", function(d,i) {
-                          if (d.value==0) {return x(d.value)+50;}
-                          return x(d.value)/2;
+                          //if (d.value<=10) {return;}
+                          return width/2;
                       })
                       .attr("y", function(d,i) {
-                          //if (d.value==0){return};
+                          //if (d.value<=10){return};
                           return y(d.label)+15;
                       })
                       .text(function(d){
-                        //if (d.value==0){return}; use together with limitation of the nr of bars shown
+                        //if (d.value<=10){return}; //use together with limitation of the nr of bars shown
                            return d.label;
                       });
 
 
               bar.on("mousemove", function(d){
-                      div.style("left", d3.event.pageX+"px");
-                      div.style("top", d3.event.pageY-130+"px");
+                      div.style("left", (d3.event.layerX + 10) + "px");
+                      div.style("top", (d3.event.layerY + 10) + "px");
                       div.style("display", "inline-block");
                       if (resizeFlag==1) {
                         div.html((d.value)+" times");
@@ -923,7 +887,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               // removed data:
               bar.exit().remove();
 
-              //animate updated data:
+              // ANIMATE updated data:
               // bar.transition()
               //         .duration(550)
               //         .attr("x", function(d) { return 0; })
@@ -1125,44 +1089,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
   var jsonResNodes=null;
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
- var nodes = [{ 
-                "id": "Rialva"
-              }, {
-                "id": "INESC"
-              }, {
-                "id": "IST alameda"
-              }, {
-                "id": "home"
-              }, {
-                "id": "Atrium Saldanha"
-              }, {
-                "id": "grandmother's house"
-              }, {
-                "id": "friend's house"
-              }, {
-                "id": "airport"
-              }, {
-                "id": "beach"
-              }, {
-                "id": "alameda station"
-              }, {
-                "id": "saldanha station"
-              }, {
-                "id": "dolce vita monumental"
-              }, {
-                "id": "choupana caffe"
-              }, {
-                "id": "forum montijo"
-              }, {
-                "id": "domus bar"
-              }, {
-                "id": "IST taguspark"
-              }, {
-                "id": "INCM"
-              }, {
-                "id": "Estádio da Luz"
-              }];
 
   var edges = [{ 
                 "source": "Rialva",
@@ -1434,16 +1360,6 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
   var delay=350;
   var jsonRes=null;
 
-  function makeid() { // funcao temporaria para criar labels aleatorias, em vez de estar a
-                      // adicionar novas linhas com o nome "label" ao json das stays
-      var text = "";
-      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-      for( var i=0; i < 5; i++ )
-          text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-      return text;
-  }
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
