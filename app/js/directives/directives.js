@@ -295,7 +295,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 				        height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
 				        height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
 
-				    var parseDate = d3.time.format("%b %Y").parse;
+				    var parseDate = d3.time.format("%b %Y").parse; // ex: Feb 2010
 
 				    var x = d3.time.scale().range([0, width]),
 					    x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
@@ -661,12 +661,44 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
   var resizeFlag=1; // flag for the resize $watch in order to draw the correct graph when resing
                     // 1->draw frequency 2->draw timespent
 
+
   function datasetSort (dataset) {
       result = dataset.sort(function(a, b) {  // function to sort the data descendingly
                         return a.value - b.value;
                     }).reverse();
       return result;
   }
+
+
+  function concatenateStays(stays) { 
+                              
+      var results;
+      var transformation = [];
+      var final_array;
+
+      var transformation = stays.map(el => (
+        { label: el.label, value: el.value }
+      ));
+
+      var transformation_sum = transformation.reduce(function(results, item) {
+          if (!results.hasOwnProperty(item.label)) {
+              results[item.label] = 0;
+          }
+
+          results[item.label] += item.value;
+          return results;
+      }, {});
+
+      var processed_array = Object.keys(transformation_sum).map(key => (
+        {label: key, value: transformation_sum[key]}
+      ));
+
+      final_array = datasetSort(processed_array);
+
+      return final_array;
+
+  }
+
 
 /******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
 
@@ -711,17 +743,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           //  concatenateStays(jsonResTime);
           // });
 
-          function concatenateStays(list_of_stays) {
-
-            // somar os tempos de stays com a mesma label
-            // ou fazer isto no backend
-            // procurar sobre iterador/comparador em python
-
-
-            datasetSort(result);
-            return result;
-          }
-
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
@@ -730,7 +751,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                 createBarChart(jsonResFrequency, resizeFlag);
               }
               if(resizeFlag==2) {
-                createBarChart(TimeSpentData, resizeFlag);
+                createBarChart(concatenateStays(TimeSpentData), resizeFlag); // temporary
                 //createBarChart(jsonResTime, resizeFlag);
               }
             });
@@ -743,7 +764,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                 createBarChart(jsonResFrequency, resizeFlag);
               }
               if(resizeFlag==2) {
-                createBarChart(TimeSpentData, resizeFlag);
+                createBarChart(concatenateStays(TimeSpentData), resizeFlag); // temporary
                 //createBarChart(jsonResTime, resizeFlag);
               }
             });
@@ -760,7 +781,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               }
               if(val[0]==false && val[1]==true) {
                 resizeFlag=2;
-                createBarChart(TimeSpentData, resizeFlag);
+                createBarChart(concatenateStays(TimeSpentData), resizeFlag); // temporary
                 //createBarChart(jsonResTime, resizeFlag);
               }
           });
@@ -838,7 +859,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("class", "bar")
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
-                      .attr("width", function(d) { console.dir(d);return x(d.value); }) // decomment bar.transition AND here return 0 if want to animate
+                      .attr("width", function(d) { return x(d.value); }) // decomment bar.transition AND here return 0 if want to animate
                       // for big dataset, limit the nr of bars shown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       // ex: bars with width under certain size or bars with d.value under certain value
                       // if(d.value<10) {return 0;}
