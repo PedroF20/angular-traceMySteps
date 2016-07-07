@@ -75,40 +75,40 @@ angular.module('myApp.view1', ['ngRoute'])
 	
 
 	$scope.addHexbinWidget = function() {
-		$scope.widgets.push({type: 'hexbin', name: "Hexbin Places Chart", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'hexbin', name: "My hexbin places", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addHexbinTracksWidget = function() {
-		$scope.widgets.push({type: 'hexbintracks', name: "Hexbin Tracks Chart", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'hexbintracks', name: "My hexbin tracks", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'areagradient', name: "Time (mins) Spent Moving", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
+		$scope.widgets.push({type: 'areagradient', name: "My time (mins) spent moving", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
 	};
 
 	$scope.addChordWidget = function() {
-		$scope.widgets.push({type: 'chord', name: "Travels to or from a place", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'chord', name: "My travels to or from a place", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addCalendarWidget = function() {
-		$scope.widgets.push({type: 'calendar', name: "Calendar: Frequency of places visited", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
+		$scope.widgets.push({type: 'calendar', name: "My calendar", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
 	 	maxSizeY:2, maxSizeX:5});
 	};
 
 	$scope.addTracksWidget = function() {
-		$scope.widgets.push({type: 'tracks', name: "My Tracks", draggable: true, sizeX: 2, sizeY: 2});
+		$scope.widgets.push({type: 'tracks', name: "My tracks", draggable: true, sizeX: 2, sizeY: 2});
 	};
 
 	$scope.addBarChartWidget = function() {
-		$scope.widgets.push({type: 'bar', name: "My Places", draggable: true, sizeX: 1, sizeY: 3, maxSizeY:3, maxSizeX:1});
+		$scope.widgets.push({type: 'bar', name: "My places", draggable: true, sizeX: 1, sizeY: 3, maxSizeY:3, maxSizeX:1});
 	};
 
 	$scope.addStaysGraphWidget = function() {
-		$scope.widgets.push({type: 'stays', name: "My Stays", draggable: true, sizeX: 4, sizeY: 2, maxSizeY:2, maxSizeX:5, minSizeY:2, minSizeX:4});
+		$scope.widgets.push({type: 'stays', name: "My stays", draggable: true, sizeX: 4, sizeY: 2, maxSizeY:2, maxSizeX:5, minSizeY:2, minSizeX:4});
 	};
 
 	$scope.addArcDiagramWidget = function() {
-		$scope.widgets.push({type: 'arc', name: "My Trips", draggable: true, sizeX: 5, sizeY: 2, maxSizeY:2, maxSizeX:6, minSizeY:2, minSizeX:3});
+		$scope.widgets.push({type: 'arc', name: "My trips", draggable: true, sizeX: 5, sizeY: 2, maxSizeY:2, maxSizeX:6, minSizeY:2, minSizeX:3});
 	};
 
 	$scope.clear = function() {
