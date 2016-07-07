@@ -295,7 +295,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 				        height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
 				        height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
 
-				    var parseDate = d3.time.format("%b %Y").parse; // ex: Feb 2010
+				    var parseDate = d3.time.format("%Y_%m_%d").parse;
 
 				    var x = d3.time.scale().range([0, width]),
 					    x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
@@ -345,7 +345,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 					var transformation = [];
 
 
-					var transformation = jsonRes.date_price.map(el => (
+					var transformation = jsonRes.map(el => (
 					  { date: el.date, price: el.price }
 					));
 
@@ -468,7 +468,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
           var selectedTransformation = [];
 
-          var selectedTransformation = jsonRes.date_price.map(el => (
+          var selectedTransformation = jsonRes.map(el => (
             { date: el.date, price: el.price }
           ));
 

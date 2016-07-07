@@ -63,7 +63,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 	/******* WIDGET INITIALIZATION AND FUNCTIONS *******/
 
-	$scope.widgets = [/*{type: 'area-g', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2}*/];
+	$scope.widgets = [];
 
 	// MEGA DIRECTIVE CAN BE COUNTER PRODUCTIVE, AS IT TAKES A BIG OPTIONS VARIABLE (CONTEXT)
 	// AND EACH GRAPH MUST CONTROL WHAT THEY NEED
@@ -83,7 +83,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addGradientWidget = function() {
-		$scope.widgets.push({type: 'areagradient', name: "Time (mins) Spent On Foot", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
+		$scope.widgets.push({type: 'areagradient', name: "Time (mins) Spent Moving", draggable: true, sizeX: 3, sizeY: 3, minSizeX: 2, minSizeY: 2});
 	};
 
 	$scope.addChordWidget = function() {
