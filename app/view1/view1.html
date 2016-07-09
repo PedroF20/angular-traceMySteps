@@ -1,30 +1,48 @@
 <div class="content">
 
-  <a class="btn btn-primary" id="right-panel-link" ng-click="toggle()">Visualizations Panel</a>
-      <div pageslide ps-open="checked" ps-push="true" ps-speed="0.25"> <!-- ps-key-listener="true" -->
+  <h1 id="title">TraceMySteps</h1>
+
+  <span class="glyphicon glyphicon-th pull-right" ng-click="toggleRight()"></span> <!-- Visualizations Panel -->
+      <div pageslide ps-open="checkedRight" ps-push="true" ps-speed="0.25"> <!-- ps-key-listener="true" -->
           <div style="padding:20px">
-              <h2 id="panel-title">Visualizations</h2>
-              <a ng-click="toggle()" class="glyphicon glyphicon-remove-circle" ></a>
-              <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Add Places Hexbin Graph</a>
-              <a class="btn btn-primary" id="add-hextracks-button" ng-click="addHexbinTracksWidget()">Add Tracks Hexbin Graph</a>
-              <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Add Area Gradient Graph</a>
-              <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Add Chord Graph</a>
-              <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Add Calendar</a>
-              <a class="btn btn-primary" id="add-tracks-button" ng-click="addTracksWidget()">Add Tracks</a>
-              <a class="btn btn-primary" id="add-barchart-button" ng-click="addBarChartWidget()">Add Bar Chart</a>
-              <a class="btn btn-primary" id="add-staysgraph-button" ng-click="addStaysGraphWidget()">Add Stays Graph</a>
-              <a class="btn btn-primary" id="add-arcdiagram-button" ng-click="addArcDiagramWidget()">Add Arc Diagram</a>
-              <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All Items</a>
+              <h2 id="panel-title">Add Visualizations</h2>
+              <a class="btn btn-primary" id="add-hex-button" ng-click="addHexbinWidget()">Hexbin Places</a>
+              <a class="btn btn-primary" id="add-hextracks-button" ng-click="addHexbinTracksWidget()">Hexbin Tracks</a>
+              <a class="btn btn-primary" id="add-gradient-button" ng-click="addGradientWidget()">Movement Graph</a>
+              <a class="btn btn-primary" id="add-chord-button" ng-click="addChordWidget()">Trips Chord Diagram</a>
+              <a class="btn btn-primary" id="add-calendar-button" ng-click="addCalendarWidget()">Calendar</a>
+              <a class="btn btn-primary" id="add-tracks-button" ng-click="addTracksWidget()">Tracks</a>
+              <a class="btn btn-primary" id="add-barchart-button" ng-click="addBarChartWidget()">Places</a>
+              <a class="btn btn-primary" id="add-staysgraph-button" ng-click="addStaysGraphWidget()">Stays</a>
+              <a class="btn btn-primary" id="add-arcdiagram-button" ng-click="addArcDiagramWidget()">Trips Network</a>
+              <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All</a>
           </div>
       </div>
+  <span class="glyphicon glyphicon-question-sign pull-right" ng-click="toggleLeft()"></span>
+    <div pageslide ps-open="checkedLeft" ps-push="true" ps-side="left" ps-speed="0.25">
+        <div style="padding:10px">
+          <h2 id="help-panel-title">Help</h2>
+          <p id="intro-paragraph">TraceMySteps allows you to analyze your personal geo-location
+            data, with focus on <strong>personal semantics</strong>.
+          </p>
+          <p id="menu-paragraph"><strong>Menu button</strong>: choose which visualization
+            you want to add to the dashboard.
+          </p>
+          <p id="clean-paragraph"><strong>Clean the dashboard</strong>: click on <strong>'Clear All'</strong>.
+          </p>
+          <p id="slider-paragraph"><strong>Slider</strong>: select the <strong>time interval</strong> in which you want
+            to analyze the data.
+          </p>
+          <p id="widget-paragraph">Each widget is <strong>draggable</strong> and some are <strong>resizable</strong>.
+            The <strong>trash button</strong> allows the <strong>deletion</strong> of that single widget.
+            The <strong>pin button</strong> fixes the widget on its current position.
+          </p>
+          <p id="credits-paragraph">
+            Author: <a href="https://github.com/PedroF20">Pedro Francisco</a>, MIT License
+          </p>
+        </div>
+    </div>
 
-    <p>
-        <a href="#">
-            <span class="glyphicon glyphicon-cog pull-right"></span>
-        </a>
-    </p>
-
-    <h1>TraceMySteps</h1>
 
         <div range-slider
              floor="0"

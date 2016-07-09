@@ -11,12 +11,19 @@ angular.module('myApp.view1', ['ngRoute'])
 
 .controller('View1Ctrl', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http) {
 
-	/******* RIGHT PANEL FUNCTIONS *******/
+	/******* RIGHT/LEFT PANEL FUNCTIONS *******/
 
-	$scope.checked = false; // This will be binded using the ps-open attribute
+	$scope.checkedRight = false; // This will be binded using the ps-open attribute
 
-    $scope.toggle = function(){
-        $scope.checked = !$scope.checked;  
+    $scope.toggleRight = function(){
+        $scope.checkedRight = !$scope.checkedRight;  
+    }
+
+
+	$scope.checkedLeft = false; // This will be binded using the ps-open attribute
+
+    $scope.toggleLeft = function(){
+        $scope.checkedLeft = !$scope.checkedLeft;  
     }
 
     /*********************************************************************/
