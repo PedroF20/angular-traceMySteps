@@ -30,14 +30,33 @@ angular.module('myApp.view1', ['ngRoute'])
 
 
 
-    /******* GRIDSTER AND CONTEXT OPTIONS/VARIABLES *******/
+    /************ GRIDSTER AND SLIDER CONTEXT OPTIONS/VARIABLES ************/
 
-	$scope.context = {
-		lowerValue: 0,  //at the moment, the initial day and final day are hardcoded
-		upperValue: 18, //this context has general data that every vis can fetch if they need
-		hourStart: 0,	//the specific data for each vis is in the directive: "widget.xxxxxx"
-		hourEnd: 2400,	//the interval of hours here is common sense. they can be hardcoded
-	}
+		//this context has general data that every vis can fetch if they need
+		//the specific data for each vis is in the directive: "widget.xxxxxx"
+
+	$scope.slider = {
+	    minValue: 0,   // min value where the slider starts
+	    maxValue: 100, // max value where the slider starts
+	    options: {
+	        floor: 0,
+	        ceil: 100,
+	        step: 1,
+	        noSwitching: true,
+	        translate: function(value, sliderId, label) {
+		      switch (label) {
+		        case 'model':
+		         	return '<b>Start date:</b> ' + value;
+		        case 'high':
+		         	return '<b>End date:</b> ' + value;
+		        case 'floor':
+		         	return '<b>Min date:</b> ' + value;
+		        case 'ceil':
+		        	return '<b>Max date:</b> ' + value;
+		      }
+		    }
+	    }
+	};
 
 	$scope.gridsterOpts = {
 	    columns: 6, // the width of the grid, in columns 

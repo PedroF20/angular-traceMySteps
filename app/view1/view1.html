@@ -18,6 +18,7 @@
               <a class="btn btn-primary" id="clear-items-button" ng-click="clear()">Clear All</a>
           </div>
       </div>
+
   <span class="glyphicon glyphicon-question-sign pull-right" ng-click="toggleLeft()"></span>
     <div pageslide ps-open="checkedLeft" ps-push="true" ps-side="left" ps-speed="0.25">
         <div style="padding:10px">
@@ -44,13 +45,11 @@
     </div>
 
 
-        <div range-slider
-             floor="0"
-             ceiling="18"
-             dragstop="true"
-             ng-model-low="context.lowerValue"
-             ng-model-high="context.upperValue">
-        </div>
+    <rzslider rz-slider-model="slider.minValue"
+          rz-slider-high="slider.maxValue"
+          rz-slider-options="slider.options">
+    </rzslider>
+
 </div>
 
 
@@ -90,9 +89,3 @@
         </li>
     <ul>
 </div>
-
-<!-- row="extraBox.row" col="extraBox.col" we can later use the row and column attributes
-    to put the new Items where we desire
-
-    we can also add a mechanism to help identify individual boxes -->
-

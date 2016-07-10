@@ -6,7 +6,7 @@ var app = angular.module('myApp', [
   'myApp.view1',
   'myApp.view2',
   'myApp.version',
-  'angularRangeSlider',
+  'rzModule',
   'gridster',
   'pageslide-directive'
 ]);
