@@ -118,32 +118,22 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var hextrackmaps = [];
-
   var hextrackmap = undefined;
   var center = [38.7, -9.1];
   var latFn = d3.random.normal(center[0], 0.5);
   var longFn = d3.random.normal(center[1], 0.5);
-  var trackdata = [];
   var jsonRes=null;
   var hexmapCount=0;
 
-  function generateData(){
-      for(i=0; i<10000; i++){
-          trackdata.push([longFn(),  latFn()]);
-      }
-  };
-
-  generateData();
 
   return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        // DataManagerService.get('/hexbinTracks', []).then(function(d) {
-        //   jsonRes=d;
-        //   createHexbinTracksGraph();
-        // });
+        DataManagerService.get('/hexbinTracks', []).then(function(d) {
+          jsonRes=d;
+        });
 
         var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -152,8 +142,8 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
         angular.element($elem[0]).append(angular.element('<div id="hextrackmap'+ hexmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
         console.log('hextrackmap'+ hexmapCount +'');
         hextrackmaps[hexmapCount] = new L.Map('hextrackmap'+ hexmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-        var layer1 = osm.addTo(hextrackmaps[hexmapCount]);
-        
+        var layer1 = osm.addTo(hextrackmaps[hexmapCount]);        
+        createHexbinTracksGraph();
 
         $scope.$watch(function () {
           return $elem[0].parentNode.clientWidth;
@@ -194,37 +184,38 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
             rootScopeBroadcastLeave();
         })
             
-        function createHexbinTracksGraph () {
+          function createHexbinTracksGraph () {
 
-            var options = {
-                radius : 12,
-                opacity: 0.5,
-                duration: 500,
-                lng: function(d){
-                    return d[0];
-                },
-                lat: function(d){
-                    return d[1];
-                },
-                value: function(d){
-                    return d.length;
-                },
-                valueFloor: 0,
-                valueCeil: undefined,
-                onmouseover: function(d, node, layer) {
-                  //console.log(d);
-                }
-            };
+              var options = {
+                  radius : 12,
+                  opacity: 0.5,
+                  duration: 500,
+                  lng: function(d){
+                      return d[0];
+                  },
+                  lat: function(d){
+                      return d[1];
+                  },
+                  value: function(d){
+                      return d.length;
+                  },
+                  valueFloor: 0,
+                  valueCeil: undefined,
+                  onmouseover: function(d, node, layer) {
+                    //console.log(d);
+                  }
+              };
 
-            var hexLayer = L.hexbinLayer(options).addTo(hextrackmaps[hexmapCount])
-            hexLayer.colorScale().range(['white', 'blue']);
-            console.log(trackdata);
-            hexLayer.data(trackdata);
-            hextrackmaps[hexmapCount].invalidateSize();
+              var hexLayer = L.hexbinLayer(options).addTo(hextrackmaps[hexmapCount])
 
-         }
-            createHexbinTracksGraph();
+              hexLayer.colorScale().range(['white', 'blue']);
+              hexLayer.data(jsonRes);
+              hextrackmaps[hexmapCount].invalidateSize();
+          }
+
+            
             hexmapCount++;
+
         }
       }
 
