@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http) {
+.controller('View1Ctrl', ['$scope', '$rootScope', function($scope, $rootScope) {
 
 	/******* RIGHT/LEFT PANEL FUNCTIONS *******/
 

@@ -118,10 +118,9 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var hextrackmaps = [];
+  var delay=1000;
   var hextrackmap = undefined;
   var center = [38.7, -9.1];
-  var latFn = d3.random.normal(center[0], 0.5);
-  var longFn = d3.random.normal(center[1], 0.5);
   var jsonRes=null;
   var hexmapCount=0;
 
@@ -135,15 +134,21 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
           jsonRes=d;
         });
 
+        setTimeout(function() {
+
         var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
+
 
         angular.element($elem[0]).append(angular.element('<div id="hextrackmap'+ hexmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
         console.log('hextrackmap'+ hexmapCount +'');
         hextrackmaps[hexmapCount] = new L.Map('hextrackmap'+ hexmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
         var layer1 = osm.addTo(hextrackmaps[hexmapCount]);        
         createHexbinTracksGraph();
+
+        // use promises?
+        // or load the data on the beginning of the app
 
         $scope.$watch(function () {
           return $elem[0].parentNode.clientWidth;
@@ -216,6 +221,8 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
             
             hexmapCount++;
 
+          }, delay);
+
         }
       }
 
@@ -226,10 +233,6 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
 app.directive('areaGradient', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var delay=350;
-
-  // CHANGE TO "TIME SPENT ON MOVEMENT". IT IS THE SAME AS "TIME SPENT ON TRIPS"
-  // WHICH IS EASY TO CALCULATE: FOR EACH DATE WE PASS THE AMOUNT OF TIME SPENT ON TRIPS
-
 	var jsonRes=null;
 
 
@@ -617,10 +620,6 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
                 })
                 .on('click', function(e) {
                     //console.log(e);
-                    /* EXEMPLO PARA QUARTA: AO CLICAR AQUI NA TRACK, FAZER BROADCAST PARA O CALENDARIO DESENHAR
-                    A SUPOSTA DAY VIEW ASSOCIADA AO SUPOSTO DIA DESTA TRACK. FAZER BROADCAST TB PARA O AREA GRADIENT
-                    PARA REDESENHAR PARA QUALQUER ZOOM TEMPORAL. EM RELACAO AO HEXBIN MANDAR O BROADCAST PARA ESTE
-                    FAZER ZOOM PARA A ZONA DO MAPA CORRESPONDENTE A TRACK */
                     if (!isOdd(counter)) {
                       $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin', calendar: 'draw track day', area_gradient: 'draw that day'});
                       counter++;
@@ -1421,6 +1420,7 @@ var stays=[
 
           // DataManagerService.get('/staysgraph', []).then(function(d) {
           //   jsonRes=d;
+          //   also use a variation of concatenateStays() here?
           // });
           
           function getNodePos(el) {
