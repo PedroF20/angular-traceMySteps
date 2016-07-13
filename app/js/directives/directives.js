@@ -1,7 +1,7 @@
 app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var maps = [];
-
+  var delay=1000;
 	var map = undefined;
 	var center = [38.7, -9.1];
 	var latFn = d3.random.normal(center[0], 0.5);
@@ -28,87 +28,91 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
         //   createHexbinGraph();
         // });
 
+        setTimeout(function() {
 
-				var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-			    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-			    osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
+    				var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    			    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    			    osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
 
-				angular.element($elem[0]).append(angular.element('<div id="map'+ mapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
-				console.log('map'+ mapCount +'');
-				maps[mapCount] = new L.Map('map'+ mapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-				var layer1 = osm.addTo(maps[mapCount]);
-				
+    				angular.element($elem[0]).append(angular.element('<div id="map'+ mapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+    				console.log('map'+ mapCount +'');
+    				maps[mapCount] = new L.Map('map'+ mapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
+    				var layer1 = osm.addTo(maps[mapCount]);
+            createHexbinGraph();
+    				
 
-        $scope.$watch(function () {
-          return $elem[0].parentNode.clientWidth;
-        }, function ( w ) {
-          if ( !w ) { return; }
-          for(var i = 0; i < mapCount; i++) {
-            maps[i].invalidateSize();
-          }
-        });
-
-        $scope.$watch(function () {
-          return $elem[0].parentNode.clientHeight;
-        }, function ( h ) {
-          if ( !h ) { return; }
-          for(var i = 0; i < mapCount; i++) {
-            maps[i].invalidateSize();
-          }
-        });
-
-        var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
-              console.log("Hexbin broadcast: " + JSON.stringify(data.hexbin_info)); // 'Broadcast!'
-              var zoom = 15;
+            $scope.$watch(function () {
+              return $elem[0].parentNode.clientWidth;
+            }, function ( w ) {
+              if ( !w ) { return; }
               for(var i = 0; i < mapCount; i++) {
-                maps[i].setView([38.73659, -9.14090], zoom);
+                maps[i].invalidateSize();
               }
-        });
+            });
 
-        var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-          console.log("Hexbin broadcast leave"); // 'Broadcast!'
-          var zoom = 10;
-          for(var i = 0; i < mapCount; i++) {
-            maps[i].setView([center[0], center[1]], zoom);
-          }
-        });
+            $scope.$watch(function () {
+              return $elem[0].parentNode.clientHeight;
+            }, function ( h ) {
+              if ( !h ) { return; }
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].invalidateSize();
+              }
+            });
 
-        $scope.$on('$destroy', function() {
-            rootScopeBroadcast();
-            rootScopeBroadcastLeave();
-        })
-	        	
-        function createHexbinGraph () {
+            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+                  console.log("Hexbin broadcast: " + JSON.stringify(data.hexbin_info)); // 'Broadcast!'
+                  var zoom = 15;
+                  for(var i = 0; i < mapCount; i++) {
+                    maps[i].setView([38.73659, -9.14090], zoom);
+                  }
+            });
 
-  					var options = {
-  					    radius : 12,
-  					    opacity: 0.5,
-  					    duration: 500,
-  					    lng: function(d){
-  					        return d[0];
-  					    },
-  					    lat: function(d){
-  					        return d[1];
-  					    },
-  					    value: function(d){
-  					        return d.length;
-  					    },
-  					    valueFloor: 0,
-  					    valueCeil: undefined,
-                onmouseover: function(d, node, layer) {
-                  //console.log(d);
-                }
-  					};
+            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+              console.log("Hexbin broadcast leave"); // 'Broadcast!'
+              var zoom = 10;
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].setView([center[0], center[1]], zoom);
+              }
+            });
 
-  					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
-  					hexLayer.colorScale().range(['white', 'blue']);
+            $scope.$on('$destroy', function() {
+                rootScopeBroadcast();
+                rootScopeBroadcastLeave();
+            })
+    	        	
+            function createHexbinGraph () {
 
-  					hexLayer.data(data);
-  					maps[mapCount].invalidateSize();
+      					var options = {
+      					    radius : 12,
+      					    opacity: 0.5,
+      					    duration: 500,
+      					    lng: function(d){
+      					        return d[0];
+      					    },
+      					    lat: function(d){
+      					        return d[1];
+      					    },
+      					    value: function(d){
+      					        return d.length;
+      					    },
+      					    valueFloor: 0,
+      					    valueCeil: undefined,
+                    onmouseover: function(d, node, layer) {
+                      //console.log(d);
+                    }
+      					};
 
-	       }
-	        	createHexbinGraph();
+      					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
+      					hexLayer.colorScale().range(['white', 'blue']);
+
+      					hexLayer.data(data);
+      					maps[mapCount].invalidateSize();
+    	       }
+
 	        	mapCount++;
+            delay = 0;
+
+          }, delay);
     		}
     	}
 }]);
@@ -118,7 +122,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var hextrackmaps = [];
-  var delay=1000;
+  var delay=5000;
   var hextrackmap = undefined;
   var center = [38.7, -9.1];
   var jsonRes=null;
@@ -205,7 +209,7 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
                       valueFloor: 0,
                       valueCeil: undefined,
                       onmouseover: function(d, node, layer) {
-                        //console.log(d);
+                        //console.log(node);
                       }
                   };
 
