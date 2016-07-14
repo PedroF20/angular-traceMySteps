@@ -590,6 +590,9 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
         });
 
         $.ajax('2016-05-04 13-13-36.gpx').done(function(response) {
+
+          // apply cleaning algorithm (RDP) to all tracks in the folder in order to reduce nr of points
+          // then iterate the result and present all the new tracks
             
             var counter = 0;
 
@@ -655,21 +658,20 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                     // 1->draw frequency 2->draw timespent
 
 
-  function datasetSort (dataset) {
-      result = dataset.sort(function(a, b) {  // function to sort the data descendingly
+  function datasetSort (d) {
+      result = d.sort(function(a, b) {  // function to sort the data descendingly
                         return a.value - b.value;
                     }).reverse();
       return result;
   }
 
 
-  function concatenateStays(stays) { 
-                              
+  function concatenateStays(s) { 
       var results;
       var transformation = [];
       var final_array;
 
-      var transformation = stays.map(el => (
+      var transformation = s.map(el => (
         { label: el.label, value: el.value }
       ));
 
@@ -693,33 +695,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
   }
 
 
-/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-          TimeSpentData = [{
-                            label: "Rialva",
-                            value: 10
-                          }, {
-                            label: "INESC",
-                            value: 20
-                          }, {
-                            label: "ist",
-                            value: 30
-                          }, {
-                            label: "ist",
-                            value: 40
-                          }, {
-                            label: "Casa",
-                            value: 5
-                          }, {
-                            label: "Atrium Saldanha",
-                            value: 12
-                          }, {
-                            label: "Estádio da Luz",
-                            value: 23
-                          }];
-
-/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
   return {
 
       restrict: 'E',
@@ -728,24 +703,21 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           DataManagerService.get('/barchartFrequency', []).then(function(d) {
             jsonResFrequency=d;
-            datasetSort(jsonResFrequency);
           });
 
-          // DataManagerService.get('/barchartTime', []).then(function(d) {
-          //  jsonResTime=d;
-          //  concatenateStays(jsonResTime);
-          // });
+          DataManagerService.get('/barchartTime', []).then(function(d) {
+           jsonResTime=d;
+          });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
               if(resizeFlag==1) {
-                createBarChart(jsonResFrequency, resizeFlag);
+                createBarChart(datasetSort(jsonResFrequency), resizeFlag);
               }
               if(resizeFlag==2) {
-                createBarChart(concatenateStays(TimeSpentData), resizeFlag); // temporary
-                //createBarChart(jsonResTime, resizeFlag);
+                createBarChart(concatenateStays(jsonResTime), resizeFlag);
               }
             });
 
@@ -754,30 +726,31 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             }, function ( h ) {
               if ( !h ) { return; }
               if(resizeFlag==1) {
-                createBarChart(jsonResFrequency, resizeFlag);
+                createBarChart(datasetSort(jsonResFrequency), resizeFlag);
               }
               if(resizeFlag==2) {
-                createBarChart(concatenateStays(TimeSpentData), resizeFlag); // temporary
-                //createBarChart(jsonResTime, resizeFlag);
+                createBarChart(concatenateStays(jsonResTime), resizeFlag);
               }
             });
+
 
           // $scope.$on('$destroy', function() {
           //   rootScopeBroadcast();
           //   rootScopeBroadcastLeave();
           // })
+        
 
           $scope.$watchGroup(['frequency', 'timespent'], function (val) {
               if(val[0]==true && val[1]==false) {
                 resizeFlag=1;
-                createBarChart(jsonResFrequency, resizeFlag);
+                createBarChart(datasetSort(jsonResFrequency), resizeFlag);
               }
               if(val[0]==false && val[1]==true) {
                 resizeFlag=2;
-                createBarChart(concatenateStays(TimeSpentData), resizeFlag); // temporary
-                //createBarChart(jsonResTime, resizeFlag);
+                createBarChart(concatenateStays(jsonResTime), resizeFlag);
               }
           });
+
       
           function createBarChart(dataset, resizeFlag) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
 
