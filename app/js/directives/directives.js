@@ -703,16 +703,19 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           DataManagerService.get('/barchartFrequency', []).then(function(d) {
             jsonResFrequency=d;
+            createBarChart(datasetSort(jsonResFrequency), resizeFlag);
           });
 
           DataManagerService.get('/barchartTime', []).then(function(d) {
            jsonResTime=d;
+           createBarChart(concatenateStays(jsonResTime), resizeFlag);
           });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
+              if(resizeFlag==0) {return;}
               if(resizeFlag==1) {
                 createBarChart(datasetSort(jsonResFrequency), resizeFlag);
               }
@@ -725,6 +728,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
               if ( !h ) { return; }
+              if(resizeFlag==0) {return;}
               if(resizeFlag==1) {
                 createBarChart(datasetSort(jsonResFrequency), resizeFlag);
               }
@@ -754,6 +758,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
       
           function createBarChart(dataset, resizeFlag) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
 
+            console.log (dataset)
             setTimeout(function() {
 
               $elem[0].svg = null;
@@ -1071,7 +1076,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
 app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-  var delay=350;
+  var delay=1500;
   var jsonResEdges=null;
   var jsonResNodes=null;
 
@@ -1081,66 +1086,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 "source": "Rialva",
                 "target": "Estádio da Luz",
                 "frequency": 5
-              }, {
-                "source": "INESC",
-                "target": "home",
-                "frequency": 6
-              }, {
-                "source": "IST alameda",
-                "target": "home",
-                "frequency": 3
-              }, {
-                "source": "home",
-                "target": "INESC",
-                "frequency": 8
-              }, {
-                "source": "Atrium Saldanha",
-                "target": "IST alameda",
-                "frequency": 4
-              }, {
-                "source": "home",
-                "target": "grandmother's house",
-                "frequency": 9
-              }, {
-                "source": "home",
-                "target": "domus bar",
-                "frequency": 3
-              }, {
-                "source": "IST alameda",
-                "target": "dolce vita monumental",
-                "frequency": 6
-              }, {
-                "source": "IST alameda",
-                "target": "IST taguspark",
-                "frequency": 3
-              }, {
-                "source": "IST taguspark",
-                "target": "IST alameda",
-                "frequency": 2
-              }, {
-                "source": "alameda station",
-                "target": "saldanha station",
-                "frequency": 1
-              }, {
-                "source": "home",
-                "target": "airport",
-                "frequency": 1
-              }, {
-                "source": "INESC",
-                "target": "INCM",
-                "frequency": 7
-              }, {
-                "source": "forum montijo",
-                "target": "home",
-                "frequency": 6
-              }, {
-                "source": "INESC",
-                "target": "choupana caffe",
-                "frequency": 2
-              }, {
-                "source": "home",
-                "target": "beach",
-                "frequency": 2
               }];
 
 
@@ -1152,9 +1097,9 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          // DataManagerService.get('/arcedges', []).then(function(d) {
-          //   jsonResEdges=d;
-          // });
+          DataManagerService.get('/arcedges', []).then(function(d) {
+            jsonResEdges=d;
+          });
 
           DataManagerService.get('/arcnodes', []).then(function(d) {
             jsonResNodes=d;
@@ -1174,18 +1119,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             createArcGraph();
            });
           
-          expEdges = edges;
-          expNodes = jsonResNodes;
-          
-          var nodeHash = {};
-          for (x in jsonResNodes) {
-            nodeHash[jsonResNodes[x].id] = jsonResNodes[x];
-            jsonResNodes[x].x = parseInt(x) * 50;
-          }
-          for (x in edges) {
-            edges[x].source = nodeHash[edges[x].source];
-            edges[x].target = nodeHash[edges[x].target];
-          }
+
 
         
           function createArcGraph () {
@@ -1193,6 +1127,22 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             setTimeout(function() {
 
               $elem[0].svg = null;
+
+              expEdges = jsonResEdges;
+              expNodes = jsonResNodes;
+              
+              var nodeHash = {};
+              for (x in jsonResNodes) {
+                nodeHash[jsonResNodes[x].id] = jsonResNodes[x];
+                jsonResNodes[x].x = parseInt(x) * 50;
+              }
+              for (x in jsonResEdges) {
+                if (typeof nodeHash[jsonResEdges[x].source] === "undefined" || typeof nodeHash[jsonResEdges[x].target] === "undefined") {}
+                else {
+                  jsonResEdges[x].source = nodeHash[jsonResEdges[x].source];
+                  jsonResEdges[x].target = nodeHash[jsonResEdges[x].target];
+                }
+              }
 
               var margin = {top: 20, right: 10, bottom: 20, left: 25},
                   width = $elem[0].parentNode.clientWidth - margin.left - margin.right,
@@ -1236,7 +1186,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 
               var arcG = svg.append("g")
                         .attr("id", "arcG")
-                        .attr("transform", "translate(" + (2/-width) + "," + (height/2) + ")"); 
+                        .attr("transform", "translate(" + (2/-width) + "," + (height/3) + ")"); 
                         //.attr("transform", "translate(50,250)");
 
               var transformation = [];
@@ -1246,7 +1196,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               ));
 
               arcG.selectAll("path")
-                .data(edges)
+                .data(jsonResEdges)
                 .enter()
                 .append("path")
                 .attr("id", "arcpath")
@@ -1254,27 +1204,13 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("stroke-width", function(d) {return d.frequency * 2})
                 .style("opacity", .25)
                 .style("fill", "none")
-                .attr("d", function (d) {
-
-                    var draw = d3.svg.line().interpolate("basis");
-                     console.log(d);
-                    // console.log(i)
-                    var midX = (d.source.x + d.target.x) / 2;
-                    var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
-                    // console.log(midX);
-                    // console.log(midY);
-                    // colocar divisão diferente para cada intervalo de nr de elementos
-                    // ex: elementos < 10, (1200/height)->(200/height)
-                    return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
-                })
+                .attr("d", arc)
                 .on("mouseover", edgeOver)
                 .on("mouseout", function(d) {    
                     tooltip.transition()    
                         .duration(100)    
                         .style("opacity", 0); 
                 });
-
-              
 
               arcG.selectAll("circle")
                 .data(jsonResNodes)
@@ -1294,18 +1230,18 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 });
 
 
-              // function arc(d,i) {
-              //   var draw = d3.svg.line().interpolate("basis");
-              //   // console.log(d);
-              //   // console.log(i)
-              //   var midX = (d.source.x + d.target.x) / 2;
-              //   var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
-              //   // console.log(midX);
-              //   // console.log(midY);
-              //   // colocar divisão diferente para cada intervalo de nr de elementos
-              //   // ex: elementos < 10, (1200/height)->(200/height)
-              //   return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
-              // }
+              function arc(d,i) {
+                var draw = d3.svg.line().interpolate("basis");
+                // console.log(d);
+                // console.log(i);
+                var midX = (d.source.x + d.target.x) / 2;
+                var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
+                // console.log(midX);
+                // console.log(midY);
+                // colocar divisão diferente para cada intervalo de nr de elementos
+                // ex: elementos < 10, (1200/height)->(200/height)
+                return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
+              }
               
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
@@ -1326,12 +1262,15 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .duration(100)    
                 .style("opacity", .9);    
                 tooltip.html("From: " + d.source.id + "<br>" + "To: " + d.target.id)
-                .style("height", 70 + "px")
+                .style("height", 50 + "px")
                 .style("left", (d3.event.layerX+10) + "px")
                 .style("top", (d3.event.layerY+10) + "px");
               }
               
               $elem[0].svg = svg;
+
+            // delay=0; test delay here on 0 for the other vizs
+            // it is a way to delete the load time used on the first copy of the viz
 
             }, delay);
           }
