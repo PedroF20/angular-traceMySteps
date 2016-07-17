@@ -9,7 +9,31 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$rootScope', function($scope, $rootScope) {
+.controller('View1Ctrl', ['DataManagerService', '$scope', '$rootScope', function(DataManagerService, $scope, $rootScope) {
+
+	/************* GET AND PARSE SLIDER DATES THROUGH SERVICE *****************/
+
+	var sliderMin = null;
+	var sliderMax = null;
+
+	DataManagerService.get('/slidermin', []).then(function(d) {
+		sliderMin=d;
+	});
+
+	DataManagerService.get('/slidermax', []).then(function(d) {
+		sliderMax=d;
+	});
+
+	// parse a date in yyyy-mm-dd format
+	function parseDate(input) {
+	  var parts = input.split('_');
+	  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
+	  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
+	}
+
+	/**************************************************************************/
+
+
 
 	/******* RIGHT/LEFT PANEL FUNCTIONS *******/
 
@@ -35,28 +59,42 @@ angular.module('myApp.view1', ['ngRoute'])
 		//this context has general data that every vis can fetch if they need
 		//the specific data for each vis is in the directive: "widget.xxxxxx"
 
-	$scope.slider = {
-	    minValue: 0,   // min value where the slider starts
-	    maxValue: 100, // max value where the slider starts
-	    options: {
-	        floor: 0,
-	        ceil: 100,
-	        step: 1,
-	        noSwitching: true,
-	        translate: function(value, sliderId, label) {
-		      switch (label) {
-		        case 'model':
-		         	return '<b>Start date:</b> ' + value;
-		        case 'high':
-		         	return '<b>End date:</b> ' + value;
-		        case 'floor':
-		         	return '<b>Min date:</b> ' + value;
-		        case 'ceil':
-		        	return '<b>Max date:</b> ' + value;
-		      }
-		    }
+
+	 function getAllDays() {
+	    var start = parseDate(sliderMin);
+	    var future = parseDate(sliderMax);
+	    var range = []
+	    var mil = 86400000 * 7 //24h
+	    for (var i = start.getTime(); i < future.getTime(); i = i + mil) {
+	      range.push(new Date(i).toLocaleDateString())
 	    }
-	};
+	    console.log(range) //range is beign badly calculated
+	    return range;
+	  };
+
+	setTimeout(function() {
+		$scope.slider = {
+		    minValue: 0,   // min value where the slider starts
+		    maxValue: 1, // max value where the slider starts
+		    options: {
+		        stepsArray: getAllDays(),
+		        noSwitching: true,
+		        translate: function(value, sliderId, label) {
+			      switch (label) {
+			        case 'model':
+			         	return '<b>Start date:</b> ' + value;
+			        case 'high':
+			         	return '<b>End date:</b> ' + value;
+			        case 'floor':
+			         	return '<b>Min date:</b> ' + value;
+			        case 'ceil':
+			        	return '<b>Max date:</b> ' + value;
+			      }
+			    }
+		    }
+		};
+	}, 1);
+
 
 	$scope.gridsterOpts = {
 	    columns: 6, // the width of the grid, in columns 
