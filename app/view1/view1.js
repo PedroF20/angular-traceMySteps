@@ -11,7 +11,7 @@ angular.module('myApp.view1', ['ngRoute'])
 
 .controller('View1Ctrl', ['DataManagerService', '$scope', '$rootScope', function(DataManagerService, $scope, $rootScope) {
 
-	/************* GET AND PARSE SLIDER DATES THROUGH SERVICE *****************/
+	/************* GET SLIDER DATES THROUGH SERVICE AND PARSE THEM *****************/
 
 	var sliderMin = null;
 	var sliderMax = null;
@@ -24,14 +24,14 @@ angular.module('myApp.view1', ['ngRoute'])
 		sliderMax=d;
 	});
 
-	// parse a date in yyyy-mm-dd format
+	// parse a date in yyyy_mm_dd format
 	function parseDate(input) {
 	  var parts = input.split('_');
 	  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
 	  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
 	}
 
-	/**************************************************************************/
+	/******************************************************************************/
 
 
 
@@ -56,28 +56,29 @@ angular.module('myApp.view1', ['ngRoute'])
 
     /************ GRIDSTER AND SLIDER CONTEXT OPTIONS/VARIABLES ************/
 
-		//this context has general data that every vis can fetch if they need
-		//the specific data for each vis is in the directive: "widget.xxxxxx"
+	// this context has general data that every vis can fetch if they need
+	// the specific data for each vis is in the directive: "widget.xxxxxx"
 
-
-	 function getAllDays() {
-	    var start = parseDate(sliderMin);
-	    var future = parseDate(sliderMax);
-	    var range = []
-	    var mil = 86400000 * 7 //24h
-	    for (var i = start.getTime(); i < future.getTime(); i = i + mil) {
-	      range.push(new Date(i).toLocaleDateString())
-	    }
-	    console.log(range) //range is beign badly calculated
-	    return range;
-	  };
+	// function that creates an array containing all the dates since the start
+	// until the end of the LIFE file, with each step of the slider equivalent
+	// to a single day
+	function getAllDays() {
+		var start = parseDate(sliderMin);
+		var future = parseDate(sliderMax);
+		var range = []
+		var mil = 86400000 //24h
+		for (var i = start.getTime(); i < (future.getTime() + mil); i = i + mil) {
+		  range.push(new Date(i).toLocaleDateString())
+		}
+		return range;
+	};
 
 	setTimeout(function() {
 		$scope.slider = {
-		    minValue: 0,   // min value where the slider starts
-		    maxValue: 1, // max value where the slider starts
+		    minValue: 0,   // default min value where the slider starts
+		    maxValue: 1, // default max value where the slider starts
 		    options: {
-		        stepsArray: getAllDays(),
+		        stepsArray: getAllDays(), // allows the step of the slider to be non-numerical
 		        noSwitching: true,
 		        translate: function(value, sliderId, label) {
 			      switch (label) {
@@ -93,7 +94,7 @@ angular.module('myApp.view1', ['ngRoute'])
 			    }
 		    }
 		};
-	}, 1);
+	}, 100);
 
 
 	$scope.gridsterOpts = {
