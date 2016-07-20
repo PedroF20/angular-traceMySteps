@@ -1,32 +1,20 @@
 app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var maps = [];
-  var delay=1000;
+  var delay=5000;
 	var map = undefined;
 	var center = [38.7, -9.1];
-	var latFn = d3.random.normal(center[0], 0.5);
-	var longFn = d3.random.normal(center[1], 0.5);
-	var data = [];
   var jsonRes=null;
 	var mapCount=0;
-
-	function generateData(){
-	    for(i=0; i<1000; i++){
-	        data.push([longFn(),  latFn()]);
-	    }
-	};
-
-	generateData();
 
 	return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        // DataManagerService.get('/hexbinPlaces', []).then(function(d) {
-        //   jsonRes=d;
-        //   createHexbinGraph();
-        // });
+        DataManagerService.get('/hexbinPlaces', []).then(function(d) {
+          jsonRes=d;
+        });
 
         setTimeout(function() {
 
@@ -105,7 +93,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
       					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
       					hexLayer.colorScale().range(['white', 'blue']);
 
-      					hexLayer.data(data);
+      					hexLayer.data(jsonRes);
       					maps[mapCount].invalidateSize();
     	       }
 
