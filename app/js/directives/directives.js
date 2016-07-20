@@ -686,18 +686,26 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
   return {
 
       restrict: 'E',
-      scope: true,
+      scope: false,
       link: function($scope, $elem, $attr, $http) {
 
-          DataManagerService.get('/barchartFrequency', []).then(function(d) {
-            jsonResFrequency=d;
-            createBarChart(datasetSort(jsonResFrequency), resizeFlag);
-          });
 
-          DataManagerService.get('/barchartTime', []).then(function(d) {
-           jsonResTime=d;
-           createBarChart(concatenateStays(jsonResTime), resizeFlag);
-          });
+          // as there are two requests in one directive, they need to be done only when the
+          // storage variables are null (first call). if they were done both every time,
+          // the data would get mixed, causing bugs
+          if (jsonResFrequency==null) {
+            DataManagerService.get('/barchartFrequency', []).then(function(d) {
+              jsonResFrequency=d;
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag);
+            });
+          }
+
+          if (jsonResTime==null) {
+            DataManagerService.get('/barchartTime', []).then(function(d) {
+             jsonResTime=d;
+             createBarChart(concatenateStays(jsonResTime), resizeFlag);
+            });
+          }
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -1068,30 +1076,27 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
   var jsonResEdges=null;
   var jsonResNodes=null;
 
-/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-  var edges = [{ 
-                "source": "Rialva",
-                "target": "Estádio da Luz",
-                "frequency": 5
-              }];
-
-
-/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
 
   return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          DataManagerService.get('/arcedges', []).then(function(d) {
-            jsonResEdges=d;
-          });
 
-          DataManagerService.get('/arcnodes', []).then(function(d) {
-            jsonResNodes=d;
-          });
+          // as there are two requests in one directive, they need to be done only when the
+          // storage variables are null (first call). if they were done both every time,
+          // the data would get mixed, causing bugs
+          if (jsonResEdges==null) {
+            DataManagerService.get('/arcedges', []).then(function(d) {
+              jsonResEdges=d;
+            });
+          }
+
+          if (jsonResNodes==null) {
+            DataManagerService.get('/arcnodes', []).then(function(d) {
+              jsonResNodes=d;
+            });
+          }
           
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -1108,8 +1113,6 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
            });
           
 
-
-        
           function createArcGraph () {
 
             setTimeout(function() {
@@ -1219,16 +1222,14 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 
 
               function arc(d,i) {
-                var draw = d3.svg.line().interpolate("basis");
-                // console.log(d);
-                // console.log(i);
-                var midX = (d.source.x + d.target.x) / 2;
-                var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
-                // console.log(midX);
-                // console.log(midY);
-                // colocar divisão diferente para cada intervalo de nr de elementos
-                // ex: elementos < 10, (1200/height)->(200/height)
-                return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
+                  var draw = d3.svg.line().interpolate("basis");
+                  var midX = (d.source.x + d.target.x) / 2;
+                  var midY = (d.source.x - d.target.x) / (1400/height); // divisao decide altura do arco
+                  // console.log(midX);
+                  // console.log(midY);
+                  // colocar divisão diferente para cada intervalo de nr de elementos
+                  // ex: elementos < 10, (1200/height)->(200/height)
+                  return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
               }
               
               function nodeOver(d,i) {
