@@ -626,6 +626,7 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
                 geolayer.showExtremities('arrowM');
                 trackmaps[trackmapCount].invalidateSize();
                 trackmapCount++;
+                delay=0;
 
             };
         });
@@ -1257,6 +1258,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               }
               
               $elem[0].svg = svg;
+              delay=350;
 
             // delay=0; test delay here on 0 for the other vizs
             // it is a way to delete the load time used on the first copy of the viz
@@ -1280,12 +1282,12 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
 
 var stays=[  
                  {  
-                    day:2, // day 1: sunday, day 2: monday, etc.
-                    hour:1, // // 1-1 ate 1-1.59 -> corresponde ao intervalo 0 ate 0.59
+                    day:[2], // day 1: sunday, day 2: monday, etc.
+                    hour:[1], // // 1-1 ate 1-1.59 -> corresponde ao intervalo 0 ate 0.59
                     // "primeira hora do dia" - fazer esta associaçao no backend
                     // ex: if 00<=hour<=00.59 -> hour=1
-                    time_spent:57,// in minutes - maximo de 60 pois o bloco e de 1 hr
-                    label: "home" // sitio onde aconteceu a stay ou a stay "mais importante"
+                    time_spent:[57],// in minutes - maximo de 60 pois o bloco e de 1 hr
+                    label: ["home"] // sitio onde aconteceu a stay ou a stay "mais importante"
                     // no caso de haver varias stays para um bloco, mostrar a maior
                  },
                  {  
