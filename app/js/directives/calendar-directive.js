@@ -1,61 +1,65 @@
 app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
 	var delay=350;
-  var jsonRes=null;
+  var data=null; // instead of jsonRes to avoid replacing the name of too many variables
 
   // **************************** EXAMPLE DATA ***********************
 
-      var now = moment().endOf('day').toDate();
-      var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
-      var data = d3.time.days(yearAgo, now).map(function (dateElement) {
-        return {
-            date: dateElement,
-            details: Array.apply(null, new Array(Math.floor(Math.random() * 25))).map(function(e, i, arr) {
-              return {
-                'name': 'Place ' + Math.floor(Math.random() * 10),
-                'date': function () {
-                  var projectDate = new Date(dateElement.getTime());
-                  projectDate.setHours(Math.floor(Math.random() * 24))
-                  projectDate.setMinutes(Math.floor(Math.random() * 60));
-                  return projectDate;
-                }(),
-                'value': 3600 * ((arr.length - i) / 5) + Math.floor(Math.random() * 3600)
-              }
-            }),
-          init: function () {
-            this.total = this.details.reduce(function (prev, e) {
-              return prev + e.value;
-            }, 0);
-            return this;
-          }
-        }.init();
-      });
+      // var now = moment().endOf('day').toDate();
+      // var yearAgo = moment().startOf('day').subtract(1, 'year').toDate();
+      // var data = d3.time.days(yearAgo, now).map(function (dateElement) {
+      //   return {
+      //       date: dateElement,
+      //       details: Array.apply(null, new Array(Math.floor(Math.random() * 25))).map(function(e, i, arr) {
+      //         return {
+      //           'name': 'Place ' + Math.floor(Math.random() * 10),
+      //           'date': function () {
+      //             var projectDate = new Date(dateElement.getTime());
+      //             projectDate.setHours(Math.floor(Math.random() * 24))
+      //             projectDate.setMinutes(Math.floor(Math.random() * 60));
+      //             return projectDate;
+      //           }(),
+      //           'value': 3600 * ((arr.length - i) / 5) + Math.floor(Math.random() * 3600)
+      //         }
+      //       }),
+      //     init: function () {
+      //       this.total = this.details.reduce(function (prev, e) {
+      //         return prev + e.value;
+      //       }, 0);
+      //       return this;
+      //     }
+      //   }.init();
+      // });
 
-      // Get daily summary if that was not provided
-      if ( !data[0].summary ) {
-        data.map(function (d) {
-          var summary = d.details.reduce( function(uniques, project) {
-            if ( !uniques[project.name] ) {
-              uniques[project.name] = {
-                'value': project.value
-              };
-            } else {
-              uniques[project.name].value += project.value;
+        DataManagerService.get('/calendar', []).then(function(d) {
+          data=d;
+            // Get daily summary if that was not provided
+            if ( !data[0].summary ) {
+              data.map(function (d) {
+                var summary = d.details.reduce( function(uniques, project) {
+                  if ( !uniques[project.name] ) {
+                    uniques[project.name] = {
+                      'value': project.value
+                    };
+                  } else {
+                    uniques[project.name].value += project.value;
+                  }
+                  return uniques;
+                }, {});
+                var unsorted_summary = Object.keys(summary).map(function (key) {
+                  return {
+                    'name': key,
+                    'value': summary[key].value
+                  };
+                });
+                d.summary = unsorted_summary.sort(function (a, b) {
+                  return b.value - a.value;
+                });
+                return d;
+              });
             }
-            return uniques;
-          }, {});
-          var unsorted_summary = Object.keys(summary).map(function (key) {
-            return {
-              'name': key,
-              'value': summary[key].value
-            };
-          });
-          d.summary = unsorted_summary.sort(function (a, b) {
-            return b.value - a.value;
-          });
-          return d;
         });
-      }
+
 
   // **************************** EXAMPLE DATA ***********************
 
@@ -66,9 +70,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       replace: true,
       link: function ($scope, $elem, $attr) {
 
-        // DataManagerService.get('/calendar', []).then(function(d) {
-        //   jsonRes=d;
-        // });
 
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var gutter = 5;
@@ -106,18 +107,20 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
           .attr('class', 'heatmap-tooltip')
           .style('opacity', 0);
 
-        $scope.$watch(function () {
-          return $elem[0].parentNode.clientWidth;
-        }, function ( w ) {
-          if ( !w ) { return; }
-          width = w < 1000 ? 1000 : w;
-          item_size = ((width - label_padding) / (moment().subtract(1, 'year').weeksInYear() - moment().subtract(1, 'year').week() + moment().week() + 1) - gutter);
-          height = label_padding + 7 * (item_size + gutter);
-          svg.attr({'width': width, 'height': height});
-          if ( !!data && !!data[0].summary ) {
-              drawChart();
-            }
-        });
+        setTimeout(function() {
+          $scope.$watch(function () {
+            return $elem[0].parentNode.clientWidth;
+          }, function ( w ) {
+            if ( !w ) { return; }
+            width = w < 1000 ? 1000 : w;
+            item_size = ((width - label_padding) / (moment().subtract(1, 'year').weeksInYear() - moment().subtract(1, 'year').week() + moment().week() + 1) - gutter);
+            height = label_padding + 7 * (item_size + gutter);
+            svg.attr({'width': width, 'height': height});
+            if ( !!data && !!data[0].summary ) {
+                drawChart();
+              }
+          });
+        }, delay);
 
         var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, response) {
             console.log("Calendar broadcast: " + JSON.stringify(response.calendar)); // 'Broadcast!'
@@ -158,8 +161,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
            * Draw year overview
            */
         function drawYearOverview() {
-
-          setTimeout(function() {
 
             $elem[0].svg = null;
 
@@ -228,7 +229,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
                 // Set selected date to the one clicked on
                 $scope.selected = d;
-                console.log(d);
 
                 // Hide tooltip
                 hideTooltip();
@@ -456,7 +456,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
               $elem[0].svg = svg;
 
-            }, delay);
           };
 
 

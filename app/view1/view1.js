@@ -156,7 +156,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addCalendarWidget = function() {
-		$scope.widgets.push({type: 'calendar', name: "My calendar", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
+		$scope.widgets.push({type: 'calendar', name: "My year calendar", draggable: true, sizeX: 5, sizeY: 1, minSizeX:5,
 	 	maxSizeY:2, maxSizeX:5});
 	};
 
