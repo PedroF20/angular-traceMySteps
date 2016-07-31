@@ -45,10 +45,8 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 npm start
 ```
 
-4) On the mock backend folder (will update when changed to the actual backend):
-```
-python app.py
-```
+4) On the backend folder (https://github.com/PedroF20/traceMySteps-backend), follow the given instructions.
+
 5) Click "Allow" when the pop-up shows.
 
 ## Dependencies
