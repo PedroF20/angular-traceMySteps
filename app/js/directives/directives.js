@@ -553,10 +553,9 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
         scope: true,
         link: function($scope, $elem, $attr, $http) {
 
-        // DataManagerService.get('/gpstracks', []).then(function(d) {
-        //   jsonRes=d;
-        //   createAreaGradientGraph();
-        // });
+        DataManagerService.get('/gpstracklist', []).then(function(d) {
+          jsonRes=d;
+        });
 
 
         $scope.$watch(function () {

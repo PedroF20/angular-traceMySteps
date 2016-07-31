@@ -176,7 +176,8 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
             var color = d3.scale.linear()
               .range(['#ffffff', '#3b6427' || '#ff4500'])
-              .domain([-0.15 * max_value, max_value]);
+              .domain([-0.15 * max_value, max_value]); // test some different color domains
+              // to see differences more easily in the year overview
 
             var calcItemX = function (d) {
               var date = moment(d.date);
