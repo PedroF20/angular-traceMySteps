@@ -39,15 +39,14 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 1) Download this folder and the backend repository (on my profile).
 2) Open two shell windows (one for each repository).
-
-3) On the Angular project folder:
+3) For simplification purposes, make sure both back-end and front-end folders are at the same level.
+4) On the backend folder (https://github.com/PedroF20/traceMySteps-backend), follow the given instructions.
+5) On the Angular project folder:
 ```
 npm start
 ```
 
-4) On the backend folder (https://github.com/PedroF20/traceMySteps-backend), follow the given instructions.
-
-5) Click "Allow" when the pop-up shows.
+6) Click "Allow" when the pop-up shows.
 
 ## Dependencies
 
