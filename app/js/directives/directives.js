@@ -524,28 +524,20 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
 app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  function (DataManagerService, $rootScope, $http) {
 
-  // temporarily we will use gpx tracks as means to get the points in geojson to draw the tracks.
-  // in the future, using the real backend and database, we will collect the parsed points/geojson?
-  // from the backend and draw them. the gpx tracks will be already dealt with in the backend
-
-  // function clear_geolayer() {
-  //   map.removeLayer(geolayer);
-  //   can addLayer() too
-  // }
 
   function isOdd(num) { 
     return (num % 2) == 1;
   }
 
   var jsonRes=null;
-
+  var delay = 1500;
   var trackmaps = [];
   var trackmapCount=0;
   var geo = [];
   var geolayer = null;
   var center = [38.7, -9.1];
-  var latFn = d3.random.normal(center[0], 0.5);
-  var longFn = d3.random.normal(center[1], 0.5);
+  var counter = 0;
+  var folderPath = "../ProcessedTracks/";
 
   return {
 
@@ -557,78 +549,82 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
           jsonRes=d;
         });
 
+        setTimeout(function() {
 
-        $scope.$watch(function () {
-          return $elem[0].parentNode.clientWidth;
-        }, function ( w ) {
-          if ( !w ) { return; }
-          for(var i = 0; i < trackmapCount; i++) {
-            trackmaps[i].invalidateSize();
-          }
-        });
+          var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
+          var ggl = new L.Google();
 
-        $scope.$watch(function () {
-          return $elem[0].parentNode.clientHeight;
-        }, function ( h ) {
-          if ( !h ) { return; }
-          for(var i = 0; i < trackmapCount; i++) {
-            trackmaps[i].invalidateSize();
-          }
-        });
+          angular.element($elem[0]).append(angular.element('<div id="trackmap'+ trackmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+          trackmaps[trackmapCount] = new L.Map('trackmap'+ trackmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
+          trackmaps[trackmapCount].addControl(new L.Control.Layers( {'Google':ggl,'OSM':osm}, {}));
+          console.log('map'+ trackmapCount +'');
+          //trackmaps[trackmapCount].addLayer(ggl);
+          // if both were active, the two layers would be active with one layer over the other,
+          // depending on the order of call. this way the map initializes on the layer1 (leaflet)
+          // layer, and then we can choose to change to the google layer
+          var layer1 = osm.addTo(trackmaps[trackmapCount]);
+          createTracks();
 
-        $.ajax('2016-05-04 13-13-36.gpx').done(function(response) {
+          $scope.$watch(function () {
+            return $elem[0].parentNode.clientWidth;
+          }, function ( w ) {
+            if ( !w ) { return; }
+            for(var i = 0; i < trackmapCount; i++) {
+              trackmaps[i].invalidateSize();
+            }
+          });
 
-          // apply cleaning algorithm (RDP) to all tracks in the folder in order to reduce nr of points
-          // then iterate the result and present all the new tracks
-            
-            var counter = 0;
+          $scope.$watch(function () {
+            return $elem[0].parentNode.clientHeight;
+          }, function ( h ) {
+            if ( !h ) { return; }
+            for(var i = 0; i < trackmapCount; i++) {
+              trackmaps[i].invalidateSize();
+            }
+          });
 
-            geo[0] = toGeoJSON.gpx(response);
+          function createTracks () {
 
-            var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
-            var ggl = new L.Google();
+              for (var i = 0; i < jsonRes.length; i += 1) {
+                omnivore.gpx(folderPath + jsonRes[i]).addTo(trackmaps[trackmapCount]);
+              }
 
-            angular.element($elem[0]).append(angular.element('<div id="trackmap'+ trackmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
-            trackmaps[trackmapCount] = new L.Map('trackmap'+ trackmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-            trackmaps[trackmapCount].addControl(new L.Control.Layers( {'Google':ggl,'OSM':osm}, {}));
-            
-            //trackmaps[trackmapCount].addLayer(ggl);
-            // if both were active, the two layers would be active with one layed over the other,
-            // depending on the order of call. this way the map initializes on the layer1 (leaflet)
-            // layer, and then we can choose to change to the google layer
-            var layer1 = osm.addTo(trackmaps[trackmapCount]);
+              var myStyle = {
+                  "color": "red",
+                  "weight": 5,
+                  "opacity": 0.65,
+                  "clickable": true
+              };
 
-            var myStyle = {
-                "color": "red",
-                "weight": 5,
-                "opacity": 0.65,
-                "clickable": true
-            };
+              // for (var i = 0; i < geo.length; i++) {
+              //     geolayer = L.geoJson(geo[i], {
+              //         style: myStyle,
+              //     })
+              //     .on('click', function(e) {
+              //         //console.log(e);
+              //         if (!isOdd(counter)) {
+              //           $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin', calendar: 'draw track day', area_gradient: 'draw that day'});
+              //           counter++;
+              //         } else {
+              //           $rootScope.$broadcast('rootScope:broadcast-leave');
+              //           counter++;
+              //         }
+              //     });
+              //     geolayer.addTo(trackmaps[trackmapCount]);
+              //     geolayer.showExtremities('arrowM');
+              //     trackmaps[trackmapCount].invalidateSize();
+              //     trackmapCount++;
+              //     delay=0;
 
-            for (var i = 0; i < geo.length; i++) {
-                geolayer = L.geoJson(geo[i], {
-                    style: myStyle,
-                })
-                .on('click', function(e) {
-                    //console.log(e);
-                    if (!isOdd(counter)) {
-                      $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin', calendar: 'draw track day', area_gradient: 'draw that day'});
-                      counter++;
-                    } else {
-                      $rootScope.$broadcast('rootScope:broadcast-leave');
-                      counter++;
-                    }
-                });
-                geolayer.addTo(trackmaps[trackmapCount]);
-                geolayer.showExtremities('arrowM');
-                trackmaps[trackmapCount].invalidateSize();
-                trackmapCount++;
-                delay=0;
+              // };
+            }
 
-            };
-        });
+            trackmapCount++;
+            delay = 0;
+
+          }, delay);
       }
     };
 
