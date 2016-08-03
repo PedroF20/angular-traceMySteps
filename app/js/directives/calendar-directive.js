@@ -31,6 +31,18 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       //   }.init();
       // });
 
+
+
+
+  // **************************** EXAMPLE DATA ***********************
+
+
+    return {
+      restrict: 'E',
+      scope: true,
+      replace: true,
+      link: function ($scope, $elem, $attr) {
+
         DataManagerService.get('/calendar', []).then(function(d) {
           data=d;
             // Get daily summary if that was not provided
@@ -59,17 +71,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               });
             }
         });
-
-
-  // **************************** EXAMPLE DATA ***********************
-
-
-    return {
-      restrict: 'E',
-      scope: true,
-      replace: true,
-      link: function ($scope, $elem, $attr) {
-
 
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var gutter = 5;

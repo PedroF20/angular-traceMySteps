@@ -76,7 +76,7 @@
             <hexbin-graph ng-if="widget.type == 'hexbin'"></hexbin-graph>
             <hexbintracks-graph ng-if="widget.type == 'hexbintracks'"></hexbintracks-graph>
             <area-gradient ng-if="widget.type == 'areagradient'"></area-gradient>
-            <calendar-heatmap class="calendar-heatmap" ng-if="widget.type == 'calendar'"></calendar-heatmap>
+            <calendar-heatmap ng-if="widget.type == 'calendar'" class="calendar-heatmap"></calendar-heatmap>
             <gps-tracks ng-if="widget.type == 'tracks'"></gps-tracks>
             <bar-chart ng-if="widget.type == 'bar'">
               <button class="btn btn-primary btn-xs" id="barchart-frequency" ng-click="frequencyDataset()">Frequency</button>

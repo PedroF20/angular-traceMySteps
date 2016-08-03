@@ -530,7 +530,7 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
   }
 
   var jsonRes=null;
-  var delay = 1500;
+  var delay = 5000;
   var trackmaps = [];
   var trackmapCount=0;
   var geo = [];
@@ -586,43 +586,35 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
           });
 
           function createTracks () {
-
-              for (var i = 0; i < jsonRes.length; i += 1) {
-                omnivore.gpx(folderPath + jsonRes[i]).addTo(trackmaps[trackmapCount]);
-              }
+              
 
               var myStyle = {
-                  "color": "red",
+                  "color": "#0033ff",
                   "weight": 5,
                   "opacity": 0.65,
                   "clickable": true
               };
 
-              // for (var i = 0; i < geo.length; i++) {
-              //     geolayer = L.geoJson(geo[i], {
-              //         style: myStyle,
-              //     })
-              //     .on('click', function(e) {
-              //         //console.log(e);
-              //         if (!isOdd(counter)) {
-              //           $rootScope.$broadcast('rootScope:broadcast', {hexbin_info: 'hexbin', calendar: 'draw track day', area_gradient: 'draw that day'});
-              //           counter++;
-              //         } else {
-              //           $rootScope.$broadcast('rootScope:broadcast-leave');
-              //           counter++;
-              //         }
-              //     });
-              //     geolayer.addTo(trackmaps[trackmapCount]);
-              //     geolayer.showExtremities('arrowM');
-              //     trackmaps[trackmapCount].invalidateSize();
-              //     trackmapCount++;
-              //     delay=0;
+              var customLayer = L.geoJson(null, {
+                  style: myStyle,
+              });
+              
 
-              // };
-            }
+              for (var i = 0; i < jsonRes.length; i += 1) {
+                var runLayer = omnivore.gpx(folderPath + jsonRes[i], null, customLayer)
+                  .on('ready', function() {
+                      //runLayer.showExtremities('arrowM');
+                  })
+                  .addTo(trackmaps[trackmapCount])
+                  .on('click', function(d) {
+                      console.log(d);
+                  });
+              }
 
-            trackmapCount++;
-            delay = 0;
+          }
+
+          trackmapCount++;
+          delay = 0;
 
           }, delay);
       }
