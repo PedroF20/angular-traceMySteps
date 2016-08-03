@@ -31,6 +31,17 @@ angular.module('myApp.view1', ['ngRoute'])
 	  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
 	}
 
+	function diffDays(max_date, min_date) {
+		var oneDay = 24*60*60*1000;
+		var parsed_temp_min = parseDate(min_date);
+		var parsed_temp_max = parseDate(max_date);
+		var diffDays = Math.round(Math.abs((parsed_temp_max.getTime() - parsed_temp_min.getTime())/(oneDay)));
+		var slider_max_init = diffDays * 86400000;
+		return slider_max_init;
+	}
+
+
+
 	/******************************************************************************/
 
 
