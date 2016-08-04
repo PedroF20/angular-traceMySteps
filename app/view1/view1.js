@@ -31,17 +31,6 @@ angular.module('myApp.view1', ['ngRoute'])
 	  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
 	}
 
-	function diffDays(max_date, min_date) {
-		var oneDay = 24*60*60*1000;
-		var parsed_temp_min = parseDate(min_date);
-		var parsed_temp_max = parseDate(max_date);
-		var diffDays = Math.round(Math.abs((parsed_temp_max.getTime() - parsed_temp_min.getTime())/(oneDay)));
-		var slider_max_init = diffDays * 86400000;
-		return slider_max_init;
-	}
-
-
-
 	/******************************************************************************/
 
 
@@ -84,10 +73,16 @@ angular.module('myApp.view1', ['ngRoute'])
 		return range;
 	};
 
+
 	setTimeout(function() {
+
+		var days_array = getAllDays();
+		var slider_min_value = days_array[0];
+		var slider_max_value = days_array[days_array.length-1];
+
 		$scope.slider = {
-		    minValue: 0,   // default min value where the slider starts
-		    maxValue: 1, // default max value where the slider starts
+		    minValue: slider_min_value,   // default min value where the slider starts
+		    maxValue: slider_max_value, // default max value where the slider starts
 		    options: {
 		        stepsArray: getAllDays(), // allows the step of the slider to be non-numerical
 		        noSwitching: true,

@@ -1291,7 +1291,7 @@ var stays=[
                  },
                  {  
                     day:1,
-                    hour:2,
+                    hour:1,
                     time_spent:1,
                     label:"atrium saldanha"
                  },
@@ -1396,8 +1396,8 @@ var stays=[
                   .enter().append("rect")
 
                     //----attach data to rect---
-                   .attr("data", function(d, i) { return d.label;})
-                   .attr("data2", function(d, i) { return d.time_spent;})
+                   .attr("data", function(d, i) {return d.label;})
+                   .attr("data2", function(d, i) { console.log(d); return d.time_spent;})
                    .attr("onmouseover","showData(evt)")
                    .attr("onmouseout","hideData(evt)")
                   .attr("x", function(d) { return (d.hour - 1) * gridSize; })
