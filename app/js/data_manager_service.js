@@ -56,7 +56,7 @@ app.service('DataManagerService', ['$http', "$timeout", function ($http, $timeou
 
             var size = JSON.stringify(cached_data).length*2;
 
-            if (size > 2500000) {  // 2,5 million bytes = max size of 2,5MB
+            if (size > 5000000) {  // 2,5 million bytes = max size of 5MB
 
                 cached_data=null;
                 cache_content = [];

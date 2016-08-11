@@ -47,26 +47,6 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               }
             });
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
-                  console.log("Hexbin broadcast: " + JSON.stringify(data.hexbin_info)); // 'Broadcast!'
-                  var zoom = 15;
-                  for(var i = 0; i < mapCount; i++) {
-                    maps[i].setView([38.73659, -9.14090], zoom);
-                  }
-            });
-
-            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-              console.log("Hexbin broadcast leave"); // 'Broadcast!'
-              var zoom = 10;
-              for(var i = 0; i < mapCount; i++) {
-                maps[i].setView([center[0], center[1]], zoom);
-              }
-            });
-
-            $scope.$on('$destroy', function() {
-                rootScopeBroadcast();
-                rootScopeBroadcastLeave();
-            })
     	        	
             function createHexbinGraph () {
 
@@ -86,7 +66,24 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
       					    valueFloor: 0,
       					    valueCeil: undefined,
                     onmouseover: function(d, node, layer) {
-                      //console.log(d);
+                      var maxFrequency = 0;
+                      var mostVisited = null;
+                      var coords = [];
+                      for (var i = 0; i <d.length; i++) {
+                        if (d[i].o[3]>maxFrequency) {
+                          mostVisited = d[i].o[2];
+                          coords[0] = d[i].o[0];
+                          coords[1] = d[i].o[1];
+                        }
+                      };
+
+                      console.log(mostVisited);
+                      console.log(coords);
+                      $rootScope.$broadcast('rootScope:broadcast', { label : mostVisited, centroid : coords});
+                      // tooltip!
+                    },
+                    onmouseout: function(d, node, layer) {
+                      $rootScope.$broadcast('rootScope:broadcast-leave', 'out');
                     }
       					};
 
@@ -158,26 +155,6 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
               }
             });
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
-                  console.log("Hexbin broadcast: " + JSON.stringify(data.hexbin_info)); // 'Broadcast!'
-                  var zoom = 15;
-                  for(var i = 0; i < mapCount; i++) {
-                    hextrackmaps[i].setView([38.73659, -9.14090], zoom);
-                  }
-            });
-
-            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-              console.log("Hexbin broadcast leave"); // 'Broadcast!'
-              var zoom = 10;
-              for(var i = 0; i < mapCount; i++) {
-                hextrackmaps[i].setView([center[0], center[1]], zoom);
-              }
-            });
-
-            $scope.$on('$destroy', function() {
-                rootScopeBroadcast();
-                rootScopeBroadcastLeave();
-            })
                 
               function createHexbinTracksGraph () {
 
@@ -251,20 +228,6 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
           createAreaGradientGraph();
         });
 
-      var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
-        console.log("Area gradient broadcast: " + JSON.stringify(data.area_gradient)); // 'Broadcast!'
-        createAreaGradientHighlightGraph();
-      });
-
-      var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-        console.log("Area gradient broadcast leave"); // 'Broadcast!'
-        createAreaGradientGraph();
-      });
-
-      $scope.$on('$destroy', function() {
-          rootScopeBroadcast();
-          rootScopeBroadcastLeave();
-      })
 
 			function createAreaGradientGraph () {
 
@@ -390,128 +353,6 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
 			    }, delay);
 			}
-
-
-      function createAreaGradientHighlightGraph () {
-
-          $elem[0].svg = null;
-          
-          var parentHeigtht = angular.element($elem[0])[0].parentNode.clientHeight;
-          
-            var margin = {top: 20, right: 10, bottom: 220, left: 40},
-                margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
-                width = ($elem[0].parentNode.clientWidth) - margin.left - margin.right,
-                height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
-                height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
-
-            var parseDate = d3.time.format("%b %Y").parse;
-
-            var x = d3.time.scale().range([0, width]),
-              x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
-              y = d3.scale.linear().range([height, 0]),
-              y2 = d3.scale.linear().range([height2, 0]); 
-
-          var xAxis = d3.svg.axis().scale(x).orient("bottom"),
-              xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
-              yAxis = d3.svg.axis().scale(y).orient("left");
-
-          var brush = d3.svg.brush()
-              .x(x2)
-              .on("brush", brushed);
-
-          var area = d3.svg.area()
-              .interpolate("monotone")
-              .x(function(d) { return x(d.date); })
-              .y0(height)
-              .y1(function(d) { return y(d.price); });
-
-          var area2 = d3.svg.area()
-              .interpolate("monotone")
-              .x(function(d) { return x2(d.date); })
-              .y0(height2)
-              .y1(function(d) { return y2(d.price); });
-
-          d3.select($elem[0]).selectAll("svg").remove()
-
-          var svg = d3.select($elem[0]).append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-
-            svg.append("defs").append("clipPath")
-                .attr("id", "clip")
-                .append("rect")
-                .attr("width", width)
-                .attr("height", height);
-
-          var focus = svg.append("g")
-              .attr("class", "focus")
-              .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
-
-          var context = svg.append("g")
-              .attr("class", "context")
-              .attr("transform", "translate(" + margin2.left + "," + (margin2.top) + ")");
-
-          var selectedTransformation = [];
-
-          var selectedTransformation = jsonRes.map(el => (
-            { date: el.date, price: el.price }
-          ));
-
-          selectedTransformation = selectedTransformation.slice(120,122); /* hardcoded to slice the data 
-          and focus to a certain day supposedly associated with the track selected */
-          
-          selectedTransformation.forEach(function(d) {
-            d.date = parseDate(d.date);
-            d.price = +d.price;
-            return d;
-          });
-
-            x.domain(d3.extent(selectedTransformation.map(function(d) { return d.date; })));
-            y.domain([0, d3.max(selectedTransformation.map(function(d) { return d.price; }))]);
-            x2.domain(x.domain());
-            y2.domain(y.domain());
-
-          focus.append("path")
-              .datum(selectedTransformation)
-              .attr("class", "area")
-              .attr("d", area);
-
-          focus.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
-
-          focus.append("g")
-              .attr("class", "y axis")
-              .call(yAxis);
-
-          context.append("path")
-              .datum(selectedTransformation)
-              .attr("class", "area")
-              .attr("d", area2);
-
-          context.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height2 + ")")
-              .call(xAxis2);
-
-          context.append("g")
-            .attr("class", "x brush")
-              .call(brush)
-              .selectAll("rect")
-              .attr("y", -6)
-              .attr("height", height2 + 7);
-
-            // create brush to also zoom in with + detail on the main graph
-
-          $elem[0].svg = svg;
-
-          function brushed() {
-            x.domain(brush.empty() ? x2.domain() : brush.extent());
-            focus.select(".area").attr("d", area);
-            focus.select(".x.axis").call(xAxis);
-          }
-      }
 
 		}
 		
@@ -720,12 +561,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                 createBarChart(concatenateStays(jsonResTime), resizeFlag);
               }
             });
-
-
-          // $scope.$on('$destroy', function() {
-          //   rootScopeBroadcast();
-          //   rootScopeBroadcastLeave();
-          // })
         
 
           $scope.$watchGroup(['frequency', 'timespent'], function (val) {
@@ -901,18 +736,34 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
-              createChordGraph();
+              createChordGraph(null);
             });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
             if ( !h ) { return; }
-            createChordGraph();
+            createChordGraph(null);
            });
 
+          $scope.$on('$destroy', function() {
+            rootScopeBroadcast();
+            rootScopeBroadcastLeave();
+          });
+          
 
-          function createChordGraph () {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createChordGraph(data.label);
+          });
+
+          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+            console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            createChordGraph(null);
+          });
+
+
+          function createChordGraph (location_label) {
 
             setTimeout(function() {
 
@@ -991,8 +842,8 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                   .attr("fill", function(d) { return fill(d.index); })
                   .attr("stroke", function(d) { return fill(d.index); })
                   .attr("d", arc)
-                  .on("click", fadeBroadcast(.1)) //put counter for to decide which function the clicking calls
-                  .on("mouseout", fadeBroadcastLeave(1));
+                  .on("mouseover", fadeIn(.1)) //put counter for to decide which function the clicking calls
+                  .on("mouseout", fadeOut(1));
 
               g.append("text")
                   .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
@@ -1027,26 +878,30 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
               $elem[0].svg = svg;
 
+              if (location_label != null) {
+                  console.log(indexByFromName.get(location_label))
+                  svg.selectAll(".chord")
+                      .filter(function(d) { return d.source.index != indexByFromName.get(location_label) && d.target.index != indexByFromName.get(location_label); })
+                      .transition()
+                      .style("opacity", .1);
+              }
+
               // Returns an event handler for fading a given chord group.
-              function fadeBroadcast(opacity) {
+              function fadeIn(opacity) {
                 return function(g, i) {
                   svg.selectAll(".chord")
-                      .filter(function(d) { return d.source.index != i && d.target.index != i; })
+                      .filter(function(d) {return d.source.index != i && d.target.index != i; })
                       .transition()
                       .style("opacity", opacity);
-                      //$rootScope.selectedItem=true;
-                      // $rootScope.$broadcast('rootScope:broadcast', { start : 4, end : 8});
                 };
               }
 
-              function fadeBroadcastLeave(opacity) {
+              function fadeOut(opacity) {
                 return function(g, i) {
                   svg.selectAll(".chord")
                       .filter(function(d) { return d.source.index != i && d.target.index != i; })
                       .transition()
                       .style("opacity", opacity);
-                      //$rootScope.selectedItem=false;
-                      // $rootScope.$broadcast('rootScope:broadcast-leave', 'json vazio');
                 };
               }
 
@@ -1063,6 +918,14 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
   var delay=1500;
   var jsonResEdges=null;
   var jsonResNodes=null;
+
+  function getPos(el) {
+      // yay readability
+      for (var lx=0, ly=0;
+           el != null;
+           lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
+      return {x: lx,y: ly};
+  }
 
 
   return {
@@ -1090,18 +953,33 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
-              createArcGraph();
+              createArcGraph(null);
             });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
             if ( !h ) { return; }
-            createArcGraph();
+            createArcGraph(null);
            });
+
+          $scope.$on('$destroy', function() {
+            rootScopeBroadcast();
+            rootScopeBroadcastLeave();
+          });
           
 
-          function createArcGraph () {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+            console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createArcGraph(data.label);
+          });
+
+          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+            console.log("Arc diagram broadcast leave"); // 'Broadcast!'
+          });
+
+
+          function createArcGraph (location_label) {
 
             setTimeout(function() {
 
@@ -1201,7 +1079,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("stroke", "black")
                 .style("stroke-width", "1px")
                 .attr("cx", function (d) {return d.x}) // fix width responsiveness
-                .on("mouseover", nodeOver) // or change circles to squares ("rect")
+                .on("mouseover", nodeOver)
                 .on("mouseout", function(d) {    
                     tooltip.transition()    
                         .duration(100)    
@@ -1220,6 +1098,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                   return draw([[d.source.x,0],[midX,midY],[d.target.x,0]]);
               }
               
+              if (location_label != null) {
+                d3.selectAll("#arccircle").style("fill", function (p) {return p.id == location_label ? "#BF0000" : "lightgray"})
+                console.log(getPos(d3.selectAll("#arccircle")));
+              }
+
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
                 d3.selectAll("#arcpath").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
@@ -1287,7 +1170,7 @@ var stays=[
                     day:1,
                     hour:1,
                     time_spent:21,
-                    label:"atrium saldanha"
+                    label:"monumental"
                  },
                  {  
                     day:1,
@@ -1311,10 +1194,10 @@ var stays=[
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          // DataManagerService.get('/staysgraph', []).then(function(d) {
-          //   jsonRes=d;
-          //   also use a variation of concatenateStays() here?
-          // });
+          DataManagerService.get('/staysgraph', []).then(function(d) {
+            jsonRes=d;
+            //also use a variation of concatenateStays() here?
+          });
           
           function getNodePos(el) {
               var body = d3.select($elem[0]).node();
@@ -1369,7 +1252,7 @@ var stays=[
               d3.select("html").style("font-size", newFontSize + "%");
 
               var colorScale = d3.scale.linear()
-                  .domain([0, d3.max(stays, function(d) {return d.time_spent; })/2, d3.max(stays, function(d) {return d.time_spent; })])
+                  .domain([0, d3.max(jsonRes, function(d) {return d.time_spent; })/2, d3.max(jsonRes, function(d) {return d.time_spent; })])
                   .range(["#FFFFDD", "#3E9583", "#1F2D86"])
 
               var dayLabels = svg.selectAll(".dayLabel")
@@ -1391,13 +1274,23 @@ var stays=[
                   .style("text-anchor", "middle")
                   .attr("transform", "translate(" + gridSize / 2 + ", -6)")
 
+              var data = d3.nest()
+              .key(function(d) { return d.day;})
+              .key(function(d) { return d.hour;})
+              .key(function(d) { return d.label;})
+              .rollup(function(d) { 
+               return d3.sum(d, function(g) {return g.time_spent; });
+              })
+              .entries(jsonRes);
+
+
               var heatMap = svg.selectAll(".hour")
-                  .data(stays)
+                  .data(jsonRes)
                   .enter().append("rect")
 
                     //----attach data to rect---
                    .attr("data", function(d, i) {return d.label;})
-                   .attr("data2", function(d, i) { console.log(d); return d.time_spent;})
+                   .attr("data2", function(d, i) {return d.time_spent;})
                    .attr("onmouseover","showData(evt)")
                    .attr("onmouseout","hideData(evt)")
                   .attr("x", function(d) { return (d.hour - 1) * gridSize; })
