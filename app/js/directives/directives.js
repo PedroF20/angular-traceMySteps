@@ -4,7 +4,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
   var delay=5000;
 	var map = undefined;
 	var center = [38.7, -9.1];
-  var jsonRes=null;
+  var jsonRes_places=null;
 	var mapCount=0;
 
 	return {
@@ -12,9 +12,11 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        DataManagerService.get('/hexbinPlaces', []).then(function(d) {
-          jsonRes=d;
-        });
+        if (jsonRes_places==null) {
+          DataManagerService.get('/hexbinPlaces', []).then(function(d) {
+            jsonRes_places=d;
+          });
+        }
 
         setTimeout(function() {
 
@@ -22,11 +24,13 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
     			    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     			    osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
 
-    				angular.element($elem[0]).append(angular.element('<div id="map'+ mapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
-    				console.log('map'+ mapCount +'');
-    				maps[mapCount] = new L.Map('map'+ mapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-    				var layer1 = osm.addTo(maps[mapCount]);
-            createHexbinGraph();
+    				angular.element($elem[0]).append(angular.element('<div id="map_places'+ mapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
+    				console.log('map_places'+ mapCount +'');
+    				maps[mapCount] = new L.Map('map_places'+ mapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
+    				var layer_hexbin_places = osm.addTo(maps[mapCount]);
+            createHexbinGraph(maps[mapCount]);
+
+            // mudar nome das hexbin layers
     				
 
             $scope.$watch(function () {
@@ -48,7 +52,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
             });
 
     	        	
-            function createHexbinGraph () {
+            function createHexbinGraph (map) {
 
       					var options = {
       					    radius : 12,
@@ -77,25 +81,31 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
                         }
                       };
 
-                      console.log(mostVisited);
-                      console.log(coords);
                       $rootScope.$broadcast('rootScope:broadcast', { label : mostVisited, centroid : coords});
-                      // tooltip!
+                      var tooltip = L.tooltip({
+                          target: node,
+                          map: map,
+                          html: mostVisited,
+                          minWidth: 40,
+                          showDelay: 200,
+                          hideDelay: 200
+                      });
                     },
                     onmouseout: function(d, node, layer) {
                       $rootScope.$broadcast('rootScope:broadcast-leave', 'out');
                     }
       					};
 
-      					var hexLayer = L.hexbinLayer(options).addTo(maps[mapCount])
-      					hexLayer.colorScale().range(['white', 'blue']);
+      					var hexLayer_hexbin_places = L.hexbinLayer(options).addTo(maps[mapCount])
+      					hexLayer_hexbin_places.colorScale().range(['white', 'blue']);
 
-      					hexLayer.data(jsonRes);
+      					hexLayer_hexbin_places.data(jsonRes_places);
       					maps[mapCount].invalidateSize();
     	       }
 
 	        	mapCount++;
             delay = 0;
+            console.log(jsonRes_places)
 
           }, delay);
     		}
@@ -119,9 +129,11 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
         scope: true,
         link: function($scope, $elem, $attr) {
 
-        DataManagerService.get('/hexbinTracks', []).then(function(d) {
-          jsonRes=d;
-        });
+        if (jsonRes==null) {
+          DataManagerService.get('/hexbinTracks', []).then(function(d) {
+            jsonRes=d;
+          });
+        }
 
         setTimeout(function() {
 
@@ -133,7 +145,7 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
             angular.element($elem[0]).append(angular.element('<div id="hextrackmap'+ hexmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
             console.log('hextrackmap'+ hexmapCount +'');
             hextrackmaps[hexmapCount] = new L.Map('hextrackmap'+ hexmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-            var layer1 = osm.addTo(hextrackmaps[hexmapCount]);        
+            var layer_hexbin_tracks = osm.addTo(hextrackmaps[hexmapCount]);        
             createHexbinTracksGraph();
 
 
@@ -178,10 +190,10 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
                       }
                   };
 
-                  var hexLayer = L.hexbinLayer(options).addTo(hextrackmaps[hexmapCount])
+                  var hexLayer_hexbin_tracks = L.hexbinLayer(options).addTo(hextrackmaps[hexmapCount])
 
-                  hexLayer.colorScale().range(['white', 'blue']);
-                  hexLayer.data(jsonRes);
+                  hexLayer_hexbin_tracks.colorScale().range(['white', 'blue']);
+                  hexLayer_hexbin_tracks.data(jsonRes);
                   hextrackmaps[hexmapCount].invalidateSize();
               }
 
@@ -574,8 +586,25 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               }
           });
 
+
+          $scope.$on('$destroy', function() {
+            rootScopeBroadcast();
+            rootScopeBroadcastLeave();
+          });
+
+
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+          });
+
+          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+            console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            createBarChart(datasetSort(jsonResFrequency), resizeFlag, null);
+          });
+
       
-          function createBarChart(dataset, resizeFlag) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
+          function createBarChart(dataset, resizeFlag, location_label) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
 
             console.log (dataset)
             setTimeout(function() {
@@ -677,6 +706,19 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                            return d.label;
                       });
 
+              if (location_label != null) {
+
+                  d3.selectAll(".bartext").text(function(d){
+                  return (location_label != d.label ? d.label : null);
+                })
+                .attr("fill", "white");
+
+                d3.selectAll(".bartext").text(function(d){
+                  return (location_label == d.label ? d.label : null);
+                })
+                .attr("fill", "red");
+
+              }
 
               bar.on("mousemove", function(d){
                       div.style("left", (d3.event.layerX + 10) + "px");
