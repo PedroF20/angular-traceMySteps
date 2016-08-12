@@ -478,7 +478,7 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
 app.directive('barChart', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-  var delay=350;
+  var delay=600;
 
   var jsonResFrequency=null;
   var jsonResTime=null;
@@ -595,18 +595,38 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            // must know here which resize flag is on to draw the correct graph
             createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            // must know here which resize flag is on to draw the correct graph            
             createBarChart(datasetSort(jsonResFrequency), resizeFlag, null);
           });
 
       
-          function createBarChart(dataset, resizeFlag, location_label) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
+          function createBarChart(dataset_raw, resizeFlag, location_label) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
 
-            console.log (dataset)
+            if (resizeFlag == 1) {
+              var dataset = [];
+              for (var i = 0; i < dataset_raw.length; i++) {
+                if (dataset_raw[i].value < 10) {}
+                else {
+                  dataset.push(dataset_raw[i]);
+                }
+              };
+            }
+            if (resizeFlag == 2) {
+              var dataset = [];
+              for (var i = 0; i < dataset_raw.length; i++) {
+                if (dataset_raw[i].value < 200) {}
+                else {
+                  dataset.push(dataset_raw[i]);
+                }
+              };
+            }
+
             setTimeout(function() {
 
               $elem[0].svg = null;
@@ -671,18 +691,26 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               }
 
               var bar = svg.selectAll(".bar")
-                        .data(dataset, function(d) { return d.label; })
+                        .data(dataset, function(d) {return d.label
+                        })
 
               // new data:
               bar.enter().append("rect")
                       .attr("class", "bar")
                       .attr("x", function(d) { return 0; })
                       .attr("y", function(d) { return y(d.label); })
-                      .attr("width", function(d) { return x(d.value); }) // decomment bar.transition AND here return 0 if want to animate
+                      .attr("width", function(d) { return x(d.value); // decomment bar.transition AND here return 0 if want to animate
                       // for big dataset, limit the nr of bars shown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       // ex: bars with width under certain size or bars with d.value under certain value
-                      // if(d.value<10) {return 0;}
-                      // else {return x(d.value);}
+                        // if (resizeFlag == 1) {
+                        //   if(d.value<10) {return;}
+                        //   else {return x(d.value);}
+                        // }
+                        // if (resizeFlag == 2) {
+                        //   if(d.value<200) {return;}
+                        //   else {return x(d.value);}
+                        // }
+                      })
                       .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
 
@@ -701,9 +729,15 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                           //if (d.value<=10){return};
                           return y(d.label)+15;
                       })
-                      .text(function(d){
-                        //if (d.value<=10){return}; //use together with limitation of the nr of bars shown
-                           return d.label;
+                      .text(function(d){ return d.label;  //use together with limitation of the nr of bars shown
+                        // if (resizeFlag == 1) {
+                        //   if(d.value<10) {return;}
+                        //   else {return d.label;}
+                        // }
+                        // if (resizeFlag == 2) {
+                        //   if(d.value<200) {return;}
+                        //   else {return d.label;}
+                        // }
                       });
 
               if (location_label != null) {
