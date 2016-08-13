@@ -28,10 +28,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
     				console.log('map_places'+ mapCount +'');
     				maps[mapCount] = new L.Map('map_places'+ mapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
     				var layer_hexbin_places = osm.addTo(maps[mapCount]);
-            createHexbinGraph(maps[mapCount]);
-
-            // mudar nome das hexbin layers
-    				
+            createHexbinGraph(maps[mapCount]);    				
 
             $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -49,6 +46,26 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               for(var i = 0; i < mapCount; i++) {
                 maps[i].invalidateSize();
               }
+            });
+
+            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
+              var lat;
+              var lon;
+              for(var j = 0; j < jsonRes_places.length; j++) {
+                if (data.label == jsonRes_places[j][2]) {
+                    lat = jsonRes_places[j][1];
+                    lon = jsonRes_places[j][0]
+                  }
+              }
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].setView(L.latLng(lat, lon), 16);
+              }
+            });
+
+            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+              // for(var i = 0; i < mapCount; i++) {
+              //   maps[i].setZoom(10);
+              // }
             });
 
     	        	
@@ -81,7 +98,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
                         }
                       };
 
-                      $rootScope.$broadcast('rootScope:broadcast', { label : mostVisited, centroid : coords});
+                      $rootScope.$broadcast('rootScope:broadcast-not_inside_hexbinPlaces', { label : mostVisited, centroid : coords});
                       var tooltip = L.tooltip({
                           target: node,
                           map: map,
@@ -105,7 +122,6 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 
 	        	mapCount++;
             delay = 0;
-            console.log(jsonRes_places)
 
           }, delay);
     		}
@@ -593,7 +609,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           });
 
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
@@ -823,7 +839,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
           });
           
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createChordGraph(data.label);
           });
@@ -950,7 +966,6 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
               $elem[0].svg = svg;
 
               if (location_label != null) {
-                  console.log(indexByFromName.get(location_label))
                   svg.selectAll(".chord")
                       .filter(function(d) { return d.source.index != indexByFromName.get(location_label) && d.target.index != indexByFromName.get(location_label); })
                       .transition()
@@ -1040,7 +1055,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           });
           
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createArcGraph(data.label);
           });
@@ -1150,11 +1165,16 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
                 .style("stroke", "black")
                 .style("stroke-width", "1px")
                 .attr("cx", function (d) {return d.x}) // fix width responsiveness
-                .on("mouseover", nodeOver)
-                .on("mouseout", function(d) {    
+                .on("mouseover", function(d) {
+
+                  $rootScope.$broadcast('rootScope:broadcast-not_inside_arc', { label : d.id});
+                  return nodeOver(d);
+                })
+                .on("mouseout", function(d) {
                     tooltip.transition()    
                         .duration(100)    
-                        .style("opacity", 0); 
+                        .style("opacity", 0);
+                    $rootScope.$broadcast('rootScope:broadcast-leave', 'out');     
                 });
 
 
@@ -1171,19 +1191,19 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               
               if (location_label != null) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p.id == location_label ? "#BF0000" : "lightgray"})
-                console.log(getPos(d3.selectAll("#arccircle")));
               }
 
               function nodeOver(d,i) {
                 d3.selectAll("#arccircle").style("fill", function (p) {return p == d ? "#BF0000" : "lightgray"})
                 d3.selectAll("#arcpath").style("stroke", function (p) {return p.source == d || p.target == d ? "red" : "black"})
                 tooltip.transition()    
-                .duration(100)    
+                .duration(0)    
                 .style("opacity", .9);    
                 tooltip.html(d.id)
                 .style("height", 30 + "px") 
                 .style("left", (d3.event.layerX+10) + "px")
                 .style("top", (d3.event.layerY+10) + "px");
+                //$rootScope.$broadcast('rootScope:broadcast', { label : d.id});
               }
           
               function edgeOver(d) {
