@@ -711,14 +711,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       .attr("width", function(d) { return x(d.value); // decomment bar.transition AND here return 0 if want to animate
                       // for big dataset, limit the nr of bars shown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                       // ex: bars with width under certain size or bars with d.value under certain value
-                        // if (resizeFlag == 1) {
-                        //   if(d.value<10) {return;}
-                        //   else {return x(d.value);}
-                        // }
-                        // if (resizeFlag == 2) {
-                        //   if(d.value<200) {return;}
-                        //   else {return x(d.value);}
-                        // }
                       })
                       .attr("height", y.rangeBand())
                       .text(function(d) { return d.label; });
@@ -739,14 +731,6 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                           return y(d.label)+15;
                       })
                       .text(function(d){ return d.label;  //use together with limitation of the nr of bars shown
-                        // if (resizeFlag == 1) {
-                        //   if(d.value<10) {return;}
-                        //   else {return d.label;}
-                        // }
-                        // if (resizeFlag == 2) {
-                        //   if(d.value<200) {return;}
-                        //   else {return d.label;}
-                        // }
                       });
 
               if (location_label != null) {
@@ -759,8 +743,10 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                 d3.selectAll(".bartext").text(function(d){
                   return (location_label == d.label ? d.label : null);
                 })
-                .attr("fill", "red");
-
+                .attr("fill", "red")
+                .style("font-size", "18px"); // maybe in this case also present the value of frequency/timespent
+                                            // in the text as if it was the tooltip 
+                                            // return d.label + hours + minutes
               }
 
               bar.on("mousemove", function(d){
@@ -771,9 +757,9 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                         div.html((d.value)+" times");
                       }
                       if (resizeFlag==2) {
-                        div.html((d.value)+" mins");
-                        // for now "mins" is hardcoded
-                        // have function to format time accordingly (hours/just minutes/etc.)!!!!!!
+                        var hours = Math.floor(d.value / 60);          
+                        var minutes = d.value % 60;
+                        div.html(hours + " hours " + minutes + " minutes");
                       }
                   });
               bar.on("mouseout", function(d){
