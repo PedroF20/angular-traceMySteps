@@ -53,6 +53,20 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               rootScopeBroadcastLeave();
             });
 
+            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
+              var lat;
+              var lon;
+              for(var j = 0; j < jsonRes_places.length; j++) {
+                if (data.label == jsonRes_places[j][2]) {
+                    lat = jsonRes_places[j][1];
+                    lon = jsonRes_places[j][0]
+                  }
+              }
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].setView(L.latLng(lat, lon), 16);
+              }
+            });
+
             var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
               var lat;
               var lon;
@@ -81,7 +95,15 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               }
             });
 
+
             var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+              console.log("Hexbin places broadcast leave");
+              // for(var i = 0; i < mapCount; i++) {
+              //   maps[i].setZoom(10);
+              // }
+            });
+
+            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
               console.log("Hexbin places broadcast leave");
               // for(var i = 0; i < mapCount; i++) {
               //   maps[i].setZoom(10);
@@ -628,6 +650,17 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             rootScopeBroadcastLeave();
           });
 
+          
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
+            console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            if (resizeFlag == 1) {
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+            }
+            if (resizeFlag == 2) {
+              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+            }
+          });
+
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
@@ -796,6 +829,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               }
 
               bar.on("mousemove", function(d){
+                      $rootScope.$broadcast('rootScope:broadcast-not_inside_bar_chart', { label : d.label});
                       div.style("left", (d3.event.layerX + 10) + "px");
                       div.style("top", (d3.event.layerY + 10) + "px");
                       div.style("display", "inline-block");
@@ -809,6 +843,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       }
                   });
               bar.on("mouseout", function(d){
+                      $rootScope.$broadcast('rootScope:broadcast-leave-not_inside_bar_chart', 'out');  
                       div.style("display", "none");
                   });
 
@@ -1090,6 +1125,10 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             rootScopeBroadcastLeave();
           });
           
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
+            console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createArcGraph(data.label);
+          });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
             console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
@@ -1105,6 +1144,9 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             console.log("Arc diagram broadcast leave"); // 'Broadcast!'
           });
 
+          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+            console.log("Arc diagram broadcast leave"); // 'Broadcast!'
+          });
 
           function createArcGraph (location_label) {
 
