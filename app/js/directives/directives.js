@@ -279,10 +279,12 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
         scope: true,
         link: function($scope, $elem, $attr) {
 
-      DataManagerService.get('/areagradient', []).then(function(d) {
-				jsonRes=d;
-				createAreaGradientGraph();
-			});
+      if (jsonRes==null) {
+        DataManagerService.get('/areagradient', []).then(function(d) {
+  				jsonRes=d;
+  				createAreaGradientGraph();
+  			});
+      }
 
       $scope.$watch(function () {
           return $elem[0].parentNode.clientWidth;
@@ -880,9 +882,11 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          DataManagerService.get('/chord', []).then(function(d) {
-            jsonRes=d;
-          });
+          if (jsonRes==null) {
+            DataManagerService.get('/chord', []).then(function(d) {
+              jsonRes=d;
+            });
+          }
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -903,6 +907,12 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             rootScopeBroadcastLeave();
           });
 
+          
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) { 
+            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createChordGraph(data.label);
+          });
+
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createChordGraph(data.label);
@@ -918,6 +928,10 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             createChordGraph(null);
           });
 
+          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+              console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            createChordGraph(null);
+          });
 
           function createChordGraph (location_label) {
 
@@ -1368,10 +1382,12 @@ var stays=[
         scope: true,
         link: function($scope, $elem, $attr) {
 
-          DataManagerService.get('/staysgraph', []).then(function(d) {
-            jsonRes=d;
-            //also use a variation of concatenateStays() here?
-          });
+          if (jsonRes==null) {
+            DataManagerService.get('/staysgraph', []).then(function(d) {
+              jsonRes=d;
+              //also use a variation of concatenateStays() here?
+            });
+          }
           
           function getNodePos(el) {
               var body = d3.select($elem[0]).node();
