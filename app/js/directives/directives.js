@@ -595,14 +595,23 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            // must know here which resize flag is on to draw the correct graph
-            createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+            if (resizeFlag == 1) {
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+            }
+            if (resizeFlag == 2) {
+              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+            }
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
             // must know here which resize flag is on to draw the correct graph            
-            createBarChart(datasetSort(jsonResFrequency), resizeFlag, null);
+            if (resizeFlag == 1) {
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+            }
+            if (resizeFlag == 2) {
+              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+            }
           });
 
       
@@ -742,7 +751,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
               if (location_label != null) {
 
-                  d3.selectAll(".bartext").text(function(d){
+                d3.selectAll(".bartext").text(function(d){
                   return (location_label != d.label ? d.label : null);
                 })
                 .attr("fill", "white");
