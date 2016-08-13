@@ -35,6 +35,9 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 <s>4) Arc Graph is drawn once, but when it is removed and added again to the grid, the arc function
     does not compute edges and nodes.</s>
 
+5) RootScope Broadcast Leave optimization: the "leave" instruction on a directive may not be listened in the directive itself.
+This means a different Leave instruction for each graph, in order to notify all the visualizations depending on it, except the directive itself.
+
 ### Steps to run:
 
 1) Download this folder and the backend repository (on my profile).
