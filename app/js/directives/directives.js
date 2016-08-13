@@ -48,6 +48,25 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               }
             });
 
+            $scope.$on('$destroy', function() {
+              rootScopeBroadcast();
+              rootScopeBroadcastLeave();
+            });
+
+            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
+              var lat;
+              var lon;
+              for(var j = 0; j < jsonRes_places.length; j++) {
+                if (data.label == jsonRes_places[j][2]) {
+                    lat = jsonRes_places[j][1];
+                    lon = jsonRes_places[j][0]
+                  }
+              }
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].setView(L.latLng(lat, lon), 16);
+              }
+            });
+
             var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
               var lat;
               var lon;
@@ -63,6 +82,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
             });
 
             var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+              console.log("Hexbin places broadcast leave");
               // for(var i = 0; i < mapCount; i++) {
               //   maps[i].setZoom(10);
               // }
@@ -609,6 +629,16 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           });
 
 
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
+            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            if (resizeFlag == 1) {
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+            }
+            if (resizeFlag == 2) {
+              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+            }
+          });
+
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
@@ -620,7 +650,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-            console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            console.log("Bar chart broadcast leave"); // 'Broadcast!'
             // must know here which resize flag is on to draw the correct graph            
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
@@ -837,8 +867,12 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             rootScopeBroadcast();
             rootScopeBroadcastLeave();
           });
-          
 
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) { 
+            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createChordGraph(data.label);
+          });
+          
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createChordGraph(data.label);
@@ -975,6 +1009,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
               // Returns an event handler for fading a given chord group.
               function fadeIn(opacity) {
                 return function(g, i) {
+                  $rootScope.$broadcast('rootScope:broadcast-not_inside_chord', { label : fromNameByIndex.get(g.index)});
                   svg.selectAll(".chord")
                       .filter(function(d) {return d.source.index != i && d.target.index != i; })
                       .transition()
@@ -984,6 +1019,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
               function fadeOut(opacity) {
                 return function(g, i) {
+                  $rootScope.$broadcast('rootScope:broadcast-leave', 'out');
                   svg.selectAll(".chord")
                       .filter(function(d) { return d.source.index != i && d.target.index != i; })
                       .transition()
