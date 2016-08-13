@@ -630,7 +630,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
-            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
             }
@@ -640,7 +640,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
-            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
             }
@@ -1090,6 +1090,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             rootScopeBroadcastLeave();
           });
           
+
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
+            console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createArcGraph(data.label);
+          });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
