@@ -31,9 +31,6 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       //   }.init();
       // });
 
-
-
-
   // **************************** EXAMPLE DATA ***********************
 
 
@@ -144,7 +141,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         /**
          * Draw the chart based on the current overview type
          */
-         function drawChart(type) {
+         function drawChart() {
           if ( !data ) { return; }
 
           if ( $scope.overview === 'year' ) {
@@ -170,7 +167,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               $scope.history.push($scope.overview);
             }
 
-            var first_date = moment(data[0].date);
+            var year_ago = moment().startOf('day').subtract(1, 'year');
             var max_value = d3.max(data, function (d) {
               return d.total;
             });
@@ -182,7 +179,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
 
             var calcItemX = function (d) {
               var date = moment(d.date);
-              var week_num = date.week() - first_date.week() + (first_date.weeksInYear() * (date.weekYear() - first_date.weekYear()));
+              var week_num = date.week() - year_ago.week() + (year_ago.weeksInYear() * (date.weekYear() - year_ago.weekYear()));
               return week_num * (item_size + gutter) + label_padding;
             };
             var calcItemY = function (d) {
@@ -396,10 +393,18 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .on('click', function (d) {
                 if ( in_transition ) { return; }
   
-                in_transition = true;
+                // Check month data
+                var month_data = data.filter(function (e) {
+                  return moment(d).startOf('month') <= moment(e.date) && moment(e.date) < moment(d).endOf('month');
+                });
+  
+                // Don't transition if there is no data to show
+                if ( !month_data.length ) { return; }
   
                 // Set selected month to the one clicked on
                 $scope.selected = {date: d};
+
+                in_transition = true;
  
                 // Hide tooltip
                 hideTooltip();
@@ -497,14 +502,16 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               }));
   
             // Define week labels and axis
-            var week_labels = [start_of_month.week()];
+            var week_labels = [start_of_month.clone()];
             while ( start_of_month.week() !== end_of_month.week() ) {
-              week_labels.push(start_of_month.add(1, 'week').week());
+              week_labels.push(start_of_month.add(1, 'week').clone());
             }
   
             var weekScale = d3.scale.ordinal()
               .rangeRoundBands([label_padding, width], 0.05)
-              .domain(week_labels);
+              .domain(week_labels.map(function(weekday) {
+                return weekday.week();
+              }));
 
             // Add month data items to the overview
             items.selectAll('.item-block-month').remove();
@@ -572,7 +579,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .attr('width', function (d) {
                 var total = parseInt(d3.select(this.parentNode).attr('total'));
                 itemScale.domain([0, total]);
-                return itemScale(d.value) - item_gutter;
+                return Math.max((itemScale(d.value) - item_gutter), 1)
               })
               .attr('height', function () {
                 return Math.min(dayScale.rangeBand(), max_block_height);
@@ -651,14 +658,14 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .attr('font-size', function () {
                 return Math.floor(label_padding / 3) + 'px';
               })
-              .text(function (week_nr) {
-                return 'Week ' + week_nr;
+              .text(function (d) {
+                return 'Week ' + d.week();
               })
               .attr('x', function (d) {
-                return weekScale(d);
+                return weekScale(d.week());
               })
               .attr('y', label_padding / 2)
-              .on('mouseenter', function (week_nr) {
+              .on('mouseenter', function (weekday) {
                 if ( in_transition ) { return; }
   
                 items.selectAll('.item-block-month')
@@ -666,7 +673,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   .duration(transition_duration)
                   .ease('ease-in')
                   .style('opacity', function (d) {
-                    return ( moment(d.date).week() === week_nr ) ? 1 : 0.1;
+                    return ( moment(d.date).week() === weekday.week() ) ? 1 : 0.1;
                   });
               })
               .on('mouseout', function () {
@@ -681,10 +688,18 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .on('click', function (d) {
                 if ( in_transition ) { return; }
 
+                // Check week data
+                var week_data = data.filter(function (e) {
+                  return d.startOf('week') <= moment(e.date) && moment(e.date) < d.endOf('week');
+                });
+  
+                // Don't transition if there is no data to show
+                if ( !week_data.length ) { return; }
+
                 in_transition = true;
   
                 // Set selected month to the one clicked on
-                $scope.selected = {date: moment($scope.selected.date).week(d)};
+                $scope.selected = { date: d };
   
                 // Hide tooltip
                 hideTooltip();
@@ -776,13 +791,12 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             }));
   
             // Define week labels and axis
-            var week_labels = [start_of_week.week()];
-            while ( start_of_week.week() !== end_of_week.week() ) {
-              week_labels.push(start_of_week.add(1, 'week').week());
-            }
+            var week_labels = [start_of_week];
             var weekScale = d3.scale.ordinal()
               .rangeRoundBands([label_padding, width], 0.01)
-              .domain(week_labels);
+              .domain(week_labels.map(function (weekday) {
+                return weekday.week();
+              }));
   
             // Add week data items to the overview
             items.selectAll('.item-block-week').remove();
@@ -850,7 +864,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .attr('width', function (d) {
                 var total = parseInt(d3.select(this.parentNode).attr('total'));
                 itemScale.domain([0, total]);
-                return itemScale(d.value) - item_gutter;
+                return Math.max((itemScale(d.value) - item_gutter), 1)
               })
               .attr('height', function () {
                 return Math.min(dayScale.rangeBand(), max_block_height);
@@ -931,14 +945,14 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               .attr('font-size', function () {
                 return Math.floor(label_padding / 3) + 'px';
               })
-              .text(function (week_nr) {
-                return 'Week ' + week_nr;
+              .text(function (d) {
+                return 'Week ' + d.week();
               })
               .attr('x', function (d) {
-                return weekScale(d);
+                return weekScale(d.week());
               })
               .attr('y', label_padding / 2)
-              .on('mouseenter', function (week_nr) {
+              .on('mouseenter', function (weekday) {
                 if ( in_transition ) { return; }
   
                 items.selectAll('.item-block-week')
@@ -946,7 +960,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
                   .duration(transition_duration)
                   .ease('ease-in')
                   .style('opacity', function (d) {
-                    return ( moment(d.date).week() === week_nr ) ? 1 : 0.1;
+                    return ( moment(d.date).week() === weekday.week() ) ? 1 : 0.1;
                   });
               })
               .on('mouseout', function () {
@@ -1045,7 +1059,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               })
               .attr('width', function (d) {
                 var end = itemScale(d3.time.second.offset(moment(d.date), d.value));
-                return end - itemScale(moment(d.date));
+                return Math.max((end - itemScale(moment(d.date))), 1);
                })
               .attr('height', function () {
                 return Math.min(projectScale.rangeBand(), max_block_height);
@@ -1240,14 +1254,14 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
               });
 
               button.append('circle')
-                .attr('cx', label_padding / 2)
+                .attr('cx', label_padding / 2.25)
                 .attr('cy', label_padding / 2.5)
-                .attr('r', item_size / 2.5);
+                .attr('r', item_size / 2);
               button.append('text')
-                .attr('x', label_padding / 2)
+                .attr('x', label_padding / 2.25)
                 .attr('y', label_padding / 2.75)
                 .attr('dy', function () {
-                  return Math.floor(width / 100) / 3;
+                  return Math.floor(width / 100) / 2.5;
                 })
                 .attr('font-size', function () {
                   return Math.floor(label_padding / 3) + 'px';
