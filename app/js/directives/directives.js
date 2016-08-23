@@ -53,6 +53,10 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               rootScopeBroadcastLeave();
             });
 
+            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+              console.log(data)
+            });
+
             var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
               var lat;
               var lon;
@@ -315,7 +319,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 				        height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
 				        height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
 
-				    var parseDate = d3.time.format("%Y_%m_%d").parse;
+				    var parseDate = d3.time.format("%Y-%m-%d").parse;
 
 				    var x = d3.time.scale().range([0, width]),
 					    x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
