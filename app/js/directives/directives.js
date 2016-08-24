@@ -324,14 +324,24 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
           return $elem[0].parentNode.clientWidth;
         }, function ( w ) {
           if ( !w ) { return; }
-          createAreaGradientGraph(jsonRes, new_dataset_flag);
+          if (new_dataset_flag == 0) {
+            createAreaGradientGraph(jsonRes, new_dataset_flag);
+          }
+          if (new_dataset_flag == 1) {
+            createAreaGradientGraph(new_dataset, new_dataset_flag)
+          }
         });
 
       $scope.$watch(function () {
           return $elem[0].parentNode.clientHeight;
         }, function ( h ) {
           if ( !h ) { return; }
-          createAreaGradientGraph(jsonRes, new_dataset_flag);
+          if (new_dataset_flag == 0) {
+            createAreaGradientGraph(jsonRes, new_dataset_flag);
+          }
+          if (new_dataset_flag == 1) {
+            createAreaGradientGraph(new_dataset, new_dataset_flag)
+          }
         });
 
       $scope.$on('$destroy', function() {
