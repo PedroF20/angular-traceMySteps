@@ -24,11 +24,19 @@ angular.module('myApp.view1', ['ngRoute'])
 		sliderMax=d;
 	});
 
-	// parse a date in yyyy_mm_dd format
+	// parse a date in yyyy_mm_dd format to present it in a nice yyyy/mm/dd format
 	function parseDate(input) {
 	  var parts = input.split('_');
 	  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
 	  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
+	}
+
+	// parse a date in yyyy/mm/dd format to broadcast in thr format for the vizs: yyyy-mm-dd
+	function prepareDate(input) {
+	  var parts = input.split('/');
+	  if (parts[1].length < 2) parts[1] = '0' + parts[1];
+      if (parts[2].length < 2) parts[2] = '0' + parts[2];
+	  return [parts[2], parts[1], parts[0]].join('-');
 	}
 
 	/******************************************************************************/
@@ -99,7 +107,7 @@ angular.module('myApp.view1', ['ngRoute'])
 			      }
 			    }, 
 			    onEnd: function (sliderId, modelValue, highValue) {
-			    	$rootScope.$broadcast('rootScope:broadcast-timeline_slider', { min_time : modelValue, max_time : highValue});
+			    	$rootScope.$broadcast('rootScope:broadcast-timeline_slider', {min_time : prepareDate(modelValue), max_time : prepareDate(highValue)});
 			    }
 		    }
 		};
@@ -182,7 +190,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addArcDiagramWidget = function() {
-		$scope.widgets.push({type: 'arc', name: "My trips", draggable: true, sizeX: 5, sizeY: 2, maxSizeY:2, maxSizeX:6, minSizeY:2, minSizeX:3});
+		$scope.widgets.push({type: 'arc', name: "My all-time trip network", draggable: true, sizeX: 5, sizeY: 2, maxSizeY:2, maxSizeX:6, minSizeY:2, minSizeX:3});
 	};
 
 	$scope.clear = function() {

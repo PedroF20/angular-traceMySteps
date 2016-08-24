@@ -53,9 +53,6 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               rootScopeBroadcastLeave();
             });
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
-              console.log(data)
-            });
 
             var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
               var lat;
@@ -185,6 +182,17 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
   var jsonRes=null;
   var hexmapCount=0;
 
+  function sliderProcessing (ldate, rdate, dataset) {
+    var result = [];
+    for (var i = 0; i < dataset.length; i++) {
+      if (Date.parse(dataset[i].date) >= Date.parse(ldate) && Date.parse(dataset[i].date) <= Date.parse(rdate)) {
+        result.push([dataset[i].lon, dataset[i].lat]);
+      }
+      else {}
+    }
+    return result;
+  }
+
 
   return {
         restrict: 'E',
@@ -208,8 +216,20 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
             console.log('hextrackmap'+ hexmapCount +'');
             hextrackmaps[hexmapCount] = new L.Map('hextrackmap'+ hexmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
             var layer_hexbin_tracks = osm.addTo(hextrackmaps[hexmapCount]);        
-            createHexbinTracksGraph();
+            createHexbinTracksGraph(jsonRes);
 
+            $scope.$on('$destroy', function() {
+              rootScopeBroadcast();
+              rootScopeBroadcastLeave();
+            });
+
+            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+              for(var i = 0; i < hexmapCount; i++) {
+                hextrackmaps[i].removeLayer( L.hexbinLayer() );
+              }
+              
+              createHexbinTracksGraph(sliderProcessing(data.min_time, data.max_time, jsonRes));
+            });
 
             $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -230,17 +250,17 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
             });
 
                 
-              function createHexbinTracksGraph () {
+              function createHexbinTracksGraph (data) {
 
                   var options = {
                       radius : 12,
                       opacity: 0.5,
                       duration: 500,
                       lng: function(d){
-                          return d[0];
+                          return d.lon;
                       },
                       lat: function(d){
-                          return d[1];
+                          return d.lat;
                       },
                       value: function(d){
                           return d.length;
@@ -248,14 +268,13 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
                       valueFloor: 0,
                       valueCeil: undefined,
                       onmouseover: function(d, node, layer) {
-                        //console.log(node);
                       }
                   };
 
                   var hexLayer_hexbin_tracks = L.hexbinLayer(options).addTo(hextrackmaps[hexmapCount])
 
                   hexLayer_hexbin_tracks.colorScale().range(['white', 'blue']);
-                  hexLayer_hexbin_tracks.data(jsonRes);
+                  hexLayer_hexbin_tracks.data(data);
                   hextrackmaps[hexmapCount].invalidateSize();
               }
 
@@ -274,9 +293,20 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
 
 app.directive('areaGradient', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-	var delay=350;
+	var delay=800;
 	var jsonRes=null;
+  var new_dataset_flag = 0;
 
+  function sliderProcessing (ldate, rdate, dataset) {
+    var result = [];
+    for (var i = 0; i < dataset.length; i++) {
+      if(Date.parse(dataset[i].date) >= Date.parse(ldate) && Date.parse(dataset[i].date) <= Date.parse(rdate)) {
+        result.push([dataset[i].date, dataset[i].price]);
+      }
+      else {}
+    }
+    return result;
+  }
 
 	return {
         restrict: 'E',
@@ -286,7 +316,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
       if (jsonRes==null) {
         DataManagerService.get('/areagradient', []).then(function(d) {
   				jsonRes=d;
-  				createAreaGradientGraph();
+  				//createAreaGradientGraph(jsonRes);
   			});
       }
 
@@ -294,18 +324,29 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
           return $elem[0].parentNode.clientWidth;
         }, function ( w ) {
           if ( !w ) { return; }
-          createAreaGradientGraph();
+          createAreaGradientGraph(jsonRes, new_dataset_flag);
         });
 
       $scope.$watch(function () {
           return $elem[0].parentNode.clientHeight;
         }, function ( h ) {
           if ( !h ) { return; }
-          createAreaGradientGraph();
+          createAreaGradientGraph(jsonRes, new_dataset_flag);
         });
 
+      $scope.$on('$destroy', function() {
+              rootScopeBroadcast();
+              rootScopeBroadcastLeave();
+      });
 
-			function createAreaGradientGraph () {
+      var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+        new_dataset = sliderProcessing(data.min_time, data.max_time, jsonRes);
+        new_dataset_flag = 1;
+        createAreaGradientGraph(new_dataset, new_dataset_flag);
+      });
+
+
+			function createAreaGradientGraph (dataset, flag) {
 
 				setTimeout(function() {
 
@@ -368,10 +409,15 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
 					var transformation = [];
 
-
-					var transformation = jsonRes.map(el => (
-					  { date: el.date, price: el.price }
-					));
+          if (flag == 0) {
+  					var transformation = dataset.map(el => (
+  					  { date: el.date, price: el.price }
+  					));
+          } if (flag == 1) {
+            var transformation = dataset.map(el => (
+              { date: el[0], price: el[1] }
+            ));
+          } 
 
 
 					transformation.forEach(function(d) {
