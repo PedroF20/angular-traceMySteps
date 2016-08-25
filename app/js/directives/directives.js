@@ -936,6 +936,19 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
   var delay=350;
   var jsonRes=null;
+  var new_dataset_flag = 0;
+
+  function sliderProcessing (ldate, rdate, dataset) {
+    var result = [];
+    for (var i = 0; i < dataset.length; i++) {
+      if(Date.parse(dataset[i].start) >= Date.parse(ldate) && Date.parse(dataset[i].start) <= Date.parse(rdate)) {
+        result.push([dataset[i].from, dataset[i].to]);
+      }
+      else {}
+    }
+  console.log(result)
+    return result;
+  }
 
   return {
         restrict: 'E',
@@ -952,15 +965,25 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
-              createChordGraph(null);
-            });
+              if (new_dataset_flag == 0) {
+                createChordGraph(null, jsonRes, new_dataset_flag);
+              }
+              if (new_dataset_flag == 1) {
+                createChordGraph(null, new_dataset, new_dataset_flag)
+              }
+          });
 
           $scope.$watch(function () {
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
-            if ( !h ) { return; }
-            createChordGraph(null);
-           });
+              if ( !h ) { return; }
+              if (new_dataset_flag == 0) {
+                 createChordGraph(null, jsonRes, new_dataset_flag);
+              }
+              if (new_dataset_flag == 1) {
+                createChordGraph(null, new_dataset, new_dataset_flag)
+              }
+          });
 
           $scope.$on('$destroy', function() {
             rootScopeBroadcast();
@@ -970,30 +993,61 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
           
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            createChordGraph(data.label);
+            if (new_dataset_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            }
+            if (new_dataset_flag == 1) {
+              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            }
           });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            createChordGraph(data.label);
+            if (new_dataset_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            }
+            if (new_dataset_flag == 1) {
+              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            }
           });
           
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            createChordGraph(data.label);
+            if (new_dataset_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            }
+            if (new_dataset_flag == 1) {
+              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            }
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
-            createChordGraph(null);
+            if (new_dataset_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            }
+            if (new_dataset_flag == 1) {
+              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            }
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
-              console.log("Chord diagram broadcast leave"); // 'Broadcast!'
-            createChordGraph(null);
+            console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            if (new_dataset_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            }
+            if (new_dataset_flag == 1) {
+              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            }
           });
 
-          function createChordGraph (location_label) {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+            new_dataset = sliderProcessing(data.min_time, data.max_time, jsonRes);
+            new_dataset_flag = 1;
+            createChordGraph(null, new_dataset, new_dataset_flag);
+          });
+
+          function createChordGraph (location_label, dataset, flag) {
 
             setTimeout(function() {
 
@@ -1022,9 +1076,18 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
               var transformation = [];
 
-              var transformation = jsonRes.map(el => (
-                { from: el.from, to: el.to }
-              ));
+              if (flag == 0) {
+                var transformation = dataset.map(el => (
+                  { from: el.from, to: el.to }
+                ));
+              }
+              if (flag == 1) {
+                var transformation = dataset.map(el => (
+                  { from: el[0], to: el[1] }
+                ));
+              }
+
+              console.log(transformation)
 
               d3.select($elem[0]).selectAll("svg").remove()
 
@@ -1197,6 +1260,9 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           $scope.$on('$destroy', function() {
             rootScopeBroadcast();
             rootScopeBroadcastLeave();
+            // IDENTIFICAR AS DIFERENTES VARS DE ROOTSCOPEBROADCAST
+            // EX: ROOTSCOPEBROADCAST1, ROOTSCOPEBROADCAST2...
+            // E DEPOIS AQUI DESTRUIR TODAS EM VEZ DE SO UMA DELAS
           });
           
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
