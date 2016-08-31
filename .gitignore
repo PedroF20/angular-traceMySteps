@@ -4,3 +4,5 @@ angular-gridster-custom.js
 app/MyTracks/2016-05-03 13-20-59.gpx
 
 *.gpx
+
+.DS_Store
