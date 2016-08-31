@@ -606,6 +606,18 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
   var resizeFlag=1; // flag for the resize $watch in order to draw the correct graph when resing
                     // 1->draw frequency 2->draw timespent
 
+  var new_dataset_flag = 0; // flag indicating the presence of a subset of the dataset
+
+  function sliderProcessing (ldate, rdate, dataset) {
+    var result = [];
+    for (var i = 0; i < dataset.length; i++) {
+      if(Date.parse(dataset[i].date) >= Date.parse(ldate) && Date.parse(dataset[i].date) <= Date.parse(rdate)) {
+        result.push([dataset[i].label, dataset[i].value]);
+      }
+      else {}
+    }
+    return result;
+  }
 
   function datasetSort (d) {
       result = d.sort(function(a, b) {  // function to sort the data descendingly
@@ -620,9 +632,18 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
       var transformation = [];
       var final_array;
 
-      var transformation = s.map(el => (
-        { label: el.label, value: el.value }
-      ));
+      if (new_dataset_flag == 0) {
+
+        var transformation = s.map(el => (
+          { label: el.label, value: el.value }
+        ));
+      }
+
+      if (new_dataset_flag == 1) {
+        var transformation = s.map(el => (
+          { label: el[0], value: el[1] }
+        ));
+      }
 
       var transformation_sum = transformation.reduce(function(results, item) {
           if (!results.hasOwnProperty(item.label)) {
@@ -674,10 +695,15 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               if ( !w ) { return; }
               if(resizeFlag==0) {return;}
               if(resizeFlag==1) {
-                createBarChart(datasetSort(jsonResFrequency), resizeFlag);
+                createBarChart(datasetSort(jsonResFrequency), resizeFlag, null, new_dataset_flag);
               }
-              if(resizeFlag==2) {
-                createBarChart(concatenateStays(jsonResTime), resizeFlag);
+              if (resizeFlag == 2) {
+                if (new_dataset_flag == 1) {
+                  createBarChart(concatenateStays(new_dataset), resizeFlag, null, new_dataset_flag);
+                }
+                if (new_dataset_flag == 0) {
+                  createBarChart(concatenateStays(jsonResTime), resizeFlag, null, new_dataset_flag);
+                }
               }
             });
 
@@ -687,10 +713,15 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               if ( !h ) { return; }
               if(resizeFlag==0) {return;}
               if(resizeFlag==1) {
-                createBarChart(datasetSort(jsonResFrequency), resizeFlag);
+                createBarChart(datasetSort(jsonResFrequency), resizeFlag, null, new_dataset_flag);
               }
-              if(resizeFlag==2) {
-                createBarChart(concatenateStays(jsonResTime), resizeFlag);
+              if (resizeFlag == 2) {
+                if (new_dataset_flag == 1) {
+                  createBarChart(concatenateStays(new_dataset), resizeFlag, null, new_dataset_flag);
+                }
+                if (new_dataset_flag == 0) {
+                  createBarChart(concatenateStays(jsonResTime), resizeFlag, null, new_dataset_flag);
+                }
               }
             });
         
@@ -698,11 +729,16 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           $scope.$watchGroup(['frequency', 'timespent'], function (val) {
               if(val[0]==true && val[1]==false) {
                 resizeFlag=1;
-                createBarChart(datasetSort(jsonResFrequency), resizeFlag);
+                createBarChart(datasetSort(jsonResFrequency), resizeFlag, null, new_dataset_flag);
               }
               if(val[0]==false && val[1]==true) {
                 resizeFlag=2;
-                createBarChart(concatenateStays(jsonResTime), resizeFlag);
+                if (new_dataset_flag == 1) {
+                  createBarChart(concatenateStays(new_dataset), resizeFlag, null, new_dataset_flag);
+                }
+                if (new_dataset_flag == 0) {
+                  createBarChart(concatenateStays(jsonResTime), resizeFlag, null, new_dataset_flag);
+                }
               }
           });
 
@@ -712,14 +748,27 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             rootScopeBroadcastLeave();
           });
 
-          
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+            if (resizeFlag == 2) {
+              new_dataset = sliderProcessing(data.min_time, data.max_time, jsonResTime);
+              new_dataset_flag = 1;
+              createBarChart(concatenateStays(new_dataset), resizeFlag, null, new_dataset_flag);
+            }
+            if (resizeFlag == 1) {}
+          });
+
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
-              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
             }
             if (resizeFlag == 2) {
-              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+              if (new_dataset_flag == 1) {
+                createBarChart(concatenateStays(new_dataset), resizeFlag, data.label, new_dataset_flag);
+              }
+              if (new_dataset_flag == 0) {
+                createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label, new_dataset_flag);
+              }
             }
           });
 
@@ -727,20 +776,30 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
-              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
             }
             if (resizeFlag == 2) {
-              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+              if (new_dataset_flag == 1) {
+                createBarChart(concatenateStays(new_dataset), resizeFlag, data.label, new_dataset_flag);
+              }
+              if (new_dataset_flag == 0) {
+                createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label, new_dataset_flag);
+              }
             }
           });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
-              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
             }
             if (resizeFlag == 2) {
-              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+              if (new_dataset_flag == 1) {
+                createBarChart(concatenateStays(new_dataset), resizeFlag, data.label, new_dataset_flag);
+              }
+              if (new_dataset_flag == 0) {
+                createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label, new_dataset_flag);
+              }
             }
           });
 
@@ -748,15 +807,20 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             console.log("Bar chart broadcast leave"); // 'Broadcast!'
             // must know here which resize flag is on to draw the correct graph            
             if (resizeFlag == 1) {
-              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label);
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
             }
             if (resizeFlag == 2) {
-              createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label);
+              if (new_dataset_flag == 1) {
+                createBarChart(concatenateStays(new_dataset), resizeFlag, data.label, new_dataset_flag);
+              }
+              if (new_dataset_flag == 0) {
+                createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label, new_dataset_flag);
+              }
             }
           });
 
       
-          function createBarChart(dataset_raw, resizeFlag, location_label) { //posso passar aqui uma flag em vez de duplicar codigo para cada dataset
+          function createBarChart(dataset_raw, resizeFlag, location_label, dataset_flag) {
 
             if (resizeFlag == 1) {
               var dataset = [];
@@ -811,12 +875,15 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               svg.append("g")
                       .attr("class", "x axis")
                       .attr("transform", "translate(0," + height + ")")
-                      .call(xAxis);
+                      .call(xAxis)                
+                      .style("opacity", 0);
+
 
               svg.append("g")
                       .attr("class", "x axis")
                       .attr("transform", "translate(0," + height + ")")
-                      .call(xAxis);
+                      .call(xAxis)
+                      .style("opacity", 0);
 
               svg.select(".y.axis").remove();
               svg.select(".x.axis").remove();
@@ -825,10 +892,10 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                 svg.append("g")
                       .append("text")
                       .attr("transform", "rotate(0)")
-                      .attr("x", 78)
+                      .attr("x", 110)
                       .attr("dx", ".1em")
                       .style("text-anchor", "end")
-                      .text("Frequency of Visit");
+                      .text("All-time frequency of visit");
               }
               if (resizeFlag==2) {
                 svg.append("g")
@@ -946,7 +1013,6 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
       }
       else {}
     }
-  console.log(result)
     return result;
   }
 
@@ -1086,8 +1152,6 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                   { from: el[0], to: el[1] }
                 ));
               }
-
-              console.log(transformation)
 
               d3.select($elem[0]).selectAll("svg").remove()
 
