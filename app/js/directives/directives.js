@@ -293,9 +293,9 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
 
 app.directive('areaGradient', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-	var delay=800;
-	var jsonRes=null;
-  var new_dataset_flag = 0;
+  var delay=800;
+  var jsonRes=null;
+  var new_dataset_gradient_flag = 0;
 
   function sliderProcessing (ldate, rdate, dataset) {
     var result = [];
@@ -308,27 +308,27 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
     return result;
   }
 
-	return {
+  return {
         restrict: 'E',
         scope: true,
         link: function($scope, $elem, $attr) {
 
       if (jsonRes==null) {
         DataManagerService.get('/areagradient', []).then(function(d) {
-  				jsonRes=d;
-  				//createAreaGradientGraph(jsonRes);
-  			});
+          jsonRes=d;
+          //createAreaGradientGraph(jsonRes);
+        });
       }
 
       $scope.$watch(function () {
           return $elem[0].parentNode.clientWidth;
         }, function ( w ) {
           if ( !w ) { return; }
-          if (new_dataset_flag == 0) {
-            createAreaGradientGraph(jsonRes, new_dataset_flag);
+          if (new_dataset_gradient_flag == 0) {
+            createAreaGradientGraph(jsonRes, new_dataset_gradient_flag);
           }
-          if (new_dataset_flag == 1) {
-            createAreaGradientGraph(new_dataset, new_dataset_flag)
+          if (new_dataset_gradient_flag == 1) {
+            createAreaGradientGraph(new_dataset_gradient, new_dataset_gradient_flag)
           }
         });
 
@@ -336,11 +336,11 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
           return $elem[0].parentNode.clientHeight;
         }, function ( h ) {
           if ( !h ) { return; }
-          if (new_dataset_flag == 0) {
-            createAreaGradientGraph(jsonRes, new_dataset_flag);
+          if (new_dataset_gradient_flag == 0) {
+            createAreaGradientGraph(jsonRes, new_dataset_gradient_flag);
           }
-          if (new_dataset_flag == 1) {
-            createAreaGradientGraph(new_dataset, new_dataset_flag)
+          if (new_dataset_gradient_flag == 1) {
+            createAreaGradientGraph(new_dataset_gradient, new_dataset_gradient_flag)
           }
         });
 
@@ -350,79 +350,79 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
       });
 
       var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
-        new_dataset = sliderProcessing(data.min_time, data.max_time, jsonRes);
-        new_dataset_flag = 1;
-        createAreaGradientGraph(new_dataset, new_dataset_flag);
+        new_dataset_gradient = sliderProcessing(data.min_time, data.max_time, jsonRes);
+        new_dataset_gradient_flag = 1;
+        createAreaGradientGraph(new_dataset_gradient, new_dataset_gradient_flag);
       });
 
 
-			function createAreaGradientGraph (dataset, flag) {
+      function createAreaGradientGraph (dataset, flag) {
 
-				setTimeout(function() {
+        setTimeout(function() {
 
-					$elem[0].svg = null;
-					
-					var parentHeigtht = angular.element($elem[0])[0].parentNode.clientHeight;
-					
-				    var margin = {top: 20, right: 10, bottom: 220, left: 40},
-	    				  margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
-				        width = ($elem[0].parentNode.clientWidth) - margin.left - margin.right,
-				        height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
-				        height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
+          $elem[0].svg = null;
+          
+          var parentHeigtht = angular.element($elem[0])[0].parentNode.clientHeight;
+          
+            var margin = {top: 20, right: 10, bottom: 220, left: 40},
+                margin2 = {top: parentHeigtht-150, right: 10, bottom: 60, left: 40},
+                width = ($elem[0].parentNode.clientWidth) - margin.left - margin.right,
+                height = ($elem[0].parentNode.clientHeight) - (margin.top) - (margin.bottom),
+                height2 = ($elem[0].parentNode.clientHeight) - (margin2.top) - (margin2.bottom);
 
-				    var parseDate = d3.time.format("%Y-%m-%d").parse;
+            var parseDate = d3.time.format("%Y-%m-%d").parse;
 
-				    var x = d3.time.scale().range([0, width]),
-					    x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
-					    y = d3.scale.linear().range([height, 0]),
-					    y2 = d3.scale.linear().range([height2, 0]); 
+            var x = d3.time.scale().range([0, width]),
+              x2 = d3.time.scale().range([0, width]), // tamanho da escala mantem, qualquer q seja a qtd de info
+              y = d3.scale.linear().range([height, 0]),
+              y2 = d3.scale.linear().range([height2, 0]); 
 
-					var xAxis = d3.svg.axis().scale(x).orient("bottom"),
-					    xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
-					    yAxis = d3.svg.axis().scale(y).orient("left");
+          var xAxis = d3.svg.axis().scale(x).orient("bottom"),
+              xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
+              yAxis = d3.svg.axis().scale(y).orient("left");
 
-					var brush = d3.svg.brush()
-					    .x(x2)
-					    .on("brush", brushed);
+          var brush = d3.svg.brush()
+              .x(x2)
+              .on("brush", brushed);
 
-					var area = d3.svg.area()
-					    .interpolate("linear")
-					    .x(function(d) { return x(d.date); })
-					    .y0(height)
-					    .y1(function(d) { return y(d.price); });
+          var area = d3.svg.area()
+              .interpolate("linear")
+              .x(function(d) { return x(d.date); })
+              .y0(height)
+              .y1(function(d) { return y(d.price); });
 
-					var area2 = d3.svg.area()
-					    .interpolate("linear")
-					    .x(function(d) { return x2(d.date); })
-					    .y0(height2)
-					    .y1(function(d) { return y2(d.price); });
+          var area2 = d3.svg.area()
+              .interpolate("linear")
+              .x(function(d) { return x2(d.date); })
+              .y0(height2)
+              .y1(function(d) { return y2(d.price); });
 
-					d3.select($elem[0]).selectAll("svg").remove()
+          d3.select($elem[0]).selectAll("svg").remove()
 
-					var svg = d3.select($elem[0]).append("svg")
-					    .attr("width", width + margin.left + margin.right)
-					    .attr("height", height + margin.top + margin.bottom)
+          var svg = d3.select($elem[0]).append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
 
-						svg.append("defs").append("clipPath")
-						    .attr("id", "clip")
-						  	.append("rect")
-						    .attr("width", width)
-						    .attr("height", height);
+            svg.append("defs").append("clipPath")
+                .attr("id", "clip")
+                .append("rect")
+                .attr("width", width)
+                .attr("height", height);
 
-					var focus = svg.append("g")
-					    .attr("class", "focus")
-					    .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
+          var focus = svg.append("g")
+              .attr("class", "focus")
+              .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
 
-					var context = svg.append("g")
-					    .attr("class", "context")
-					    .attr("transform", "translate(" + margin2.left + "," + (margin2.top) + ")");
+          var context = svg.append("g")
+              .attr("class", "context")
+              .attr("transform", "translate(" + margin2.left + "," + (margin2.top) + ")");
 
-					var transformation = [];
+          var transformation = [];
 
           if (flag == 0) {
-  					var transformation = dataset.map(el => (
-  					  { date: el.date, price: el.price }
-  					));
+            var transformation = dataset.map(el => (
+              { date: el.date, price: el.price }
+            ));
           } if (flag == 1) {
             var transformation = dataset.map(el => (
               { date: el[0], price: el[1] }
@@ -430,65 +430,65 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
           } 
 
 
-					transformation.forEach(function(d) {
-					  d.date = parseDate(d.date);
-					  d.price = +d.price;
-					  return d;
-					});
+          transformation.forEach(function(d) {
+            d.date = parseDate(d.date);
+            d.price = +d.price;
+            return d;
+          });
 
-				
-					  x.domain(d3.extent(transformation.map(function(d) { return d.date; })));
-					  y.domain([0, d3.max(transformation.map(function(d) { return d.price; }))]);
-					  x2.domain(x.domain());
-					  y2.domain(y.domain());
+        
+            x.domain(d3.extent(transformation.map(function(d) { return d.date; })));
+            y.domain([0, d3.max(transformation.map(function(d) { return d.price; }))]);
+            x2.domain(x.domain());
+            y2.domain(y.domain());
 
-					focus.append("path")
-				      .datum(transformation)
-				      .attr("class", "area")
-				      .attr("d", area);
+          focus.append("path")
+              .datum(transformation)
+              .attr("class", "area")
+              .attr("d", area);
 
-					focus.append("g")
-				      .attr("class", "x axis")
-				      .attr("transform", "translate(0," + height + ")")
-				      .call(xAxis);
+          focus.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
 
-					focus.append("g")
-				      .attr("class", "y axis")
-				      .call(yAxis);
+          focus.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
 
-					context.append("path")
-				      .datum(transformation)
-				      .attr("class", "area")
-				      .attr("d", area2);
+          context.append("path")
+              .datum(transformation)
+              .attr("class", "area")
+              .attr("d", area2);
 
-					context.append("g")
-				      .attr("class", "x axis")
-				      .attr("transform", "translate(0," + height2 + ")")
-				      .call(xAxis2);
+          context.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height2 + ")")
+              .call(xAxis2);
 
-					context.append("g")
-				 	  .attr("class", "x brush")
-				      .call(brush)
-				      .selectAll("rect")
-				      .attr("y", -6)
-				      .attr("height", height2 + 7);
+          context.append("g")
+            .attr("class", "x brush")
+              .call(brush)
+              .selectAll("rect")
+              .attr("y", -6)
+              .attr("height", height2 + 7);
 
-				    // create brush to also zoom in with + detail on the main graph
+            // create brush to also zoom in with + detail on the main graph
 
-					$elem[0].svg = svg;
+          $elem[0].svg = svg;
 
-					function brushed() {
-					  x.domain(brush.empty() ? x2.domain() : brush.extent());
-					  focus.select(".area").attr("d", area);
-					  focus.select(".x.axis").call(xAxis);
-					}
+          function brushed() {
+            x.domain(brush.empty() ? x2.domain() : brush.extent());
+            focus.select(".area").attr("d", area);
+            focus.select(".x.axis").call(xAxis);
+          }
 
-			    }, delay);
-			}
+          }, delay);
+      }
 
-		}
-		
-	};
+    }
+    
+  };
 
 }]);
 
@@ -1003,7 +1003,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
 
   var delay=350;
   var jsonRes=null;
-  var new_dataset_flag = 0;
+  var new_dataset_chord_flag = 0;
 
   function sliderProcessing (ldate, rdate, dataset) {
     var result = [];
@@ -1031,11 +1031,11 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
               if ( !w ) { return; }
-              if (new_dataset_flag == 0) {
-                createChordGraph(null, jsonRes, new_dataset_flag);
+              if (new_dataset_chord_flag == 0) {
+                createChordGraph(null, jsonRes, new_dataset_chord_flag);
               }
-              if (new_dataset_flag == 1) {
-                createChordGraph(null, new_dataset, new_dataset_flag)
+              if (new_dataset_chord_flag == 1) {
+                createChordGraph(null, new_dataset_chord, new_dataset_chord_flag)
               }
           });
 
@@ -1043,11 +1043,11 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
               return $elem[0].parentNode.clientHeight;
             }, function ( h ) {
               if ( !h ) { return; }
-              if (new_dataset_flag == 0) {
-                 createChordGraph(null, jsonRes, new_dataset_flag);
+              if (new_dataset_chord_flag == 0) {
+                 createChordGraph(null, jsonRes, new_dataset_chord_flag);
               }
-              if (new_dataset_flag == 1) {
-                createChordGraph(null, new_dataset, new_dataset_flag)
+              if (new_dataset_chord_flag == 1) {
+                createChordGraph(null, new_dataset_chord, new_dataset_chord_flag)
               }
           });
 
@@ -1059,58 +1059,59 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
           
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            if (new_dataset_flag == 0) {
-               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
             }
-            if (new_dataset_flag == 1) {
-              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            if (new_dataset_chord_flag == 1) {
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
             }
           });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            if (new_dataset_flag == 0) {
-               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
             }
-            if (new_dataset_flag == 1) {
-              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            if (new_dataset_chord_flag == 1) {
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
             }
           });
           
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
-            if (new_dataset_flag == 0) {
-               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
             }
-            if (new_dataset_flag == 1) {
-              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            if (new_dataset_chord_flag == 1) {
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
             }
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
-            if (new_dataset_flag == 0) {
-               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
             }
-            if (new_dataset_flag == 1) {
-              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            if (new_dataset_chord_flag == 1) {
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
             }
           });
 
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
-            if (new_dataset_flag == 0) {
-               createChordGraph(data.label, jsonRes, new_dataset_flag);
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
             }
-            if (new_dataset_flag == 1) {
-              createChordGraph(data.label, new_dataset, new_dataset_flag)
+            if (new_dataset_chord_flag == 1) {
+              console.log(new_dataset_chord)
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
             }
           });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
-            new_dataset = sliderProcessing(data.min_time, data.max_time, jsonRes);
-            new_dataset_flag = 1;
-            createChordGraph(null, new_dataset, new_dataset_flag);
+            new_dataset_chord = sliderProcessing(data.min_time, data.max_time, jsonRes);
+            new_dataset_chord_flag = 1;
+            createChordGraph(null, new_dataset_chord, new_dataset_chord_flag);
           });
 
           function createChordGraph (location_label, dataset, flag) {
