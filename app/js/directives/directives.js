@@ -223,13 +223,7 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
               rootScopeBroadcastLeave();
             });
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
-              for(var i = 0; i < hexmapCount; i++) {
-                hextrackmaps[i].removeLayer( L.hexbinLayer() );
-              }
-              
-              createHexbinTracksGraph(sliderProcessing(data.min_time, data.max_time, jsonRes));
-            });
+            
 
             $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
@@ -276,6 +270,13 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
                   hexLayer_hexbin_tracks.colorScale().range(['white', 'blue']);
                   hexLayer_hexbin_tracks.data(data);
                   hextrackmaps[hexmapCount].invalidateSize();
+
+                  var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+                    for(var i = 0; i < hexmapCount; i++) {
+                      hextrackmaps[i].removeLayer(hexLayer_hexbin_tracks);
+                      console.log(sliderProcessing(data.min_time, data.max_time, jsonRes))
+                    }
+                  });
               }
 
                 
@@ -346,7 +347,6 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
       $scope.$on('$destroy', function() {
               rootScopeBroadcast();
-              rootScopeBroadcastLeave();
       });
 
       var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
@@ -497,11 +497,6 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
 
 app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  function (DataManagerService, $rootScope, $http) {
 
-
-  function isOdd(num) { 
-    return (num % 2) == 1;
-  }
-
   var jsonRes=null;
   var delay = 5000;
   var trackmaps = [];
@@ -511,6 +506,23 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
   var center = [38.7, -9.1];
   var counter = 0;
   var folderPath = "../ProcessedTracks/";
+
+
+  function sliderProcessing (ldate, rdate, dataset) {
+    var result = [];
+    for (var i = 0; i < dataset.length; i++) {
+
+      var parts = dataset[i].split('-');
+      var temp_date = [parts[0], parts[1], parts[2]].join('-');
+      var complete_name = [parts[0], parts[1], parts[2], parts[3]].join('-');
+
+      if(Date.parse(temp_date) >= Date.parse(ldate) && Date.parse(temp_date) <= Date.parse(rdate)) {
+        result.push(complete_name);
+      }
+      else {}
+    }
+    return result;
+  }
 
   return {
 
@@ -522,7 +534,12 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
           jsonRes=d;
         });
 
+
         setTimeout(function() {
+
+          // for (var i = 0; i < jsonRes.length; i++) {
+          //   console.log(Date.parse(parseString(jsonRes[i])));
+          // };
 
           var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -538,7 +555,7 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
           // depending on the order of call. this way the map initializes on the layer1 (leaflet)
           // layer, and then we can choose to change to the google layer
           var layer1 = osm.addTo(trackmaps[trackmapCount]);
-          createTracks();
+          createTracks(jsonRes);
 
           $scope.$watch(function () {
             return $elem[0].parentNode.clientWidth;
@@ -558,7 +575,14 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
             }
           });
 
-          function createTracks () {
+          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+            for(var i = 0; i < trackmapCount; i++) {
+              trackmaps[i].removeLayer(runLayer);
+              console.log(sliderProcessing(data.min_time, data.max_time, jsonRes))
+            }
+          });
+
+          function createTracks (track_list) {
               
 
               var myStyle = {
@@ -573,8 +597,10 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
               });
               
 
-              for (var i = 0; i < jsonRes.length; i += 1) {
-                var runLayer = omnivore.gpx(folderPath + jsonRes[i], null, customLayer)
+              for (var i = 0; i < track_list.length; i += 1) {
+                runLayer = omnivore.gpx(folderPath + track_list[i], null, customLayer) //local variables start with var
+                                                                                  // global variables do not have var
+                                                                                  // this way i can acess them in the broadcast
                   .on('ready', function() {
                       //runLayer.showExtremities('arrowM');
                   })
