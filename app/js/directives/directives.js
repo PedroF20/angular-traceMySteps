@@ -49,12 +49,15 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
             });
 
             $scope.$on('$destroy', function() {
-              rootScopeBroadcast();
-              rootScopeBroadcastLeave();
+              rootScopeBroadcast1();
+              rootScopeBroadcast2();
+              rootScopeBroadcast3();
+              rootScopeBroadcastLeave1();
+              rootScopeBroadcastLeave2();
             });
 
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
+            var rootScopeBroadcast1 = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
               var lat;
               var lon;
               for(var j = 0; j < jsonRes_places.length; j++) {
@@ -68,7 +71,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               }
             });
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
+            var rootScopeBroadcast2 = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
               var lat;
               var lon;
               for(var j = 0; j < jsonRes_places.length; j++) {
@@ -82,7 +85,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               }
             });
 
-            var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
+            var rootScopeBroadcast3 = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
               var lat;
               var lon;
               for(var j = 0; j < jsonRes_places.length; j++) {
@@ -97,14 +100,14 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
             });
 
 
-            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+            var rootScopeBroadcastLeave1 = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
               console.log("Hexbin places broadcast leave");
               // for(var i = 0; i < mapCount; i++) {
               //   maps[i].setZoom(10);
               // }
             });
 
-            var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+            var rootScopeBroadcastLeave2= $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
               console.log("Hexbin places broadcast leave");
               // for(var i = 0; i < mapCount; i++) {
               //   maps[i].setZoom(10);
@@ -220,7 +223,7 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
 
             $scope.$on('$destroy', function() {
               rootScopeBroadcast();
-              rootScopeBroadcastLeave();
+              //rootScopeBroadcastLeave();
             });
 
             
@@ -346,7 +349,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
         });
 
       $scope.$on('$destroy', function() {
-              rootScopeBroadcast();
+        rootScopeBroadcast();
       });
 
       var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
@@ -537,10 +540,6 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
         setTimeout(function() {
 
-          // for (var i = 0; i < jsonRes.length; i++) {
-          //   console.log(Date.parse(parseString(jsonRes[i])));
-          // };
-
           var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           osm = L.tileLayer(osmUrl, {maxZoom: 18, attributionControl: false});
@@ -575,10 +574,14 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
             }
           });
 
+          $scope.$on('$destroy', function() {
+            rootScopeBroadcast();
+          });
+
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
             for(var i = 0; i < trackmapCount; i++) {
               trackmaps[i].removeLayer(runLayer);
-              console.log(sliderProcessing(data.min_time, data.max_time, jsonRes))
+              //console.log(sliderProcessing(data.min_time, data.max_time, jsonRes))
             }
           });
 
@@ -770,11 +773,14 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
 
           $scope.$on('$destroy', function() {
-            rootScopeBroadcast();
+            rootScopeBroadcast1();
+            rootScopeBroadcast2();
+            rootScopeBroadcast3();
+            rootScopeBroadcast4();
             rootScopeBroadcastLeave();
           });
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
+          var rootScopeBroadcast1 = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
             if (resizeFlag == 2) {
               new_dataset = sliderProcessing(data.min_time, data.max_time, jsonResTime);
               new_dataset_flag = 1;
@@ -783,7 +789,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             if (resizeFlag == 1) {}
           });
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
+          var rootScopeBroadcast2 = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
@@ -799,7 +805,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
           });
 
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
+          var rootScopeBroadcast3 = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
@@ -814,7 +820,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             }
           });
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
+          var rootScopeBroadcast4 = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (resizeFlag == 1) {
               createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
@@ -1078,12 +1084,15 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
           });
 
           $scope.$on('$destroy', function() {
-            rootScopeBroadcast();
-            rootScopeBroadcastLeave();
+            rootScopeBroadcast1();
+            rootScopeBroadcast2();
+            rootScopeBroadcast3();
+            rootScopeBroadcastLeave1();
+            rootScopeBroadcastLeave2();
           });
 
           
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) { 
+          var rootScopeBroadcast1 = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
                createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
@@ -1093,7 +1102,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             }
           });
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) { 
+          var rootScopeBroadcast2 = $rootScope.$on('rootScope:broadcast-not_inside_arc', function (event, data) { 
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
                createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
@@ -1103,7 +1112,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             }
           });
           
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
+          var rootScopeBroadcast3 = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
                createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
@@ -1113,7 +1122,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             }
           });
 
-          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+          var rootScopeBroadcastLeave1 = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
                createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
@@ -1123,7 +1132,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             }
           });
 
-          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+          var rootScopeBroadcastLeave2 = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
                createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
@@ -1349,33 +1358,33 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
            });
 
           $scope.$on('$destroy', function() {
-            rootScopeBroadcast();
-            rootScopeBroadcastLeave();
-            // IDENTIFICAR AS DIFERENTES VARS DE ROOTSCOPEBROADCAST
-            // EX: ROOTSCOPEBROADCAST1, ROOTSCOPEBROADCAST2...
-            // E DEPOIS AQUI DESTRUIR TODAS EM VEZ DE SO UMA DELAS
+            rootScopeBroadcast1();
+            rootScopeBroadcast2();
+            rootScopeBroadcast3();
+            rootScopeBroadcastLeave1();
+            rootScopeBroadcastLeave2();
           });
           
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
+          var rootScopeBroadcast1 = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
             console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createArcGraph(data.label);
           });
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
+          var rootScopeBroadcast2 = $rootScope.$on('rootScope:broadcast-not_inside_chord', function (event, data) {
             console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createArcGraph(data.label);
           });
 
-          var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
+          var rootScopeBroadcast3 = $rootScope.$on('rootScope:broadcast-not_inside_hexbinPlaces', function (event, data) {
             console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
             createArcGraph(data.label);
           });
 
-          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+          var rootScopeBroadcastLeave1 = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Arc diagram broadcast leave"); // 'Broadcast!'
           });
 
-          var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+          var rootScopeBroadcastLeave2 = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
             console.log("Arc diagram broadcast leave"); // 'Broadcast!'
           });
 
