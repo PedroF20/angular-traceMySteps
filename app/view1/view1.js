@@ -186,7 +186,7 @@ angular.module('myApp.view1', ['ngRoute'])
 	};
 
 	$scope.addStaysGraphWidget = function() {
-		$scope.widgets.push({type: 'stays', name: "My usual stays", draggable: true, sizeX: 4, sizeY: 2, maxSizeY:2, maxSizeX:5, minSizeY:2, minSizeX:4});
+		$scope.widgets.push({type: 'stays', name: "My stays heatmap (by day & hour)", draggable: true, sizeX: 4, sizeY: 2, maxSizeY:2, maxSizeX:5, minSizeY:2, minSizeX:4});
 	};
 
 	$scope.addArcDiagramWidget = function() {

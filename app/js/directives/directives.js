@@ -1566,48 +1566,6 @@ app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataM
   var delay=1500;
   var jsonRes=null;
 
-
-/******* HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-var stays=[  
-                 {  
-                    day:[2], // day 1: sunday, day 2: monday, etc.
-                    hour:[1], // // 1-1 ate 1-1.59 -> corresponde ao intervalo 0 ate 0.59
-                    // "primeira hora do dia" - fazer esta associaçao no backend
-                    // ex: if 00<=hour<=00.59 -> hour=1
-                    time_spent:[57],// in minutes - maximo de 60 pois o bloco e de 1 hr
-                    label: ["home", "asasasasas"] // sitio onde aconteceu a stay ou a stay "mais importante"
-                    // no caso de haver varias stays para um bloco, mostrar a maior
-                 },
-                 {  
-                    day:4,
-                    hour:1,
-                    time_spent:41,
-                    label: "inesc"
-                 },
-                 {  
-                    day:1,
-                    hour:1,
-                    time_spent:21,
-                    label:"monumental"
-                 },
-                 {  
-                    day:1,
-                    hour:1,
-                    time_spent:1,
-                    label:"atrium saldanha"
-                 },
-                 {  
-                    day:1,
-                    hour:3,
-                    time_spent:10,
-                    label:"ist"
-                 }
-              ];
-
-/******* END OF HARDCODED DATA - WILL BE CHANGED TO THE SERVICE PROVIDED DATA ********/
-
-
   return {
         restrict: 'E',
         scope: true,
@@ -1616,7 +1574,6 @@ var stays=[
           if (jsonRes==null) {
             DataManagerService.get('/staysgraph', []).then(function(d) {
               jsonRes=d;
-              //also use a variation of concatenateStays() here?
             });
           }
           
@@ -1710,7 +1667,11 @@ var stays=[
                   .enter().append("rect")
 
                     //----attach data to rect---
-                   .attr("data", function(d, i) {return d.label;})
+                   .attr("data", function(d, i) {
+                      // console.log(d.label.join(", "));
+                      // return d.label;
+                      return d.label.join(", ");
+                    })
                    .attr("data2", function(d, i) {return d.time_spent;})
                    .attr("onmouseover","showData(evt)")
                    .attr("onmouseout","hideData(evt)")
@@ -1740,12 +1701,17 @@ var stays=[
                       var data2=target.getAttribute("data2")
 
                       //---format as desired---
+
+                      // CORRECT THE TOOLTIPS!!!!!!!!!!!!!!!!!!!!
+
                       var html=data
-                      var html2=data2
-                      dataDiv.innerHTML = '<div class="header"><strong>' + 'Stays' + ' </strong></div><br>'
-                                            + '<div><span><strong>' + html + '</strong></span>' + '<span>' 
-                                            + '&nbsp' + '&nbsp' + '&nbsp'+ '&nbsp' + '&nbsp'
-                                            + html2 + ' minutes' + '</span></div>';
+                      // var html2=data2
+                      // dataDiv.innerHTML = '<div class="header"><strong>' + 'Stays' + ' </strong></div><br>'
+                      //                       + '<div><span><strong>' + html + '</strong></span>' + '<span>' 
+                      //                       + '&nbsp' + '&nbsp' + '&nbsp'+ '&nbsp' + '&nbsp'
+                      //                       + html2 + ' minutes' + '</span></div>';
+                      dataDiv.innerHTML = '<div class="header"><strong>' + 'Main stay(s) in: ' + ' </strong></div><br>'
+                                            + '<div><span>' + html + '</span>' + '<span>';
                       dataDiv.style.visibility="visible"
 
                   }
