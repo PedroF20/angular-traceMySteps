@@ -486,6 +486,8 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
             focus.select(".x.axis").call(xAxis);
           }
 
+          delay = 350;
+
           }, delay);
       }
 
@@ -1020,6 +1022,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               //         .attr("height", y.rangeBand());
               
               $elem[0].svg = svg;
+              delay = 350;
 
             }, delay);
 
@@ -1299,6 +1302,8 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                 };
               }
 
+              delay = 350;
+
             }, delay);
           }
       }
@@ -1558,7 +1563,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
 
 app.directive('staysGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-  var delay=350;
+  var delay=1500;
   var jsonRes=null;
 
 
@@ -1571,7 +1576,7 @@ var stays=[
                     // "primeira hora do dia" - fazer esta associaçao no backend
                     // ex: if 00<=hour<=00.59 -> hour=1
                     time_spent:[57],// in minutes - maximo de 60 pois o bloco e de 1 hr
-                    label: ["home"] // sitio onde aconteceu a stay ou a stay "mais importante"
+                    label: ["home", "asasasasas"] // sitio onde aconteceu a stay ou a stay "mais importante"
                     // no caso de haver varias stays para um bloco, mostrar a maior
                  },
                  {  
@@ -1751,6 +1756,8 @@ var stays=[
                   }
 
               $elem[0].svg = svg;
+
+              delay = 250;
 
             }, delay);
           }
