@@ -14,7 +14,7 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 <s>4) Add more visualizations.</s>
 
-5) Bind all the visualizations & bind with date slider.
+<s>5) Bind all the visualizations & bind with date slider.</s>
 
 6) Optimize code, performance & styling - Correct eventual bugs.
 
@@ -35,8 +35,8 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 <s>4) Arc Graph is drawn once, but when it is removed and added again to the grid, the arc function
     does not compute edges and nodes.</s>
 
-5) RootScope Broadcast Leave optimization: the "leave" instruction on a directive may not be listened in the directive itself.
-This means a different Leave instruction for each graph, in order to notify all the visualizations depending on it, except the directive itself.
+<s>5) RootScope Broadcast Leave optimization: the "leave" instruction on a directive may not be listened in the directive itself.
+This means a different Leave instruction for each graph, in order to notify all the visualizations depending on it, except the directive itself.</s>
 
 ### Steps to run:
 
