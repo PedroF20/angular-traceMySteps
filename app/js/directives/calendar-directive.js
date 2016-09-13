@@ -40,34 +40,37 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
       replace: true,
       link: function ($scope, $elem, $attr) {
 
-        DataManagerService.get('/calendar', []).then(function(d) {
-          data=d;
-            // Get daily summary if that was not provided
-            if ( !data[0].summary ) {
-              data.map(function (d) {
-                var summary = d.details.reduce( function(uniques, project) {
-                  if ( !uniques[project.name] ) {
-                    uniques[project.name] = {
-                      'value': project.value
-                    };
-                  } else {
-                    uniques[project.name].value += project.value;
-                  }
-                  return uniques;
-                }, {});
-                var unsorted_summary = Object.keys(summary).map(function (key) {
-                  return {
-                    'name': key,
-                    'value': summary[key].value
-                  };
-                });
-                d.summary = unsorted_summary.sort(function (a, b) {
-                  return b.value - a.value;
-                });
-                return d;
-              });
-            }
-        });
+
+        if (data==null) {
+            DataManagerService.get('/calendar', []).then(function(d) {
+              data=d;
+                // Get daily summary if that was not provided
+                if ( !data[0].summary ) {
+                  data.map(function (d) {
+                    var summary = d.details.reduce( function(uniques, project) {
+                      if ( !uniques[project.name] ) {
+                        uniques[project.name] = {
+                          'value': project.value
+                        };
+                      } else {
+                        uniques[project.name].value += project.value;
+                      }
+                      return uniques;
+                    }, {});
+                    var unsorted_summary = Object.keys(summary).map(function (key) {
+                      return {
+                        'name': key,
+                        'value': summary[key].value
+                      };
+                    });
+                    d.summary = unsorted_summary.sort(function (a, b) {
+                      return b.value - a.value;
+                    });
+                    return d;
+                  });
+                }
+            });
+        }
 
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var gutter = 5;
@@ -120,23 +123,23 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
           });
         }, delay);
 
-        var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, response) {
-            console.log("Calendar broadcast: " + JSON.stringify(response.calendar)); // 'Broadcast!'
-            removeYearOverview();
-            selected_date=data[0]; //hardcoded to show the first day of the data array in the day overview (proof-of-concept)
-            drawDayOverview();
-        });
+        // var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, response) {
+        //     console.log("Calendar broadcast: " + JSON.stringify(response.calendar)); // 'Broadcast!'
+        //     removeYearOverview();
+        //     selected_date=data[0]; //hardcoded to show the first day of the data array in the day overview (proof-of-concept)
+        //     drawDayOverview();
+        // });
 
-        var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-          console.log("Calendar broadcast leave"); // 'Broadcast!'
-          removeDayOverview();
-          drawYearOverview();
-        });
+        // var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+        //   console.log("Calendar broadcast leave"); // 'Broadcast!'
+        //   removeDayOverview();
+        //   drawYearOverview();
+        // });
 
-        $scope.$on('$destroy', function() {
-            rootScopeBroadcast();
-            rootScopeBroadcastLeave();
-        })
+        // $scope.$on('$destroy', function() {
+        //     rootScopeBroadcast();
+        //     rootScopeBroadcastLeave();
+        // })
 
         /**
          * Draw the chart based on the current overview type
