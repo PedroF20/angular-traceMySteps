@@ -624,8 +624,8 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
 
               myStyle = {
                   "color": "#0033ff",
-                  "weight": 5,
-                  "opacity": 0.65,
+                  "weight": 1,
+                  "opacity": 0.6,
                   "clickable": true
               };
 
