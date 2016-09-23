@@ -439,6 +439,14 @@ text.label{
     fill-opacity: .9;
 }
 
+/*.bar:active { 
+    fill: red;
+}*/
+
+.selected {
+    fill: black;
+}
+
 .bartext {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;

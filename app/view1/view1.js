@@ -74,7 +74,8 @@ angular.module('myApp.view1', ['ngRoute'])
 		var start = parseDate(sliderMin);
 		var future = parseDate(sliderMax);
 		var range = []
-		var mil = 86400000 //24h
+		//var mil = 86400000 //24h
+		var mil = 2629743000 // one month *temporary*
 		for (var i = start.getTime(); i < (future.getTime() + mil); i = i + mil) {
 		  range.push(new Date(i).toLocaleDateString())
 		}

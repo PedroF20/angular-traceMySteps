@@ -52,8 +52,10 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               rootScopeBroadcast1();
               rootScopeBroadcast2();
               rootScopeBroadcast3();
+              rootScopeBroadcast4();
               rootScopeBroadcastLeave1();
               rootScopeBroadcastLeave2();
+              rootScopeBroadcastLeave3();
             });
 
 
@@ -99,6 +101,20 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
               }
             });
 
+            var rootScopeBroadcast4 = $rootScope.$on('rootScope:broadcast-not_inside_calendar', function (event, data) {
+              var lat;
+              var lon;
+              for(var j = 0; j < jsonRes_places.length; j++) {
+                if (data.label == jsonRes_places[j][2]) {
+                    lat = jsonRes_places[j][1];
+                    lon = jsonRes_places[j][0]
+                  }
+              }
+              for(var i = 0; i < mapCount; i++) {
+                maps[i].setView(L.latLng(lat, lon), 16);
+              }
+            });
+
 
             var rootScopeBroadcastLeave1 = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
               console.log("Hexbin places broadcast leave");
@@ -108,6 +124,13 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
             });
 
             var rootScopeBroadcastLeave2= $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+              console.log("Hexbin places broadcast leave");
+              // for(var i = 0; i < mapCount; i++) {
+              //   maps[i].setZoom(10);
+              // }
+            });
+
+            var rootScopeBroadcastLeave3= $rootScope.$on('rootScope:broadcast-leave-not_inside_calendar', function (event, data) {
               console.log("Hexbin places broadcast leave");
               // for(var i = 0; i < mapCount; i++) {
               //   maps[i].setZoom(10);
@@ -179,7 +202,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var hextrackmaps = [];
-  var delay=5000;
+  var delay=10000; // 5000
   var hextrackmap = undefined;
   var center = [38.7, -9.1];
   var jsonRes=null;
@@ -706,6 +729,8 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
   }
 
+  function isOdd(num) { return (num % 2)==1;}
+
 
   return {
 
@@ -790,7 +815,9 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             rootScopeBroadcast2();
             rootScopeBroadcast3();
             rootScopeBroadcast4();
+            rootScopeBroadcast5();
             rootScopeBroadcastLeave();
+            rootScopeBroadcastLeave2();
           });
 
           var rootScopeBroadcast1 = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
@@ -848,7 +875,38 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             }
           });
 
+          var rootScopeBroadcast5 = $rootScope.$on('rootScope:broadcast-not_inside_calendar', function (event, data) {
+            console.log("bar chart broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            if (resizeFlag == 1) {
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
+            }
+            if (resizeFlag == 2) {
+              if (new_dataset_flag == 1) {
+                createBarChart(concatenateStays(new_dataset), resizeFlag, data.label, new_dataset_flag);
+              }
+              if (new_dataset_flag == 0) {
+                createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label, new_dataset_flag);
+              }
+            }
+          });
+
           var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
+            console.log("Bar chart broadcast leave"); // 'Broadcast!'
+            // must know here which resize flag is on to draw the correct graph            
+            if (resizeFlag == 1) {
+              createBarChart(datasetSort(jsonResFrequency), resizeFlag, data.label, new_dataset_flag);
+            }
+            if (resizeFlag == 2) {
+              if (new_dataset_flag == 1) {
+                createBarChart(concatenateStays(new_dataset), resizeFlag, data.label, new_dataset_flag);
+              }
+              if (new_dataset_flag == 0) {
+                createBarChart(concatenateStays(jsonResTime), resizeFlag, data.label, new_dataset_flag);
+              }
+            }
+          });
+
+          var rootScopeBroadcastLeave2 = $rootScope.$on('rootScope:broadcast-leave-not_inside_calendar', function (event, data) {
             console.log("Bar chart broadcast leave"); // 'Broadcast!'
             // must know here which resize flag is on to draw the correct graph            
             if (resizeFlag == 1) {
@@ -870,7 +928,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             if (resizeFlag == 1) {
               var dataset = [];
               for (var i = 0; i < dataset_raw.length; i++) {
-                if (dataset_raw[i].value < 10) {}
+                if (dataset_raw[i].value < 90) {}  // default 10 (frequency of visit)
                 else {
                   dataset.push(dataset_raw[i]);
                 }
@@ -879,7 +937,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             if (resizeFlag == 2) {
               var dataset = [];
               for (var i = 0; i < dataset_raw.length; i++) {
-                if (dataset_raw[i].value < 200) {}
+                if (dataset_raw[i].value < 13260) {} // default 200 (hours spent)
                 else {
                   dataset.push(dataset_raw[i]);
                 }
@@ -981,7 +1039,8 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       })
                       .attr("y", function(d,i) {
                           //if (d.value<=10){return};
-                          return y(d.label)+15;
+                          //return y(d.label)+15; // default
+                          return y(d.label)+10;
                       })
                       .text(function(d){ return d.label;  //use together with limitation of the nr of bars shown
                       });
@@ -1000,21 +1059,46 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                 .style("font-size", "18px"); // maybe in this case also present the value of frequency/timespent
                                             // in the text as if it was the tooltip 
                                             // return d.label + hours + minutes
-              }
+              } 
 
-              bar.on("mousemove", function(d){
-                      $rootScope.$broadcast('rootScope:broadcast-not_inside_bar_chart', { label : d.label});
-                      div.style("left", (d3.event.layerX + 10) + "px");
-                      div.style("top", (d3.event.layerY + 10) + "px");
-                      div.style("display", "inline-block");
-                      if (resizeFlag==1) {
-                        div.html((d.value)+" times");
+              var currentColor = "#1b6427";
+              var nClicks = 0;
+
+              bar.on("click", function(d){
+ 
+                      // Find previously selected, unselect
+                      // d3.select(".selected").classed("selected", false);
+
+                      // // Select current item
+                      // d3.select(this).classed("selected", true);
+                      // console.log(this)
+
+                      // currentColor = currentColor == "#1b6427" ? "black" : "#1b6427";
+                      // d3.select(this).style("fill", currentColor);
+                      // console.log(this)
+
+                      nClicks += 1;
+                      if (isOdd(nClicks)) {
+                        d3.select(this).classed("selected", true);
+                        $rootScope.$broadcast('rootScope:broadcast-not_inside_bar_chart', { label : d.label});
+                        div.style("left", (d3.event.layerX + 10) + "px");
+                        div.style("top", (d3.event.layerY + 10) + "px");
+                        div.style("display", "inline-block");
+                        if (resizeFlag==1) {
+                          div.html((d.value)+" times");
+                        }
+                        if (resizeFlag==2) {
+                          var hours = Math.floor(d.value / 60);          
+                          var minutes = d.value % 60;
+                          div.html(hours + " hours " + minutes + " minutes");
+                        }
                       }
-                      if (resizeFlag==2) {
-                        var hours = Math.floor(d.value / 60);          
-                        var minutes = d.value % 60;
-                        div.html(hours + " hours " + minutes + " minutes");
+                      if (!isOdd(nClicks)) {
+                        $rootScope.$broadcast('rootScope:broadcast-leave-not_inside_bar_chart', 'out'); 
+                        d3.select(".selected").classed("selected", false);
                       }
+
+
                   });
               bar.on("mouseout", function(d){
                       $rootScope.$broadcast('rootScope:broadcast-leave-not_inside_bar_chart', 'out');  
@@ -1101,8 +1185,10 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             rootScopeBroadcast1();
             rootScopeBroadcast2();
             rootScopeBroadcast3();
+            rootScopeBroadcast4();
             rootScopeBroadcastLeave1();
             rootScopeBroadcastLeave2();
+            rootScopeBroadcastLeave3();
           });
 
           
@@ -1136,6 +1222,16 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
             }
           });
 
+          var rootScopeBroadcast4 = $rootScope.$on('rootScope:broadcast-not_inside_calendar', function (event, data) {
+            console.log("chord broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
+            }
+            if (new_dataset_chord_flag == 1) {
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
+            }
+          });
+
           var rootScopeBroadcastLeave1 = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
@@ -1147,6 +1243,17 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
           });
 
           var rootScopeBroadcastLeave2 = $rootScope.$on('rootScope:broadcast-leave-not_inside_bar_chart', function (event, data) {
+            console.log("Chord diagram broadcast leave"); // 'Broadcast!'
+            if (new_dataset_chord_flag == 0) {
+               createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
+            }
+            if (new_dataset_chord_flag == 1) {
+              console.log(new_dataset_chord)
+              createChordGraph(data.label, new_dataset_chord, new_dataset_chord_flag)
+            }
+          });
+
+          var rootScopeBroadcastLeave3 = $rootScope.$on('rootScope:broadcast-leave-not_inside_calendar', function (event, data) {
             console.log("Chord diagram broadcast leave"); // 'Broadcast!'
             if (new_dataset_chord_flag == 0) {
                createChordGraph(data.label, jsonRes, new_dataset_chord_flag);
@@ -1236,8 +1343,10 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                   }
                   //d.to.forEach(function(d) { row[indexByFromName.get(d)]++; });
                   row[indexByFromName.get(d.to)]++;
+
               });
 
+              console.log(matrix)
               chord.matrix(matrix);
 
               var g = svg.selectAll(".group")
@@ -1246,7 +1355,9 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                 .attr("class", "group");
 
               g.append("path")
-                  .attr("fill", function(d) { return fill(d.index); })
+                  .attr("fill", function(d) { 
+                    return fill(d.index); 
+                  })
                   .attr("stroke", function(d) { return fill(d.index); })
                   .attr("d", arc)
                   .on("mouseover", fadeIn(.1)) //put counter for to decide which function the clicking calls
@@ -1261,7 +1372,9 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                         + (d.angle > Math.PI ? "rotate(180)" : "");
                   })
                   .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-                  .text(function(d) { return fromNameByIndex.get(d.index); });
+                  .text(function(d) {
+                   return fromNameByIndex.get(d.index);
+                  });
 
                   // as labels não aparecem se o elemento tiver um nr de travels abaixo de um threshold
                   // ou elemento não aparece de todo
@@ -1281,7 +1394,7 @@ app.directive('chordGraph', ['DataManagerService', '$rootScope', function (DataM
                  + "\n" + fromNameByIndex.get(d.target.index)
                  + " → " + fromNameByIndex.get(d.source.index)
                  + ": " + d.target.value + " travels";
-                 });
+              });
 
               $elem[0].svg = svg;
 
@@ -1337,6 +1450,38 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
       return {x: lx,y: ly};
   }
 
+  function sortEdges(set) {
+    temp = [];
+    set.forEach(function(d) {
+      if (d.frequency<50) {
+        
+      }
+      else {
+        temp.push(d);
+      }
+    });
+    return temp;
+  }
+
+  function filterNodes(edge_list, node_list) {
+    var result = [];
+    //var start = 0;
+    for (var i = 0; i < node_list.length; i++) {
+      for (var j = 0; j < edge_list.length; j++) {
+        if(edge_list[j].source.x == node_list[i].x || edge_list[j].target.x == node_list[i].x){
+          result.push(node_list[i]);
+        }
+        else{}
+      };
+    };
+    // for (var k = 0; k < result.length; k++) {
+    //   result[k].x=start;
+    //   start +=50;
+    //   console.dir(result)
+    // };
+    return result;
+  }
+
 
   return {
         restrict: 'E',
@@ -1350,15 +1495,23 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
           if (jsonResEdges==null) {
             DataManagerService.get('/arcedges', []).then(function(d) {
               jsonResEdges=d;
+              // temp = sortEdges(jsonResEdges);
+              // console.log(sortEdges(jsonResEdges))
+              // jsonResEdges = temp;
             });
           }
 
           if (jsonResNodes==null) {
             DataManagerService.get('/arcnodes', []).then(function(d) {
               jsonResNodes=d;
+              //console.log(jsonResNodes)
+
+              // para retirar nodes sem viagens, buscar o x de cada objecto e comparar com o x da
+              // source e target de cada edge. se não existir, retirar o node da lista
             });
           }
           
+
           $scope.$watch(function () {
               return $elem[0].parentNode.clientWidth;
             }, function ( w ) {
@@ -1377,8 +1530,10 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             rootScopeBroadcast1();
             rootScopeBroadcast2();
             rootScopeBroadcast3();
+            rootScopeBroadcast4();
             rootScopeBroadcastLeave1();
             rootScopeBroadcastLeave2();
+            rootScopeBroadcastLeave3();
           });
           
           var rootScopeBroadcast1 = $rootScope.$on('rootScope:broadcast-not_inside_bar_chart', function (event, data) {
@@ -1396,6 +1551,11 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             createArcGraph(data.label);
           });
 
+          var rootScopeBroadcast4 = $rootScope.$on('rootScope:broadcast-not_inside_calendar', function (event, data) {
+            console.log("arc diagram broadcast: " + JSON.stringify(data)); // 'Broadcast!'
+            createArcGraph(data.label);
+          });
+
           var rootScopeBroadcastLeave1 = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
             console.log("Arc diagram broadcast leave"); // 'Broadcast!'
           });
@@ -1404,11 +1564,19 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
             console.log("Arc diagram broadcast leave"); // 'Broadcast!'
           });
 
+          var rootScopeBroadcastLeave3 = $rootScope.$on('rootScope:broadcast-leave-not_inside_calendar', function (event, data) {
+            console.log("Arc diagram broadcast leave"); // 'Broadcast!'
+          });
+
           function createArcGraph (location_label) {
+
 
             setTimeout(function() {
 
+
               $elem[0].svg = null;
+              // console.dir(filterNodes(jsonResEdges, jsonResNodes))
+              // jsonResNodes = filterNodes(jsonResEdges, jsonResNodes);                                                
 
               expEdges = jsonResEdges;
               expNodes = jsonResNodes;
@@ -1416,7 +1584,7 @@ app.directive('arcDiagram', ['DataManagerService', '$rootScope', function (DataM
               var nodeHash = {};
               for (x in jsonResNodes) {
                 nodeHash[jsonResNodes[x].id] = jsonResNodes[x];
-                jsonResNodes[x].x = parseInt(x) * 50;
+                jsonResNodes[x].x = parseInt(x) * 50; //50
               }
               for (x in jsonResEdges) {
                 if (typeof nodeHash[jsonResEdges[x].source] === "undefined" || typeof nodeHash[jsonResEdges[x].target] === "undefined") {}
