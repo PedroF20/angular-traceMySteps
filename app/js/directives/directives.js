@@ -202,7 +202,7 @@ app.directive('hexbinGraph', ['DataManagerService', '$rootScope', function (Data
 app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
   var hextrackmaps = [];
-  var delay=10000; // 5000
+  var delay=5000; // 10000 scalability
   var hextrackmap = undefined;
   var center = [38.7, -9.1];
   var jsonRes=null;
@@ -242,11 +242,11 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
             angular.element($elem[0]).append(angular.element('<div id="hextrackmap'+ hexmapCount +'" style="width: 100%; height: calc(100% - 25px); border: 1px solid #ccc"></div>'));
             console.log('hextrackmap'+ hexmapCount +'');
             hextrackmaps[hexmapCount] = new L.Map('hextrackmap'+ hexmapCount +'', {center: new L.LatLng(center[0], center[1]), zoom: 10});
-            var layer_hexbin_tracks = osm.addTo(hextrackmaps[hexmapCount]);        
+            var layer_hexbin_tracks = osm.addTo(hextrackmaps[hexmapCount]);  
             createHexbinTracksGraph(jsonRes, hexmapCount);
 
             $scope.$on('$destroy', function() {
-              rootScopeBroadcast();
+              //rootScopeBroadcast();
               //rootScopeBroadcastLeave();
             });
 
@@ -274,7 +274,8 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
                 for(var i = 0; i < hexmapCount; i++) {
                   hextrackmaps[i].removeLayer(hexLayer_hexbin_tracks[i]);
                 }
-                var new_tracks = sliderProcessing(data.min_time, data.max_time, jsonRes)
+                new_tracks = sliderProcessing(data.min_time, data.max_time, jsonRes)
+                console.log(new_tracks)
                 for(var i = 0; i < hexmapCount; i++) {
                   createHexbinTracksGraph(new_tracks, i);
                 }
@@ -282,6 +283,10 @@ app.directive('hexbintracksGraph', ['DataManagerService', '$rootScope', function
 
                 
               function createHexbinTracksGraph (data, hexmapNumber) {
+
+                if (hexmapNumber >= 1) {
+                  data = new_tracks;
+                }
 
                   var options = {
                       radius : 12,
@@ -376,7 +381,7 @@ app.directive('areaGradient', ['DataManagerService', '$rootScope', function (Dat
         });
 
       $scope.$on('$destroy', function() {
-        rootScopeBroadcast();
+        //rootScopeBroadcast();
       });
 
       var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
@@ -604,22 +609,27 @@ app.directive('gpsTracks', ['DataManagerService', '$rootScope', '$http',  functi
           });
 
           $scope.$on('$destroy', function() {
-            rootScopeBroadcast();
+            //rootScopeBroadcast();
           });
 
           var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast-timeline_slider', function (event, data) {
             for(var i = 0; i < trackmapCount; i++) {
               trackmaps[i].removeLayer(runLayer[i]);
             }
-              var new_tracks = sliderProcessing(data.min_time, data.max_time, jsonRes)
+              new_tracks_list = sliderProcessing(data.min_time, data.max_time, jsonRes)
               for(var i = 0; i < trackmapCount; i++) {
-              createTracks(new_tracks, i);
+              createTracks(new_tracks_list, i);
             }
               
           });
 
 
           function createTracks (track_list, n) {
+
+
+            if (n >= 1) {
+              track_list = new_tracks_list;
+            }
               
 
               myStyle = {
@@ -811,7 +821,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
 
 
           $scope.$on('$destroy', function() {
-            rootScopeBroadcast1();
+            //rootScopeBroadcast1();
             rootScopeBroadcast2();
             rootScopeBroadcast3();
             rootScopeBroadcast4();
@@ -928,7 +938,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             if (resizeFlag == 1) {
               var dataset = [];
               for (var i = 0; i < dataset_raw.length; i++) {
-                if (dataset_raw[i].value < 90) {}  // default 10 (frequency of visit)
+                if (dataset_raw[i].value < 10) {}  // default 10 (frequency of visit), scalability 90
                 else {
                   dataset.push(dataset_raw[i]);
                 }
@@ -937,7 +947,7 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
             if (resizeFlag == 2) {
               var dataset = [];
               for (var i = 0; i < dataset_raw.length; i++) {
-                if (dataset_raw[i].value < 13260) {} // default 200 (hours spent)
+                if (dataset_raw[i].value < 200) {} // default 200 (hours spent), scalability 13260
                 else {
                   dataset.push(dataset_raw[i]);
                 }
@@ -1039,8 +1049,8 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
                       })
                       .attr("y", function(d,i) {
                           //if (d.value<=10){return};
-                          //return y(d.label)+15; // default
-                          return y(d.label)+10;
+                          return y(d.label)+15; // default
+                          //return y(d.label)+10; // scalability
                       })
                       .text(function(d){ return d.label;  //use together with limitation of the nr of bars shown
                       });
@@ -1064,46 +1074,48 @@ app.directive('barChart', ['DataManagerService', '$rootScope', function (DataMan
               var currentColor = "#1b6427";
               var nClicks = 0;
 
-              bar.on("click", function(d){
- 
-                      // Find previously selected, unselect
-                      // d3.select(".selected").classed("selected", false);
-
-                      // // Select current item
-                      // d3.select(this).classed("selected", true);
-                      // console.log(this)
-
-                      // currentColor = currentColor == "#1b6427" ? "black" : "#1b6427";
-                      // d3.select(this).style("fill", currentColor);
-                      // console.log(this)
-
-                      nClicks += 1;
-                      if (isOdd(nClicks)) {
-                        d3.select(this).classed("selected", true);
-                        $rootScope.$broadcast('rootScope:broadcast-not_inside_bar_chart', { label : d.label});
-                        div.style("left", (d3.event.layerX + 10) + "px");
-                        div.style("top", (d3.event.layerY + 10) + "px");
-                        div.style("display", "inline-block");
-                        if (resizeFlag==1) {
-                          div.html((d.value)+" times");
-                        }
-                        if (resizeFlag==2) {
-                          var hours = Math.floor(d.value / 60);          
-                          var minutes = d.value % 60;
-                          div.html(hours + " hours " + minutes + " minutes");
-                        }
-                      }
-                      if (!isOdd(nClicks)) {
-                        $rootScope.$broadcast('rootScope:broadcast-leave-not_inside_bar_chart', 'out'); 
-                        d3.select(".selected").classed("selected", false);
-                      }
-
-
-                  });
+              
+              bar.on("mouseover", function(d){
+                div.style("left", (d3.event.layerX + 10) + "px");
+                div.style("top", (d3.event.layerY + 10) + "px");
+                div.style("display", "inline-block");
+                if (resizeFlag==1) {
+                  div.html((d.value)+" times");
+                }
+                if (resizeFlag==2) {
+                  var hours = Math.floor(d.value / 60);          
+                  var minutes = d.value % 60;
+                  div.html(hours + " hours " + minutes + " minutes");
+                }
+              });
               bar.on("mouseout", function(d){
                       $rootScope.$broadcast('rootScope:broadcast-leave-not_inside_bar_chart', 'out');  
                       div.style("display", "none");
-                  });
+              });
+              bar.on("click", function(d){
+ 
+                  // Find previously selected, unselect
+                  // d3.select(".selected").classed("selected", false);
+
+                  // // Select current item
+                  // d3.select(this).classed("selected", true);
+                  // console.log(this)
+
+                  // currentColor = currentColor == "#1b6427" ? "black" : "#1b6427";
+                  // d3.select(this).style("fill", currentColor);
+                  // console.log(this)
+
+                  nClicks += 1;
+                  if (isOdd(nClicks)) {
+                    d3.select(this).classed("selected", true);
+                    $rootScope.$broadcast('rootScope:broadcast-not_inside_bar_chart', { label : d.label});
+                  }
+                  if (!isOdd(nClicks)) {
+                    $rootScope.$broadcast('rootScope:broadcast-leave-not_inside_bar_chart', 'out'); 
+                    d3.select(".selected").classed("selected", false);
+                  }
+
+              });
 
               // removed data:
               bar.exit().remove();

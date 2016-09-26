@@ -1,6 +1,6 @@
 app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (DataManagerService, $rootScope) {
 
-	var delay=550;
+	//var delay=550; // scalability
   var data=null; // instead of jsonRes to avoid replacing the name of too many variables
 
   // **************************** EXAMPLE DATA ***********************
@@ -81,7 +81,7 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
         var label_padding = 40;
         var max_block_height = 20;
         var in_transition = false;
-        //var delay=350;
+        var delay=350;
         var transition_duration = 500;
 
         // Tooltip defaults
@@ -118,25 +118,12 @@ app.directive('calendarHeatmap', ['DataManagerService', '$rootScope', function (
             height = label_padding + 7 * (item_size + gutter);
             svg.attr({'width': width, 'height': height});
             //if ( !!data && !!data[0].summary ) {
-              console.log("here1")
                 drawChart();
               //}
           });
 
         }, delay);
 
-        // var rootScopeBroadcast = $rootScope.$on('rootScope:broadcast', function (event, response) {
-        //     console.log("Calendar broadcast: " + JSON.stringify(response.calendar)); // 'Broadcast!'
-        //     removeYearOverview();
-        //     selected_date=data[0]; //hardcoded to show the first day of the data array in the day overview (proof-of-concept)
-        //     drawDayOverview();
-        // });
-
-        // var rootScopeBroadcastLeave = $rootScope.$on('rootScope:broadcast-leave', function (event, data) {
-        //   console.log("Calendar broadcast leave"); // 'Broadcast!'
-        //   removeDayOverview();
-        //   drawYearOverview();
-        // });
 
         $scope.$on('$destroy', function() {
 

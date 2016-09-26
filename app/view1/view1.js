@@ -74,8 +74,8 @@ angular.module('myApp.view1', ['ngRoute'])
 		var start = parseDate(sliderMin);
 		var future = parseDate(sliderMax);
 		var range = []
-		//var mil = 86400000 //24h
-		var mil = 2629743000 // one month *temporary*
+		var mil = 86400000 //24h
+		//var mil = 2629743000 // one month *scalability*
 		for (var i = start.getTime(); i < (future.getTime() + mil); i = i + mil) {
 		  range.push(new Date(i).toLocaleDateString())
 		}
@@ -121,6 +121,8 @@ angular.module('myApp.view1', ['ngRoute'])
 	    // remove initial page scrolling
 	    // may need to adjust graphs widths, heights and margins, though
 	    margins: [10, 10], // the pixel distance between each widget
+	    pushing: true,
+	    floating: true,
 	    swapping: true,
 	    rowHeight: 'match', // 120 if we want to adjust to the window
 	    outerMargin: true, // whether margins apply to outer edges of the grid
