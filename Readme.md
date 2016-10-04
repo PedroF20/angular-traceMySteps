@@ -16,11 +16,11 @@ AngularJS development of the front-end for traceMySteps. Works with the back-end
 
 <s>5) Bind all the visualizations & bind with date slider.</s>
 
-6) Optimize code, performance & styling - Correct eventual bugs.
+<s>6) Optimize code, performance & styling - Correct eventual bugs.</s>
 
-7) Perform heuristic and user tests.
+<s>7) Perform heuristic and user tests.</s>
 
-8) Deploy the webapp.
+<s>8) Deploy the webapp.</s>
 
 9) Write its paper.
 
